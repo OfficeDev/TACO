@@ -45,7 +45,7 @@
             "metadata": {
                 "description": "Location of the ZIP files with the Azure Functions definition"
             },
-            "defaultValue": "https://github.com/johanveldhuis/AAandCQManagementApp/blob/main/Packages/Azure/artifact.zip?raw=true"
+            "defaultValue": "https://github.com/OfficeDev/AAandCQManagementApp/blob/main/Packages/Azure/artifact.zip?raw=true"
         }
     },
     "variables": {
