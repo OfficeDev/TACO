@@ -1,0 +1,27 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "resourcePrefix": {
+            "value": "Teams"
+        },
+        "serviceAccountUPN": {
+            "value": "service@tenant.onmicrosoft.com"
+        },
+        "serviceAccountSecret": {
+            "value": "XXXXXXXXXX"
+        },      
+        "clientID": {
+            "value": "XXXXXXXXXX"
+        },      
+        "appSecret": {
+            "value": "XXXXXXXXXX"
+        },                   
+        "TeamsPSModuleVersion" : {
+            "value": "4.3.0"
+        },                           
+        "packageURI" : {
+            "value": "https://github.com/johanveldhuis/AAandCQManagementApp/blob/main/Packages/Azure/artifact.zip?raw=true"
+        }
+    }
+}

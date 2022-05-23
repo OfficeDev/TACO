@@ -1,0 +1,6 @@
+connect-pnponline -url https://myuclabnl.sharepoint.com/sites/Teamsvoicemanagement -interactive
+
+get-pnpsitetemplate -out c:\temp\Lists.xml -ListsToExtract "Auto Attendant - holidays","Auto Attendant management","Call Queue management", "Holidays","User administration", "Voice management audit log" -Handlers Lists
+
+connect-pnponline -url https://m365x18873442.sharepoint.com/sites/Teamsvoicemanagement -interactive
+invoke-pnpsitetemplate -path c:\temp\Lists.xml
