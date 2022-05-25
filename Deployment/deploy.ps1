@@ -1,11 +1,12 @@
 Param (
-    [parameter(mandatory = $false)] $displayName = "Teams Auto Attendant and Call Queue Management3",   # Display name for your application registered in Azure AD 
-    [parameter(mandatory = $false)] $rgName = "Teams-AA-and-CQ-Management3",        # Name of the resource group for Azure
-    [parameter(mandatory = $false)] $resourcePrefix = "AACQMgmt",                  # Prefix for the resources deployed on your Azure subscription (should be less than 11 characters)
-    [parameter(mandatory = $false)] $location = 'westeurope',                   # Location (region) where the Azure resource are deployed
+    [parameter(mandatory = $true)] $displayName,   # Display name for your application registered in Azure AD 
+    [parameter(mandatory = $true)] [ValidateLength(3, 24)] $rgName,        # Name of the resource group for Azure
+    [parameter(mandatory = $true)] [ValidateLength(3, 11)] $resourcePrefix,                  # Prefix for the resources deployed on your Azure subscription (should be less than 11 characters)
+    [parameter(mandatory = $true)] $location,                   # Location (region) where the Azure resource are deployed
     [parameter(mandatory = $true)] $serviceAccountUPN,                          # AzureAD Service Account UPN
     [parameter(mandatory = $true)] $serviceAccountSecret,                        # AzureAD Service Account password
-    [parameter(mandatory = $false)] $teamsPSModuleVersion = "4.3.0"              # Microsoft Teams PowerShell module version
+    [parameter(mandatory = $false)] $teamsPSModuleVersion = "4.3.0",              # Microsoft Teams PowerShell module version
+    [parameter(mandatory = $false)] $subscriptionID               # Microsoft Azure Subscription id  
 )
 
 $base = $PSScriptRoot
@@ -44,7 +45,7 @@ Write-Host -ForegroundColor blue "Azure sign-in request - Please check the sign-
 
 Try
 {
-    Connect-AzAccount -WarningAction Ignore -ErrorAction Stop
+    Connect-AzAccount -WarningAction Ignore -ErrorAction Stop |Out-Null
 }
 Catch
 {
@@ -53,19 +54,26 @@ Catch
 }
 
 # Validating if multiple Azure Subscriptions are active
-[array]$AzSubscriptions = Get-AzSubscription |Where-Object {$_.State -eq "Enabled"}
-$menu = @{}
-If($(Get-AzSubscription |Where-Object {$_.State -eq "Enabled"}).Count -gt 1)
+If($subscriptionID -eq $null)
 {
-    Write-Host "Multiple active Azure Subscriptions found, please select a subscription from the list below:"
-    for ($i=1;$i -le $AzSubscriptions.count; $i++) 
-    { 
-            Write-Host "$i. $($AzSubscriptions[$i-1].Id)" 
-            $menu.Add($i,($AzSubScriptions[$i-1].Id))
+    [array]$AzSubscriptions = Get-AzSubscription |Where-Object {$_.State -eq "Enabled"}
+    $menu = @{}
+    If($(Get-AzSubscription |Where-Object {$_.State -eq "Enabled"}).Count -gt 1)
+    {
+        Write-Host "Multiple active Azure Subscriptions found, please select a subscription from the list below:"
+        for ($i=1;$i -le $AzSubscriptions.count; $i++) 
+        { 
+                Write-Host "$i. $($AzSubscriptions[$i-1].Id)" 
+                $menu.Add($i,($AzSubScriptions[$i-1].Id))
+        }
+        [int]$AZSelectedSubscription = Read-Host 'Enter selection'
+        $selection = $menu.Item($AZSelectedSubscription) ; 
+        Select-AzSubscription -Subscription $selection | Out-Null
     }
-    [int]$AZSelectedSubscription = Read-Host 'Enter selection'
-    $selection = $menu.Item($AZSelectedSubscription) ; 
-    Select-AzSubscription -Subscription $selection
+}
+else
+{
+    Select-AzSubscription -Subscription $subscriptionID | Out-Null
 }
 
 Write-Host -ForegroundColor blue "Checking if app '$displayName' is already registered"
@@ -124,7 +132,7 @@ If([string]::IsNullOrEmpty($AADapp)){
 
 Write-Host -ForegroundColor blue "Deploy resource to Azure subscription"
 Try {
-    New-AzResourceGroup -Name $rgName -Location $location -Force -ErrorAction Stop
+    New-AzResourceGroup -Name $rgName -Location $location -Force -ErrorAction Stop | Out-Null
 }    
 Catch {
     Write-Error "Azure Resource Group creation failed - Please verify your permissions on the subscription and review detailed error description below"
@@ -146,8 +154,12 @@ $parameters = @{
 $outputs = New-AzResourceGroupDeployment -ResourceGroupName $rgName -TemplateFile $base\ZipDeploy\azuredeploy.json -TemplateParameterObject $parameters -Name $deploymentName
 If ($outputs.provisioningState -ne 'Succeeded') {
     Write-Error "ARM deployment failed with error"
-    Write-Error "Please retry deployment"
-    $outputs
+    $retry = Read-Host "Do you want to retry the deployment (yes/no)?"
+    
+    if($retry -eq "yes")
+    {
+        $outputs = New-AzResourceGroupDeployment -ResourceGroupName $rgName -TemplateFile $base\ZipDeploy\azuredeploy.json -TemplateParameterObject $parameters -Name $deploymentName
+    }    
     return
 }
 
@@ -204,17 +216,17 @@ $GraphServicePrincipal = Get-MgServicePrincipal -Filter "startswith(DisplayName,
 # Assigning sites read all permissions
 $PermissionName = "Sites.ReadWrite.All" 
 $AppRole = $GraphServicePrincipal.AppRoles | Where-Object {$_.Value -eq $PermissionName -and $_.AllowedMemberTypes -contains "Application"}
-New-MgServicePrincipalAppRoleAssignment -AppRoleId $AppRole.Id -ServicePrincipalId $MSI.identityprincipalid -ResourceId $GraphServicePrincipal.Id -PrincipalId $MSI.IdentityPrincipalId
+New-MgServicePrincipalAppRoleAssignment -AppRoleId $AppRole.Id -ServicePrincipalId $MSI.identityprincipalid -ResourceId $GraphServicePrincipal.Id -PrincipalId $MSI.IdentityPrincipalId | Out-Null
 
 # Assigning files read all permissions
 $PermissionName = "Files.Read.All"
 $AppRole = $GraphServicePrincipal.AppRoles | Where-Object {$_.Value -eq $PermissionName -and $_.AllowedMemberTypes -contains "Application"}
-New-MgServicePrincipalAppRoleAssignment -AppRoleId $AppRole.Id -ServicePrincipalId $MSI.IdentityPrincipalId -ResourceId $GraphServicePrincipal.Id -PrincipalId $MSI.IdentityPrincipalId
+New-MgServicePrincipalAppRoleAssignment -AppRoleId $AppRole.Id -ServicePrincipalId $MSI.IdentityPrincipalId -ResourceId $GraphServicePrincipal.Id -PrincipalId $MSI.IdentityPrincipalId | Out-Null
 
 # Assigning group read all permissions
 $PermissionName = "Group.Read.All"
 $AppRole = $GraphServicePrincipal.AppRoles | Where-Object {$_.Value -eq $PermissionName -and $_.AllowedMemberTypes -contains "Application"}
-New-MgServicePrincipalAppRoleAssignment -AppRoleId $AppRole.Id -ServicePrincipalId $MSI.IdentityPrincipalId -ResourceId $GraphServicePrincipal.Id -PrincipalId $MSI.IdentityPrincipalId
+New-MgServicePrincipalAppRoleAssignment -AppRoleId $AppRole.Id -ServicePrincipalId $MSI.IdentityPrincipalId -ResourceId $GraphServicePrincipal.Id -PrincipalId $MSI.IdentityPrincipalId | Out-Null
 
 # Generating outputs
 $outputsData = [ordered]@{

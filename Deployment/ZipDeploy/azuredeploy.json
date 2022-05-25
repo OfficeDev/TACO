@@ -108,9 +108,9 @@
             },
             "resources": [
                 {
-                    "apiVersion": "2020-12-01",
-                    "name": "[concat(variables('functionAppName'), '/web')]",
-                    "type": "Microsoft.Web/sites/config",
+                    "apiVersion": "2021-02-01",
+                    "name": "web",
+                    "type": "config",
                     "dependsOn": [
                         "[resourceId('Microsoft.Web/Sites', variables('functionAppName'))]"
                     ],
@@ -121,9 +121,9 @@
                     }
                 },   
                 {
-                    "apiVersion": "2020-12-01",
-                    "name": "[concat(variables('functionAppName'), '/authsettingsV2')]",
-                    "type": "Microsoft.Web/sites/config",
+                    "apiVersion": "2021-02-01",
+                    "name": "authsettingsV2",
+                    "type": "config",
                     "dependsOn": [
                         "[resourceId('Microsoft.Web/Sites', variables('functionAppName'))]",
                         "[resourceId('Microsoft.Web/sites/config', variables('functionAppName'), 'web')]"
@@ -150,8 +150,8 @@
                 },                 
                 {
                     "apiVersion": "2021-02-01",
-                    "name": "[concat(variables('functionAppName'), '/appsettings')]",
-                    "type": "Microsoft.Web/sites/config",
+                    "name": "appsettings",
+                    "type": "config",
                     "dependsOn": [
                         "[resourceId('Microsoft.Web/sites', variables('functionAppName'))]",
                         "[resourceId('Microsoft.Web/sites/config', variables('functionAppName'), 'web')]",
@@ -190,7 +190,7 @@
                         "objectId": "[reference(resourceId('Microsoft.Web/sites/', variables('functionAppName')), '2020-12-01', 'Full').identity.principalId]",
                         "permissions": {
                             "secrets": [
-                                "Get"
+                                "get"
                             ]
                         }
                     }                  
@@ -204,7 +204,7 @@
                 {
                     "type": "Microsoft.KeyVault/vaults/secrets",
                     "name": "[concat(variables('keyVaultName'), '/Teams-service-account-name')]",
-                    "apiVersion": "2021-04-01-preview",
+                    "apiVersion": "2021-11-01-preview",
                     "dependsOn": [
                         "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]"
                     ],
@@ -219,7 +219,7 @@
                 {
                     "type": "Microsoft.KeyVault/vaults/secrets",
                     "name": "[concat(variables('keyVaultName'), '/Teams-service-account-secret')]",
-                    "apiVersion": "2021-04-01-preview",
+                    "apiVersion": "2021-11-01-preview",
                     "dependsOn": [
                         "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]"
                     ],
@@ -234,7 +234,7 @@
                 {
                     "type": "Microsoft.KeyVault/vaults/secrets",
                     "name": "[concat(variables('keyVaultName'), '/Teams-AA-CQ-Management-appSecret')]",
-                    "apiVersion": "2021-04-01-preview",
+                    "apiVersion": "2021-11-01-preview",
                     "dependsOn": [
                         "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]"
                     ],
