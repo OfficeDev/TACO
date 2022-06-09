@@ -1,9 +1,9 @@
 Param (
-    [parameter(mandatory = $true)] $displayName,   # Display name for your application registered in Azure AD 
-    [parameter(mandatory = $true)] [ValidateLength(3, 24)] $rgName,        # Name of the resource group for Azure
-    [parameter(mandatory = $true)] [ValidateLength(3, 11)] $resourcePrefix,                  # Prefix for the resources deployed on your Azure subscription (should be less than 11 characters)
-    [parameter(mandatory = $true)] $location,                   # Location (region) where the Azure resource are deployed
-    [parameter(mandatory = $true)] $serviceAccountUPN,                          # AzureAD Service Account UPN
+    [parameter(mandatory = $true)] [string]$displayName,   # Display name for your application registered in Azure AD 
+    [parameter(mandatory = $true)] [ValidateLength(3, 24)] [string]$rgName,        # Name of the resource group for Azure
+    [parameter(mandatory = $true)] [ValidateLength(3, 11)] [string]$resourcePrefix,                  # Prefix for the resources deployed on your Azure subscription (should be less than 11 characters)
+    [parameter(mandatory = $true)] [string]$location,                   # Location (region) where the Azure resource are deployed
+    [parameter(mandatory = $true)] [string]$serviceAccountUPN,                          # AzureAD Service Account UPN
     [parameter(mandatory = $true)] $serviceAccountSecret,                        # AzureAD Service Account password
     [parameter(mandatory = $false)] $teamsPSModuleVersion = "4.3.0",              # Microsoft Teams PowerShell module version
     [parameter(mandatory = $false)] $subscriptionID               # Microsoft Azure Subscription id  
@@ -137,7 +137,6 @@ Try {
 Catch {
     Write-Error "Azure Resource Group creation failed - Please verify your permissions on the subscription and review detailed error description below"
     $_.Exception.Message
-    return
 }
 
 Write-Host -ForegroundColor blue "Resource Group $rgName created in location $location - Now initiating Azure resource deployments..."
@@ -158,9 +157,9 @@ If ($outputs.provisioningState -ne 'Succeeded') {
     
     if($retry -eq "yes")
     {
+        Write-Host "Retrying deployment Azure resource deployments"
         $outputs = New-AzResourceGroupDeployment -ResourceGroupName $rgName -TemplateFile $base\ZipDeploy\azuredeploy.json -TemplateParameterObject $parameters -Name $deploymentName
     }    
-    return
 }
 
 Write-Host -ForegroundColor blue "ARM template deployed successfully"
@@ -174,7 +173,6 @@ Try {
 Catch {
     Write-Error "Error - Couldn't assign user permissions to get,list the KeyVault secrets - Please review detailed error message below"
     $_.Exception.Message
-    return
 }
 
 Write-Host -ForegroundColor blue "Getting the Azure Function App key for warm-up test"
@@ -193,7 +191,6 @@ if($result -and $result.StatusCode -eq 200)
 }
 else {
     Write-Error "Couldn't retrieve the Azure Function app master key - Warm-up tests not executed"
-    return
 }
 
 Write-Host -ForegroundColor blue "Waiting 2 min to let the Azure function app to start"
