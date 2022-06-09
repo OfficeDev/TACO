@@ -73,9 +73,6 @@ If ($StatusCode -eq [HttpStatusCode]::OK) {
     }
 }
 
-Write-Host $StatusCode
-Write-Host "retrieving auto attendant id"
-
 # Retrieving auto attendant information
 If ($StatusCode -eq [HttpStatusCode]::OK) {
     Try {
@@ -88,8 +85,14 @@ If ($StatusCode -eq [HttpStatusCode]::OK) {
     }
 }
 
+# Retrieving holiday schedule information
+$holiday = $AutoAttendant.Schedules|where-object {$_.Name -eq $AAHolidayName -and $_.Type -eq "Fixed"}
+
+# Retrieving call handling association
+$CallHandlingAssociation = $AutoAttendant.CallhandlingAssociations |Where {$_.ScheduleId -eq $($holiday.Id)}
+write-host "Call handlind: $CallHandlingAssociation"
+
 # Updating prompt
-Write-Host "updating prompt"
 If ($StatusCode -eq [HttpStatusCode]::OK) {
     Try {
             If ($AAHolidayGreetingAudio -ne $null -and $AAHolidayGreetingType -eq "audio")
@@ -114,10 +117,9 @@ If ($StatusCode -eq [HttpStatusCode]::OK) {
 } 
 
 # Modifying call flow
-Write-Host "Modify call flow"
 If ($StatusCode -eq [HttpStatusCode]::OK -and $Greeting -ne $null) {
     Try {
-            $($Autoattendant.CallFlows |where Name -eq $AAHolidayName).Greetings = @($Greeting)
+            $($Autoattendant.CallFlows|where-object {$_.id -eq $($CallHandlingAssociation.CallFlowId)})
         }
     Catch {
         $CallFlow = @{ "Error" = $_.Exception.Message }
@@ -128,13 +130,12 @@ If ($StatusCode -eq [HttpStatusCode]::OK -and $Greeting -ne $null) {
 
 # Modify call routing
 # Reconfiguring menu options"
-Write-Host "Reconfiguring menu options"
 If ($StatusCode -eq [HttpStatusCode]::OK) {
     Try {
             if($AAHolidayRedirectType -eq "Disconnect")
             {
                 $HolidayMenuOption = New-CsAutoAttendantMenuOption -Action DisconnectCall -DtmfResponse Automatic
-                $($AutoAttendant.CallFlows | where name -eq $AAHolidayName).menu.menuoptions = @($HolidayMenuOption)
+                $($AutoAttendant.CallFlows | where-object {$_.id -eq $($CallHandlingAssociation.CallFlowId)}).menu.menuoptions = @($HolidayMenuOption)
                 
             }
             if($AAHolidayRedirectType -eq "Redirect: Person in organization")
@@ -143,14 +144,14 @@ If ($StatusCode -eq [HttpStatusCode]::OK) {
                 $ObjectId = $(Get-CsOnlineUser -Identity $AAHolidayRedirectTarget -ErrorAction Stop|Select Identity)
                 $Callable_Entity = New-CsAutoAttendantCallableEntity -Identity $ObjectId.Identity -Type User
                 $HolidayMenuOption = New-CsAutoAttendantMenuOption -Action TransferCallToTarget -DtmfResponse "automatic" -CallTarget $Callable_Entity
-                $($AutoAttendant.CallFlows | where name -eq $AAHolidayName).menu.menuoptions = @($HolidayMenuOption)                
+                $($AutoAttendant.CallFlows | where-object {$_.id -eq $($CallHandlingAssociation.CallFlowId)}).menu.menuoptions = @($HolidayMenuOption)                
             }
             if($AAHolidayRedirectType -eq "Redirect: Voice app")
             {
-                $ObjectId = $(Get-CsOnlineUser -Identity $AAHolidayRedirectTarget-ErrorAction Stop|Select Identity)
+                $ObjectId = $(Get-CsOnlineUser -Identity $AAHolidayRedirectTarget -ErrorAction Stop|Select Identity)
                 $Callable_Entity = New-CsAutoAttendantCallableEntity -Identity $ObjectId.Identity -Type ApplicationEndpoint
                 $HolidayMenuOption = New-CsAutoAttendantMenuOption -Action TransferCallToTarget -DtmfResponse "automatic" -CallTarget $Callable_Entity
-                $($AutoAttendant.CallFlows | where name -eq $AAHolidayName).menu.menuoptions = @($HolidayMenuOption)
+                $($AutoAttendant.CallFlows | where-object {$_.id -eq $($CallHandlingAssociation.CallFlowId)}).menu.menuoptions = @($HolidayMenuOption)
                 
             }
             if($AAHolidayRedirectType -eq "Redirect: External phone number")
@@ -158,7 +159,7 @@ If ($StatusCode -eq [HttpStatusCode]::OK) {
                 $CallForwardNumber = "tel:" + $AAHolidayRedirectTarget
                 $Callable_Entity = New-CsAutoAttendantCallableEntity -Identity $CallForwardNumber -Type ExternalPSTN
                 $HolidayMenuOption = New-CsAutoAttendantMenuOption -Action TransferCallToTarget -DtmfResponse "automatic" -CallTarget $Callable_Entity
-                $($AutoAttendant.CallFlows | where name -eq $AAHolidayName).menu.menuoptions = @($HolidayMenuOption)
+                $($AutoAttendant.CallFlows | where-object {$_.id -eq $($CallHandlingAssociation.CallFlowId)}).menu.menuoptions = @($HolidayMenuOption)
                 
             } 
             if($AAHolidayRedirectType -eq "Redirect: Voicemail")
@@ -168,7 +169,7 @@ If ($StatusCode -eq [HttpStatusCode]::OK) {
                 $ObjectId = ($GroupInfo | select-object Value).Value.id
                 $Callable_Entity = New-CsAutoAttendantCallableEntity -Identity $ObjectId.Identity -Type SharedVoicemail
                 $HolidayMenuOption = New-CsAutoAttendantMenuOption -Action TransferCallToTarget -DtmfResponse "automatic" -CallTarget $Callable_Entity
-                $($AutoAttendant.CallFlows | where name -eq $AAHolidayName).menu.menuoptions = @($HolidayMenuOption)
+                $($AutoAttendant.CallFlows | where-object {$_.id -eq $($CallHandlingAssociation.CallFlowId)}).menu.menuoptions = @($HolidayMenuOption)
                 
             }                                                   
         }

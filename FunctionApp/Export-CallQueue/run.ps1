@@ -22,6 +22,8 @@ Write-Host "PowerShell HTTP trigger function processed a request."
 # Initialize PS script
 $StatusCode = [HttpStatusCode]::OK
 $Resp = ConvertTo-Json @()
+$CallQueues = @()
+$output = @()
 
 # Validate the request JSON body against the schema_validator
 $Schema = Get-jsonSchema ('Export-CallQueue')
@@ -64,6 +66,7 @@ Import-Module $AuthentionModuleLocation
 $GroupModuleLocation = ".\Modules\GetGroupInfo\GetGroupInfo.psd1"
 Import-Module $GroupModuleLocation
 
+        Connect-MicrosoftTeams -Credential $Credential -ErrorAction Stop
 # Connect to Microsoft Teams
 If ($StatusCode -eq [HttpStatusCode]::OK) {
     Try {
@@ -76,131 +79,153 @@ If ($StatusCode -eq [HttpStatusCode]::OK) {
     }
 }
 
-# Collecting information about Call Queue
-$cq = Get-CsCallQueue -Name $CQName
-
-# Retrieving displayname for overflow action target
-If($cq.OverflowActionTarget.Id -ne $null)
+If($($Request.Body.Identity) -eq $null)
 {
-    If($(Test-IsGuid -StringGuid $cq.OverflowActionTarget.Id) -and $cq.OverflowAction -ne "SharedVoicemail")
-    {
-        write-host "running get-csonlineuser"
-        $OverflowActionTarget = $(Get-CsOnlineuser $cq.OverflowActionTarget.Id).DisplayName
-    }
-    ElseIf($cq.OverflowAction -eq "SharedVoicemail")
-    {
-        write-host "getting group info"
-        $authHeader = Get-AuthenticationToken
-        $OverflowActionTarget = $(Get-GroupObjectInfo -Token $authHeader -ObjectId $cq.OverflowActionTarget.Id).displayName
-        write-host "overflow: $OverflowActionTarget"
-    }
-    Else
-    {
-        $OverflowActionTarget = $($cq.OverflowActionTarget.Id).split(":")[0]
-    }
-}
-
-# Retrieving displayname for timeout action target
-If($cq.TimeoutActionTarget -ne $null)
-{
-    If($(Test-IsGuid -StringGuid $cq.TimeoutActionTarget) -and $cq.TimeoutAction -ne "SharedVoicemail")
-    {
-        $TimeoutActionTarget = Get-CsOnlineuser $cq.TimeoutActionTarget
-    }
-    ElseIf($cq.TimeoutAction -eq "SharedVoicemail")
-    {
-        $authHeader = Get-AuthenticationToken
-        $TimeoutActionTarget = $(Get-GroupObjectInfo -Token $authHeader -ObjectId $cq.TimeoutActionTarget.Id).displayName
-    }    
-    Else
-    {
-        $TimeoutActionTarget = $($cq.TimeoutActionTarget).split(":")[0]
-    }
-}
-
-
-# Determining greeting music type
-If($cq.WelcomeMusicFileName -eq $null)
-{
-    $UseDefaultWelcomeMusic = "Default"
+    $CallQueues = Get-CsCallQueue | Select Name
 }
 Else
 {
-    $UseDefaultWelcomeMusic = "Custom"
-}
-
-# Determining MoH music type
-If($cq.UseDefaultMusicOnHold)
-{
-    $UseDefaultOnHoldMusic = "Default"
-}
-Else
-{
-    $UseDefaultOnHoldMusic = "Custom"
+    $CallQueues = Get-CsCallQueue -Name $($Request.Body.Identity)| Select Name    
 }
 
 
-# Determining overflow action
-If($cq.OverflowAction -eq "Disconnect")
+foreach ($CQName in $CallQueues)
 {
-    $OverflowAction = "Disconnect"
-}
-ElseIf($cq.OverflowAction -eq "Forward" -and $cq.OverflowActionTarget -eq "User") 
-{
-    $OverflowAction = "Redirect: Person in organization"
-}
-ElseIf($cq.OverflowAction -eq "Forward" -and $cq.OverflowActionTarget -eq "ApplicationEndpoint") 
-{
-    $OverflowAction = "Redirect: Voice app"
-}
-ElseIf($cq.OverflowAction -eq "Forward" -and $cq.OverflowActionTarget -eq "Phone") 
-{
-    $OverflowAction = "Redirect: External phone number"
-}
-ElseIf($cq.OverflowAction -eq "SharedVoicemail") 
-{
-    $OverflowAction = "Redirect: Voicemail"
-}
+    $UseDefaultOnHoldMusic = $null
+    $UseDefaultWelcomeMusic = $null
+    $OverflowAction = $null
+    $OverflowActionTarget = $null
+    $TimeoutAction = $null
+    $TimeoutActionTarget = $null
 
-# Determining timeout action
-If($cq.TimeoutAction -eq "Disconnect")
-{
-    $TimeoutAction = "Disconnect"
-}
-ElseIf($cq.TimeoutAction -eq "Forward" -and $cq.TimeoutActionTarget -eq "User") 
-{
-    $TimeoutAction = "Redirect: Person in organization"
-}
-ElseIf($cq.OverflowAction -eq "Forward" -and $cq.TimeoutActionTarget -eq "ApplicationEndpoint") 
-{
-    $TimeoutwAction = "Redirect: Voice app"
-}
-ElseIf($cq.TimeOutAction -eq "Forward" -and $cq.TimeoutActionTarget -eq "Phone") 
-{
-    $TimeoutAction = "Redirect: External phone number"
-}
-ElseIf($cq.TimeOutAction -eq "SharedVoicemail") 
-{
-    $TimeoutAction = "Redirect: Voicemail"
-}
+    # Collecting information about Call Queue
+    $cq = Get-CsCallQueue -Name $CQName.Name
 
-$output = New-Object -TypeName PSObject
-$output | Add-Member -MemberType NoteProperty -Name Name -Value $cq.Name
-$output | Add-Member -MemberType NoteProperty -Name AgentAlertTime -Value $cq.AgentAlertTime
-$output | Add-Member -MemberType NoteProperty -Name OverflowThreshold -Value $cq.OverflowThreshold
-$output | Add-Member -MemberType NoteProperty -Name OverflowAction -Value $OverflowAction
-$output | Add-Member -MemberType NoteProperty -Name OverflowActionTarget -Value $OverflowActionTarget
-$output | Add-Member -MemberType NoteProperty -Name OverflowSharedTextToSpeechPrompt -Value $cq.OverflowSharedVoicemailTextToSpeechPrompt
-$output | Add-Member -MemberType NoteProperty -Name OverflowSharedVoicemailAudioFilePromptFileName -Value $cq.OverflowSharedVoicemailAudioFilePromptFileName
-$output | Add-Member -MemberType NoteProperty -Name TimeoutThreshold -Value $cq.TimeoutThreshold
-$output | Add-Member -MemberType NoteProperty -Name TimeoutAction -Value $TimeoutAction
-$output | Add-Member -MemberType NoteProperty -Name TimeoutActionTarget -Value $TimeoutActionTarget
-$output | Add-Member -MemberType NoteProperty -Name TimeoutSharedTextToSpeechPrompt -Value $cq.TimeoutSharedVoicemailTextToSpeechPrompt
-$output | Add-Member -MemberType NoteProperty -Name TimeoutSharedVoicemailAudioFilePromptFileName -Value $cq.TimeoutSharedVoicemailAudioFilePromptFileName
-$output | Add-Member -MemberType NoteProperty -Name UseDefaultWelcomeMusic -Value $UseDefaultWelcomeMusic
-$output | Add-Member -MemberType NoteProperty -Name WelcomeMusicFileName -Value $cq.WelcomeMusicFileName
-$output | Add-Member -MemberType NoteProperty -Name UseDefaultMusicOnHold -Value $UseDefaultOnHoldMusic
-$output | Add-Member -MemberType NoteProperty -Name MusicOnHoldFileName -Value $cq.MusicOnHoldFileName
+    # Retrieving displayname for overflow action target
+    If($cq.OverflowActionTarget.Id -ne $null)
+    {
+        If($(Test-IsGuid -StringGuid $cq.OverflowActionTarget.Id) -and $cq.OverflowAction -ne "SharedVoicemail")
+        {
+            write-host "running get-csonlineuser"
+            $OverflowActionTarget = $(Get-CsOnlineuser $cq.OverflowActionTarget.Id).DisplayName
+        }
+        ElseIf($cq.OverflowAction -eq "SharedVoicemail")
+        {
+            write-host "getting group info"
+            $authHeader = Get-AuthenticationToken
+            $OverflowActionTarget = $(Get-GroupObjectInfo -Token $authHeader -ObjectId $cq.OverflowActionTarget.Id).displayName
+            write-host "overflow: $OverflowActionTarget"
+        }
+        Else
+        {
+            $OverflowActionTarget = $($cq.OverflowActionTarget.Id).split(":")[0]
+        }
+    }
+
+    # Retrieving displayname for timeout action target
+    If($cq.TimeoutActionTarget -ne $null)
+    {
+        If($(Test-IsGuid -StringGuid $cq.TimeoutActionTarget) -and $cq.TimeoutAction -ne "SharedVoicemail")
+        {
+            $TimeoutActionTarget = Get-CsOnlineuser $cq.TimeoutActionTarget
+        }
+        ElseIf($cq.TimeoutAction -eq "SharedVoicemail")
+        {
+            $authHeader = Get-AuthenticationToken
+            $TimeoutActionTarget = $(Get-GroupObjectInfo -Token $authHeader -ObjectId $cq.TimeoutActionTarget.Id).displayName
+        }    
+        Else
+        {
+            $TimeoutActionTarget = $($cq.TimeoutActionTarget).split(":")[0]
+        }
+    }
+
+
+    # Determining greeting music type
+    If($cq.WelcomeMusicFileName -eq $null)
+    {
+        $UseDefaultWelcomeMusic = "Default"
+    }
+    Else
+    {
+        $UseDefaultWelcomeMusic = "Custom"
+    }
+
+    # Determining MoH music type
+    If($cq.UseDefaultMusicOnHold)
+    {
+        $UseDefaultOnHoldMusic = "Default"
+    }
+    Else
+    {
+        $UseDefaultOnHoldMusic = "Custom"
+    }
+
+
+    # Determining overflow action
+    If($cq.OverflowAction -eq "Disconnect")
+    {
+        $OverflowAction = "Disconnect"
+    }
+    ElseIf($cq.OverflowAction -eq "Forward" -and $cq.OverflowActionTarget -eq "User") 
+    {
+        $OverflowAction = "Redirect: Person in organization"
+    }
+    ElseIf($cq.OverflowAction -eq "Forward" -and $cq.OverflowActionTarget -eq "ApplicationEndpoint") 
+    {
+        $OverflowAction = "Redirect: Voice app"
+    }
+    ElseIf($cq.OverflowAction -eq "Forward" -and $cq.OverflowActionTarget -eq "Phone") 
+    {
+        $OverflowAction = "Redirect: External phone number"
+    }
+    ElseIf($cq.OverflowAction -eq "SharedVoicemail") 
+    {
+        $OverflowAction = "Redirect: Voicemail"
+    }
+
+    # Determining timeout action
+    If($cq.TimeoutAction -eq "Disconnect")
+    {
+        $TimeoutAction = "Disconnect"
+    }
+    ElseIf($cq.TimeoutAction -eq "Forward" -and $cq.TimeoutActionTarget -eq "User") 
+    {
+        $TimeoutAction = "Redirect: Person in organization"
+    }
+    ElseIf($cq.OverflowAction -eq "Forward" -and $cq.TimeoutActionTarget -eq "ApplicationEndpoint") 
+    {
+        $TimeoutwAction = "Redirect: Voice app"
+    }
+    ElseIf($cq.TimeOutAction -eq "Forward" -and $cq.TimeoutActionTarget -eq "Phone") 
+    {
+        $TimeoutAction = "Redirect: External phone number"
+    }
+    ElseIf($cq.TimeOutAction -eq "SharedVoicemail") 
+    {
+        $TimeoutAction = "Redirect: Voicemail"
+    }
+
+    $cqoutput = New-Object -TypeName PSObject
+    $cqoutput | Add-Member -MemberType NoteProperty -Name Name -Value $cq.Name
+    $cqoutput | Add-Member -MemberType NoteProperty -Name AgentAlertTime -Value $cq.AgentAlertTime
+    $cqoutput | Add-Member -MemberType NoteProperty -Name OverflowThreshold -Value $cq.OverflowThreshold
+    $cqoutput | Add-Member -MemberType NoteProperty -Name OverflowAction -Value $OverflowAction
+    $cqoutput | Add-Member -MemberType NoteProperty -Name OverflowActionTarget -Value $OverflowActionTarget
+    $cqoutput | Add-Member -MemberType NoteProperty -Name OverflowSharedTextToSpeechPrompt -Value $cq.OverflowSharedVoicemailTextToSpeechPrompt
+    $cqoutput | Add-Member -MemberType NoteProperty -Name OverflowSharedVoicemailAudioFilePromptFileName -Value $cq.OverflowSharedVoicemailAudioFilePromptFileName
+    $cqoutput | Add-Member -MemberType NoteProperty -Name TimeoutThreshold -Value $cq.TimeoutThreshold
+    $cqoutput | Add-Member -MemberType NoteProperty -Name TimeoutAction -Value $TimeoutAction
+    $cqoutput | Add-Member -MemberType NoteProperty -Name TimeoutActionTarget -Value $TimeoutActionTarget
+    $cqoutput | Add-Member -MemberType NoteProperty -Name TimeoutSharedTextToSpeechPrompt -Value $cq.TimeoutSharedVoicemailTextToSpeechPrompt
+    $cqoutput | Add-Member -MemberType NoteProperty -Name TimeoutSharedVoicemailAudioFilePromptFileName -Value $cq.TimeoutSharedVoicemailAudioFilePromptFileName
+    $cqoutput | Add-Member -MemberType NoteProperty -Name UseDefaultWelcomeMusic -Value $UseDefaultWelcomeMusic
+    $cqoutput | Add-Member -MemberType NoteProperty -Name WelcomeMusicFileName -Value $cq.WelcomeMusicFileName
+    $cqoutput | Add-Member -MemberType NoteProperty -Name UseDefaultMusicOnHold -Value $UseDefaultOnHoldMusic
+    $cqoutput | Add-Member -MemberType NoteProperty -Name MusicOnHoldFileName -Value $cq.MusicOnHoldFileName
+
+    $output += $cqoutput
+}
 
 $output = $output|ConvertTo-Json
 
