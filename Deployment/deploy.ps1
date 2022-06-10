@@ -164,27 +164,42 @@ If ($outputs.provisioningState -ne 'Succeeded') {
 
 Write-Host -ForegroundColor blue "ARM template deployed successfully"
 
-# Assign current user with the permissions to list and read Azure KeyVault secrets (to enable the connection with the Power Automate flow)
 $CurrentUserId = Get-AzContext | ForEach-Object account | ForEach-Object Id
-Write-Host -ForegroundColor blue "Assigning 'Secrets List & Get' policy on Azure KeyVault for user $CurrentUserId"
-Try {
-    Set-AzKeyVaultAccessPolicy -VaultName $outputs.Outputs.azKeyVaultName.Value -ResourceGroupName $rgName -UserPrincipalName $CurrentUserId -PermissionsToSecrets list,get
-}
-Catch {
-    Write-Error "Error - Couldn't assign user permissions to get,list the KeyVault secrets - Please review detailed error message below"
-    $_.Exception.Message
-}
 
-# Assign service account with the permissions to list and read Azure KeyVault secrets (to enable the connection with the Power Automate flow)
-Write-Host -ForegroundColor blue "Assigning 'Secrets List & Get' policy on Azure KeyVault for user $serviceAccountUPN"
-Try {
-    Set-AzKeyVaultAccessPolicy -VaultName $outputs.Outputs.azKeyVaultName.Value -ResourceGroupName $rgName -UserPrincipalName $CurrentUserId -PermissionsToSecrets list,get
-}
-Catch {
-    Write-Error "Error - Couldn't assign user permissions to get,list the KeyVault secrets - Please review detailed error message below"
-    $_.Exception.Message
-}
+if($CurrentUserId -ne $serviceAccountUPN)
+{
+    # Assign current user with the permissions to list and read Azure KeyVault secrets (to enable the connection with the Power Automate flow)
+    Write-Host -ForegroundColor blue "Assigning 'Secrets List & Get' policy on Azure KeyVault for user $CurrentUserId"
+    Try {
+        Set-AzKeyVaultAccessPolicy -VaultName $outputs.Outputs.azKeyVaultName.Value -ResourceGroupName $rgName -UserPrincipalName $CurrentUserId -PermissionsToSecrets list,get
+    }
+    Catch {
+        Write-Error "Error - Couldn't assign user permissions to get,list the KeyVault secrets - Please review detailed error message below"
+        $_.Exception.Message
+    }
 
+    # Assign service account with the permissions to list and read Azure KeyVault secrets (to enable the connection with the Power Automate flow)
+    Write-Host -ForegroundColor blue "Assigning 'Secrets List & Get' policy on Azure KeyVault for user $serviceAccountUPN"
+    Try {
+        Set-AzKeyVaultAccessPolicy -VaultName $outputs.Outputs.azKeyVaultName.Value -ResourceGroupName $rgName -UserPrincipalName $CurrentUserId -PermissionsToSecrets list,get
+    }
+    Catch {
+        Write-Error "Error - Couldn't assign user permissions to get,list the KeyVault secrets - Please review detailed error message below"
+        $_.Exception.Message
+    }    
+}
+else
+{
+    # Assign service account with the permissions to list and read Azure KeyVault secrets (to enable the connection with the Power Automate flow)
+    Write-Host -ForegroundColor blue "Assigning 'Secrets List & Get' policy on Azure KeyVault for user $serviceAccountUPN"
+    Try {
+        Set-AzKeyVaultAccessPolicy -VaultName $outputs.Outputs.azKeyVaultName.Value -ResourceGroupName $rgName -UserPrincipalName $CurrentUserId -PermissionsToSecrets list,get
+    }
+    Catch {
+        Write-Error "Error - Couldn't assign user permissions to get,list the KeyVault secrets - Please review detailed error message below"
+        $_.Exception.Message
+    }
+}
 
 Write-Host -ForegroundColor blue "Getting the Azure Function App key for warm-up test"
 ## lookup the resource id for your Azure Function App ##
