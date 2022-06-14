@@ -1,0 +1,53 @@
+---
+name: New Feature or request \U0001F64B
+about: Suggest an idea for this project
+title: "[Enhancement]: \U0001F64B‍♂️
+labels: ["enhancement" ]
+assignees:
+  - 
+---
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to create this feature request.
+
+  - type: textarea
+    id: feature-description
+    attributes:
+      label: What are you proposing ?
+      description: Is your feature request related to a problem? Please describe or add a link to the issue or discussion.
+      value: "Proposal for ..."
+    validations:
+      required: true  
+
+  - type: textarea
+    id: feature-alternatives
+    attributes:
+      label: Describe alternatives you've considered ?
+      description: A short description of any alternative solutions or features you've considered, and why they do not work for you.
+      value: > 
+        " * One"
+        " * Two"
+
+  - type: dropdown
+    id: feature-area
+    attributes:
+      label: Area in which the issue occurred
+      description: In what area of the app did you have issues 
+      options:
+        - Other
+        - Auto Attendant
+        - Call Queues
+        - PowerApp
+    validations:
+      required: false
+
+  - type: textarea
+    id: feature-context
+    attributes:
+      label: Additional context
+      description: Add any other context or screenshots about the feature request here..
+      value: ""
+
