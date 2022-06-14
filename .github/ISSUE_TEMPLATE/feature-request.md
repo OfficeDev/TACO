@@ -1,8 +1,8 @@
 ---
-name: "\U0001F64B‍♂️Feature request"
+name: "New Feature or request \U0001F64B‍♂️ "
 about: Suggest an idea for this project
-title: ''
-labels: ''
+title: 'Enhancement: \U0001F64B‍♂️ '
+labels: 'enhancement    '
 assignees: ''
 
 ---
@@ -10,8 +10,10 @@ assignees: ''
 ## Is your feature request related to a problem? Please describe.
 A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
 
-**Describe the solution you'd like**
+## Proposed solution or change
 A clear and concise description of what you want to happen.
+
+
 
 ## Describe alternatives you've considered
 A clear and concise description of any alternative solutions or features you've considered.
