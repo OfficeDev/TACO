@@ -27,9 +27,7 @@ body:
     attributes:
       label: Describe alternatives you've considered ?
       description: A short description of any alternative solutions or features you've considered, and why they do not work for you.
-      value: >- 
-         * One
-         * Two
+      value: ""
 
   - type: dropdown
     id: feature-area
