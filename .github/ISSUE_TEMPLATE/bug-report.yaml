@@ -37,9 +37,8 @@ body:
     attributes:
       label: What were the steps you followed?
       placeholder: The steps leading up to this issue 
-      value: > 
-        " 1. Step one"
-        " 2. Step two"
+      value: >- 
+         1. Step one
     validations:
       required: false
 
