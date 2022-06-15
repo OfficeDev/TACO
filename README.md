@@ -1,5 +1,5 @@
 # Microsoft Teams Auto Attendant and Call Queue Management App
-| [Solution overview](https://github.com/OfficeDev/AAandCQManagementApp/wiki/4.-FAQ)) | [Deployment guide powershell](https://github.com/OfficeDev/microsoft-teams-company-communicator-app/wiki/Deployment-guide-powershell)  |[Deployment guide](https://github.com/OfficeDev/AAandCQManagementApp/wiki/2.-Deployment) | [Configuration guide](https://github.com/OfficeDev/AAandCQManagementApp/wiki/3.-Configuration) | [FAQ](https://github.com/OfficeDev/AAandCQManagementApp/wiki/4.-FAQ) |
+| [Solution overview](https://github.com/OfficeDev/AAandCQManagementApp/wiki/4.-FAQ) | [Deployment guide powershell](https://github.com/OfficeDev/microsoft-teams-company-communicator-app/wiki/Deployment-guide-powershell)  |[Deployment guide](https://github.com/OfficeDev/AAandCQManagementApp/wiki/2.-Deployment) | [Configuration guide](https://github.com/OfficeDev/AAandCQManagementApp/wiki/3.-Configuration) | [FAQ](https://github.com/OfficeDev/AAandCQManagementApp/wiki/4.-FAQ) |
 | ---- | ---- | ---- | ---- | ---- |
 
 A delegated Admin application for Auto Attendant and Call Queue management
