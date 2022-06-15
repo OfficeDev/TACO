@@ -2,7 +2,7 @@ Param (
     [parameter(mandatory = $true)] [string]$displayName,   # Display name for your application registered in Azure AD 
     [parameter(mandatory = $true)] [ValidateLength(3, 24)] [string]$rgName,        # Name of the resource group for Azure
     [parameter(mandatory = $true)] [ValidateLength(3, 11)] [string]$resourcePrefix,                  # Prefix for the resources deployed on your Azure subscription (should be less than 11 characters)
-    [parameter(mandatory = $true)] [string]$location,                   # Location (region) where the Azure resource are deployed
+    [parameter(mandatory = $true)] [ValidateSet('Australia Central','Australia East','Australia Southeast','Brazil South','Canada Central','Canada East','Central India','Central US','East Asia','East US 2','East US','France Central','Germany West Central','Japan East','Japan West','Korea Central','Korea South','North Central US','North Europe','Norway East','South Africa North','South Central US','South India','Southeast Asia','Sweden Central','Switzerland North','UAE North','UK South','UK West','West Central US','West Europe','West India','West US 2','West US 3','West US')] [string]$location,                   # Location (region) where the Azure resource are deployed
     [parameter(mandatory = $true)] [string]$serviceAccountUPN,                          # AzureAD Service Account UPN
     [parameter(mandatory = $true)] $serviceAccountSecret,                        # AzureAD Service Account password
     [parameter(mandatory = $false)] $teamsPSModuleVersion = "4.3.0",              # Microsoft Teams PowerShell module version
@@ -79,10 +79,48 @@ else
 Write-Host -ForegroundColor blue "Checking if app '$displayName' is already registered"
 $AADapp = Get-AzADServicePrincipal -DisplayName $displayName
 If ($AADapp.Count -gt 0) {
-    Throw "Multiple Azure AD app registered under the name '$displayName' - Please use another name and retry"
-}
+    Write-Warning "The Azure AD App name which was provided '$displayName' does already exist!"
+    $ResetAADapp = Read-Host "Do you want to reset the credentials the existing Azure AD App registration? `r`nDoing this will impact any other application using this Azure AD App registration. (Answer with yes or no) "
 
-If([string]::IsNullOrEmpty($AADapp)){
+    If($ResetAADapp -eq "yes")
+    {
+        Try
+        {
+            Remove-AzADSpCredential -DisplayName $displayName -ErrorAction Stop
+        }
+        Catch
+        {
+            Write-Error "An issue occured removing the credentials from the Azure AD application"
+            $_.Exception.Message
+        }
+
+        Try
+        {
+            $newCredential = $AADapp|New-AzADSpCredential -ErrorAction Stop
+        }
+        Catch
+        {
+            Write-Error "An issue occured creating new credentials for the Azure AD application"
+            $_.Exception.Message
+        }
+
+        #
+        # Get the AppID and AppSecret from the newly registered App
+        $clientID = $AADapp.AppId
+        $clientsecret = $newCredential.SecretText
+
+        # Get the tenantID from current AzureAD PowerShell session
+        $tenantID = $(Get-AzTenant).Id
+        Write-Host -ForegroundColor blue "New app '$displayName' registered into AzureAD"
+
+    }
+    ElseIf($ResetAADapp -eq "no")
+    {
+        write-host "user answered no"
+        throw "Please rerun the deployment script by providing a different name for the displayname parameter"
+    }
+}
+ElseIf([string]::IsNullOrEmpty($AADapp)){
     Write-Host -ForegroundColor blue "Register a new app in Azure AD using Azure Function app name"
     
     Try
@@ -114,6 +152,7 @@ If([string]::IsNullOrEmpty($AADapp)){
 
     Try {
         Get-AzAdApplication -DisplayName $displayName | Update-AzADApplication -IdentifierUri $AppIdURI -Api $apiProperties -ErrorAction Stop
+        Write-Host -ForegroundColor blue "New app '$displayName' registered into AzureAD"
     }    
     Catch {
         Write-Error "Azure AD application registration error - Please check your permissions in Azure AD and review detailed error description below"
@@ -127,7 +166,6 @@ If([string]::IsNullOrEmpty($AADapp)){
 
     # Get the tenantID from current AzureAD PowerShell session
     $tenantID = $(Get-AzTenant).Id
-    Write-Host -ForegroundColor blue "New app '$displayName' registered into AzureAD"
 }
 
 Write-Host -ForegroundColor blue "Deploy resource to Azure subscription"
@@ -159,6 +197,10 @@ If ($outputs.provisioningState -ne 'Succeeded') {
     {
         Write-Host "Retrying deployment Azure resource deployments"
         $outputs = New-AzResourceGroupDeployment -ResourceGroupName $rgName -TemplateFile $base\ZipDeploy\azuredeploy.json -TemplateParameterObject $parameters -Name $deploymentName
+    }
+    elseif($retry -eq "no")
+    {
+        throw "Deployment of the Azure resources failed, please review the error messages and review the logs available in the Azure Portal"
     }    
 }
 
