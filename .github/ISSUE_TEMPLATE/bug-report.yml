@@ -1,0 +1,64 @@
+name: Bug Report
+description: File a bug report to help us improve
+title: "[Bug]: <title>"
+labels: ["bug" ]
+assignees:
+  - 
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+
+  - type: textarea
+    id: issue-description
+    attributes:
+      label: What happened?
+      description: Also tell us, what did you expect to happen?
+      placeholder: A clear and concise description of what the bug is
+      value: >- 
+         - A bug happened!
+                
+    validations:
+      required: true  
+
+  - type: textarea
+    id: version
+    attributes:
+      label: What is the version of the App?
+      value: "V0.1"
+    validations:
+      required: true
+
+  - type: textarea
+    id: issue-repo
+    attributes:
+      label: What were the steps you followed?
+      placeholder: The steps leading up to this issue 
+      value: >- 
+         1. Step one
+    validations:
+      required: false
+
+  - type: dropdown
+    id: issue-area
+    attributes:
+      label: Area in which the issue occurred
+      description: In what area did you have issues ?
+      options:
+        - Other
+        - Auto Attendant
+        - Call Queues
+        - PowerApp
+        - Setup and Installation
+        - Documentation or Wiki 
+    validations:
+      required: false
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log output
+      description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
+      render: shell
