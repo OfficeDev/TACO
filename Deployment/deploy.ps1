@@ -193,12 +193,23 @@ If ($outputs.provisioningState -ne 'Succeeded') {
     Write-Error "ARM deployment failed with error"
     $retry = Read-Host "Do you want to retry the deployment (yes/no)?"
     
-    if($retry -eq "yes")
+    while($retry -eq "yes")
     {
         Write-Host "Retrying deployment Azure resource deployments"
         $outputs = New-AzResourceGroupDeployment -ResourceGroupName $rgName -TemplateFile $base\ZipDeploy\azuredeploy.json -TemplateParameterObject $parameters -Name $deploymentName
+
+        If ($outputs.provisioningState -ne 'Succeeded') 
+        {
+            Write-Error "ARM deployment failed with error"
+            $retry = Read-Host "Do you want to retry the deployment (yes/no)?"
+        }
+        If ($outputs.provisioningState -eq 'Succeeded') 
+        {
+            $retry = "no"
+        }
     }
-    elseif($retry -eq "no")
+
+    if($retry -eq "no" -and $outputs.provisioningState -ne 'Succeeded')
     {
         throw "Deployment of the Azure resources failed, please review the error messages and review the logs available in the Azure Portal"
     }    
