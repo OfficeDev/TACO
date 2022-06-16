@@ -22,6 +22,8 @@ ElseIf($TeamsPSModuleInstalled -eq $null)
 # List in the ZIP package all the function app you need to deploy
 $packageFiles = @(
     "$($rootfolder)FunctionApp\Add-AutoAttendantHoliday",
+    "$($rootfolder)FunctionApp\Export-AutoAttendant",
+    "$($rootfolder)FunctionApp\Export-CallQueue",
     "$($rootfolder)FunctionApp\Remove-AutoAttendantHoliday",
     "$($rootfolder)FunctionApp\Set-AutoAttendantBusinessHours",
     "$($rootfolder)FunctionApp\Set-AutoAttendantCallRouting",

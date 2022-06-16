@@ -275,8 +275,8 @@ else {
 Write-Host -ForegroundColor blue "Waiting 2 min to let the Azure function app to start"
 Start-Sleep -Seconds 120
 
-Write-Host -ForegroundColor blue "Warming-up Azure Function apps - This will take a few minutes"
-& $base\warmup.ps1 -hostname $outputs.Outputs.azFuncHostName.Value -code $code -tenantID $tenantID -clientID $clientID -secret $clientSecret
+#Write-Host -ForegroundColor blue "Warming-up Azure Function apps - This will take a few minutes"
+#& $base\warmup.ps1 -hostname $outputs.Outputs.azFuncHostName.Value -code $code -tenantID $tenantID -clientID $clientID -secret $clientSecret
 
 Write-Host -ForegroundColor blue "Deployment script completed"
 
