@@ -1,4 +1,4 @@
-# Microsoft Teams Auto Attendant and Call Queue Management App
+# Microsoft Teams AA/CQ Orchestrator App
 | [Solution overview](https://github.com/OfficeDev/AAandCQManagementApp/wiki/4.-FAQ) | [Deployment guide powershell](https://github.com/OfficeDev/microsoft-teams-company-communicator-app/wiki/Deployment-guide-powershell)  |[Deployment guide](https://github.com/OfficeDev/AAandCQManagementApp/wiki/2.-Deployment) | [Configuration guide](https://github.com/OfficeDev/AAandCQManagementApp/wiki/3.-Configuration) | [FAQ](https://github.com/OfficeDev/AAandCQManagementApp/wiki/4.-FAQ) |
 | ---- | ---- | ---- | ---- | ---- |
 
@@ -27,10 +27,10 @@ The architecture of this solution can be adapted to support other scenarios that
 Here is the application running in Microsoft Teams
 
 <!-- <p align="center">
-    <img src="./Media/AAandCQManagement.jpg" alt="Microsoft Teams Auto Attendant and Call Queue Management screenshot" width="600"/>
+    <img src="./Media/AAandCQManagement.jpg" alt="Microsoft Teams AA/CQ Orchestrator screenshot" width="600"/>
 </p> -->
 
-![Microsoft Teams Auto Attendant and Call Queue Management screenshot](./Media/AAandCQManagement.jpg)
+![Microsoft Teams AA/CQ Orchestrator screenshot](./Media/AAandCQManagement.jpg)
 
 If you want to start using the solution yourself review the Wiki for the deployment and configuration steps.
 
