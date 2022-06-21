@@ -290,7 +290,7 @@ Connect-MgGraph -AccessToken $token.Token
 $GraphServicePrincipal = Get-MgServicePrincipal -Filter "startswith(DisplayName,'Microsoft Graph')" | Select-Object -first 1 
 
 # Assigning sites read all permissions
-$PermissionName = "Sites.ReadWrite.All" 
+$PermissionName = "Sites.Read.All" 
 $AppRole = $GraphServicePrincipal.AppRoles | Where-Object {$_.Value -eq $PermissionName -and $_.AllowedMemberTypes -contains "Application"}
 New-MgServicePrincipalAppRoleAssignment -AppRoleId $AppRole.Id -ServicePrincipalId $MSI.identityprincipalid -ResourceId $GraphServicePrincipal.Id -PrincipalId $MSI.IdentityPrincipalId | Out-Null
 
@@ -306,12 +306,11 @@ New-MgServicePrincipalAppRoleAssignment -AppRoleId $AppRole.Id -ServicePrincipal
 
 # Generating outputs
 $outputsData = [ordered]@{
-    API_URL       = 'https://'+ $outputs.Outputs.azFuncHostName.value
-    API_Code      = $outputs.Outputs.azFuncAppCode.Value
-    TenantID      = $tenantID
-    ClientID      = $clientID
-    Audience      = 'api://azfunc-' + $clientID
-    KeyVault_Name = $outputs.Outputs.azKeyVaultName.Value
+    FunctionApp       = 'https://'+ $outputs.Outputs.azFuncHostName.value
+    FunctionKey      = $outputs.Outputs.azFuncAppCode.Value
+    Tenant    = $tenantName
+    ApplicationID      = $clientID
+    KeyVaultName = $outputs.Outputs.azKeyVaultName.Value
     AzFunctionIPs = $outputs.Outputs.outboundIpAddresses.Value
 }
 
