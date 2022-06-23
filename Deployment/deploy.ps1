@@ -289,15 +289,10 @@ $token = Get-AzAccessToken -ResourceUrl "https://graph.microsoft.com"
 Connect-MgGraph -AccessToken $token.Token
 $GraphServicePrincipal = Get-MgServicePrincipal -Filter "startswith(DisplayName,'Microsoft Graph')" | Select-Object -first 1 
 
-# Assigning sites read all permissions
-$PermissionName = "Sites.Read.All" 
+# Assigning sites selected permission
+$PermissionName = "Sites.Selected" 
 $AppRole = $GraphServicePrincipal.AppRoles | Where-Object {$_.Value -eq $PermissionName -and $_.AllowedMemberTypes -contains "Application"}
 New-MgServicePrincipalAppRoleAssignment -AppRoleId $AppRole.Id -ServicePrincipalId $MSI.identityprincipalid -ResourceId $GraphServicePrincipal.Id -PrincipalId $MSI.IdentityPrincipalId | Out-Null
-
-# Assigning files read all permissions
-$PermissionName = "Files.Read.All"
-$AppRole = $GraphServicePrincipal.AppRoles | Where-Object {$_.Value -eq $PermissionName -and $_.AllowedMemberTypes -contains "Application"}
-New-MgServicePrincipalAppRoleAssignment -AppRoleId $AppRole.Id -ServicePrincipalId $MSI.IdentityPrincipalId -ResourceId $GraphServicePrincipal.Id -PrincipalId $MSI.IdentityPrincipalId | Out-Null
 
 # Assigning group read all permissions
 $PermissionName = "Group.Read.All"
