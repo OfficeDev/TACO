@@ -1,5 +1,5 @@
 # Microsoft Teams AA/CQ Orchestrator App
-| [Solution overview](https://github.com/OfficeDev/AAandCQManagementApp/wiki/4.-FAQ) |[Deployment guide](https://github.com/OfficeDev/AAandCQManagementApp/wiki/2.-Deployment) | [Configuration guide](https://github.com/OfficeDev/AAandCQManagementApp/wiki/3.-Configuration) | [FAQ](https://github.com/OfficeDev/AAandCQManagementApp/wiki/4.-FAQ) | [Support](https://github.com/OfficeDev/AAandCQManagementApp/blob/main/SUPPORT.md) |
+| [Solution overview](https://github.com/OfficeDev/TACO/wiki/4.-FAQ) |[Deployment guide](https://github.com/OfficeDev/TACO/wiki/2.-Deployment) | [Configuration guide](https://github.com/OfficeDev/TACO/wiki/3.-Configuration) | [FAQ](https://github.com/OfficeDev/TACO/wiki/4.-FAQ) | [Support](https://github.com/OfficeDev/TACO/blob/main/SUPPORT.md) |
 | ---- | ---- | ---- | ---- | ---- |
 
 A delegated Admin application for Auto Attendant and Call Queue management
