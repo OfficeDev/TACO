@@ -12,7 +12,7 @@ A delegated Admin application for Auto Attendant and Call Queue management
 
 ## What's in it for you
 
-Microsoft Teams provides an administration portal (Teams Admin Center (TAC)) to manage the different telephony services including auto attendants and call queues for the organization. To access this portal, you need to assign one of the administrator roles defined [here](https://docs.microsoft.com/en-us/MicrosoftTeams/using-admin-roles). To manage the auto attendants and call queues, the minimum required  role is "Teams Communications Administrator" - This role is then applied at the scope of the Azure AD tenant, meaning all users in your organization.
+Microsoft Teams provides an administration portal (Teams Admin Center (TAC)) to manage the different telephony services including auto attendants and call queues for the organization. To access this portal, you need to assign one of the administrator roles defined [here](https://docs.microsoft.com/en-us/MicrosoftTeams/using-admin-roles). To manage the auto attendants and call queues, the minimum required  role is "Teams Administrator" - This role is then applied at the scope of the Azure AD tenant, meaning all users in your organization.
 
 Currently the Teams Admin Center does not provide the ability to delegate access to for example the owners of auto attendants to change the greeting or change business hours. This can only be changed by a user who has access to the Teams Admin Center. This application will provide organizations a method to delegate the administration of auto attendants and call queues.
 
