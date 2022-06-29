@@ -6,7 +6,7 @@
 
 A delegated Admin application for Auto Attendant and Call Queue management
 
-<img src="./Media/taco-white-logo-transparent.png" height="140">
+<img src="./Media/taco-logo.png" height="140">
 
 
 
