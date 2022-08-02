@@ -234,7 +234,7 @@ if($CurrentUserId -ne $serviceAccountUPN)
     # Assign service account with the permissions to list and read Azure KeyVault secrets (to enable the connection with the Power Automate flow)
     Write-Host -ForegroundColor blue "Assigning 'Secrets List & Get' policy on Azure KeyVault for user $serviceAccountUPN"
     Try {
-        Set-AzKeyVaultAccessPolicy -VaultName $outputs.Outputs.azKeyVaultName.Value -ResourceGroupName $rgName -UserPrincipalName $CurrentUserId -PermissionsToSecrets list,get
+        Set-AzKeyVaultAccessPolicy -VaultName $outputs.Outputs.azKeyVaultName.Value -ResourceGroupName $rgName -UserPrincipalName $serviceAccountUPN -PermissionsToSecrets list,get
     }
     Catch {
         Write-Error "Error - Couldn't assign user permissions to get,list the KeyVault secrets - Please review detailed error message below"
