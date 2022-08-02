@@ -254,6 +254,7 @@ else
     }
 }
 
+<#
 Write-Host -ForegroundColor blue "Getting the Azure Function App key for warm-up test"
 ## lookup the resource id for your Azure Function App ##
 $azFuncResourceId = (Get-AzResource -ResourceGroupName $rgName -ResourceName $outputs.Outputs.azFuncAppName.Value -ResourceType "Microsoft.Web/sites").ResourceId
@@ -272,11 +273,12 @@ else {
     Write-Error "Couldn't retrieve the Azure Function app master key - Warm-up tests not executed"
 }
 
-Write-Host -ForegroundColor blue "Waiting 2 min to let the Azure function app to start"
-Start-Sleep -Seconds 120
+#Write-Host -ForegroundColor blue "Waiting 2 min to let the Azure function app to start"
+#Start-Sleep -Seconds 120
 
 #Write-Host -ForegroundColor blue "Warming-up Azure Function apps - This will take a few minutes"
 #& $base\warmup.ps1 -hostname $outputs.Outputs.azFuncHostName.Value -code $code -tenantID $tenantID -clientID $clientID -secret $clientSecret
+#>
 
 Write-Host -ForegroundColor blue "Deployment script completed"
 

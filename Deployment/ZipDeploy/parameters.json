@@ -21,7 +21,7 @@
             "value": "4.4.1"
         },                           
         "packageURI" : {
-            "value": "https://github.com/OfficeDev/AAandCQManagementApp/blob/main/Packages/Azure/artifact.zip?raw=true"
+            "value": "https://github.com/OfficeDev/TACO/blob/main/Packages/Azure/artifact.zip?raw=true"
         }
     }
 }
