@@ -45,7 +45,7 @@
             "metadata": {
                 "description": "Location of the ZIP files with the Azure Functions definition"
             },
-            "defaultValue": "https://github.com/OfficeDev/AAandCQManagementApp/blob/main/Packages/Azure/artifact.zip?raw=true"
+            "defaultValue": "https://github.com/OfficeDev/TACO/blob/main/Packages/Azure/artifact.zip?raw=true"
         }
     },
     "variables": {
@@ -158,8 +158,8 @@
                         "[resourceId('Microsoft.Web/sites/config', variables('functionAppName'), 'authsettingsV2')]"
                     ],
                     "properties": {
-                        "ServiceAccountLogin"   : "[concat('@Microsoft.KeyVault(VaultName=', variables('keyVaultName') ,';SecretName=Teams-service-account-name)')]",
-                        "ServiceAccountPassword" : "[concat('@Microsoft.KeyVault(VaultName=', variables('keyVaultName') ,';SecretName=Teams-service-account-secret)')]",
+                        "ServiceAccountLogin"   : "[concat('@Microsoft.KeyVault(VaultName=', variables('keyVaultName') ,';SecretName=TACO-service-account-name)')]",
+                        "ServiceAccountPassword" : "[concat('@Microsoft.KeyVault(VaultName=', variables('keyVaultName') ,';SecretName=TACO-service-account-secret)')]",
                         "TeamsPSVersion" : "[parameters('TeamsPSModuleVersion')]",
                         "AzureWebJobsStorage" : "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('stoAccountName'), ';EndpointSuffix=', environment().suffixes.storage, ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('stoAccountName')), '2019-06-01').keys[0].value)]",
                         "FUNCTIONS_EXTENSION_VERSION" : "~4",
@@ -203,7 +203,7 @@
             "resources": [
                 {
                     "type": "Microsoft.KeyVault/vaults/secrets",
-                    "name": "[concat(variables('keyVaultName'), '/Teams-service-account-name')]",
+                    "name": "[concat(variables('keyVaultName'), '/TACO-service-account-name')]",
                     "apiVersion": "2021-11-01-preview",
                     "dependsOn": [
                         "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]"
@@ -218,7 +218,7 @@
                 },
                 {
                     "type": "Microsoft.KeyVault/vaults/secrets",
-                    "name": "[concat(variables('keyVaultName'), '/Teams-service-account-secret')]",
+                    "name": "[concat(variables('keyVaultName'), '/TACO-service-account-secret')]",
                     "apiVersion": "2021-11-01-preview",
                     "dependsOn": [
                         "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]"
@@ -233,7 +233,7 @@
                 },
                 {
                     "type": "Microsoft.KeyVault/vaults/secrets",
-                    "name": "[concat(variables('keyVaultName'), '/Teams-AA-CQ-Management-appSecret')]",
+                    "name": "[concat(variables('keyVaultName'), '/TACO-appSecret')]",
                     "apiVersion": "2021-11-01-preview",
                     "dependsOn": [
                         "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]"

@@ -5,7 +5,7 @@ Param (
     [parameter(mandatory = $true)] [ValidateSet('Australia Central','Australia East','Australia Southeast','Brazil South','Canada Central','Canada East','Central India','Central US','East Asia','East US 2','East US','France Central','Germany West Central','Japan East','Japan West','Korea Central','Korea South','North Central US','North Europe','Norway East','South Africa North','South Central US','South India','Southeast Asia','Sweden Central','Switzerland North','UAE North','UK South','UK West','West Central US','West Europe','West India','West US 2','West US 3','West US')] [string]$location,                   # Location (region) where the Azure resource are deployed
     [parameter(mandatory = $true)] [string]$serviceAccountUPN,                          # AzureAD Service Account UPN
     [parameter(mandatory = $true)] $serviceAccountSecret,                        # AzureAD Service Account password
-    [parameter(mandatory = $false)] $teamsPSModuleVersion = "4.3.0",              # Microsoft Teams PowerShell module version
+    [parameter(mandatory = $false)] $teamsPSModuleVersion = "4.4.1",              # Microsoft Teams PowerShell module version
     [parameter(mandatory = $false)] $subscriptionID               # Microsoft Azure Subscription id  
 )
 
@@ -234,7 +234,7 @@ if($CurrentUserId -ne $serviceAccountUPN)
     # Assign service account with the permissions to list and read Azure KeyVault secrets (to enable the connection with the Power Automate flow)
     Write-Host -ForegroundColor blue "Assigning 'Secrets List & Get' policy on Azure KeyVault for user $serviceAccountUPN"
     Try {
-        Set-AzKeyVaultAccessPolicy -VaultName $outputs.Outputs.azKeyVaultName.Value -ResourceGroupName $rgName -UserPrincipalName $CurrentUserId -PermissionsToSecrets list,get
+        Set-AzKeyVaultAccessPolicy -VaultName $outputs.Outputs.azKeyVaultName.Value -ResourceGroupName $rgName -UserPrincipalName $serviceAccountUPN -PermissionsToSecrets list,get
     }
     Catch {
         Write-Error "Error - Couldn't assign user permissions to get,list the KeyVault secrets - Please review detailed error message below"
@@ -254,6 +254,7 @@ else
     }
 }
 
+<#
 Write-Host -ForegroundColor blue "Getting the Azure Function App key for warm-up test"
 ## lookup the resource id for your Azure Function App ##
 $azFuncResourceId = (Get-AzResource -ResourceGroupName $rgName -ResourceName $outputs.Outputs.azFuncAppName.Value -ResourceType "Microsoft.Web/sites").ResourceId
@@ -272,11 +273,12 @@ else {
     Write-Error "Couldn't retrieve the Azure Function app master key - Warm-up tests not executed"
 }
 
-Write-Host -ForegroundColor blue "Waiting 2 min to let the Azure function app to start"
-Start-Sleep -Seconds 120
+#Write-Host -ForegroundColor blue "Waiting 2 min to let the Azure function app to start"
+#Start-Sleep -Seconds 120
 
 #Write-Host -ForegroundColor blue "Warming-up Azure Function apps - This will take a few minutes"
 #& $base\warmup.ps1 -hostname $outputs.Outputs.azFuncHostName.Value -code $code -tenantID $tenantID -clientID $clientID -secret $clientSecret
+#>
 
 Write-Host -ForegroundColor blue "Deployment script completed"
 
