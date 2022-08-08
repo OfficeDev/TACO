@@ -28,7 +28,7 @@ $output = @()
 # Validate the request JSON body against the schema_validator
 $Schema = Get-jsonSchema ('Export-CallQueue')
 
-If ($Request.Body -ne $null) {
+If ($Request.Body.Identity -ne $null) {
     # Test JSON format and content
     $Result = $Request.Body | ConvertTo-Json | Test-Json -Schema $Schema
 
