@@ -28,7 +28,7 @@ $output = @()
 # Validate the request JSON body against the schema_validator
 $Schema = Get-jsonSchema ('Export-CallQueue')
 
-If ($Request.Body){
+If ($Request.Body) {
     # Test JSON format and content
     $Result = $Request.Body | ConvertTo-Json | Test-Json -Schema $Schema
 
@@ -122,7 +122,7 @@ foreach ($CQName in $CallQueues)
     {
         If($(Test-IsGuid -StringGuid $cq.TimeoutActionTarget.Id) -and $cq.TimeoutAction -ne "SharedVoicemail")
         {
-            $TimeoutActionTarget = Get-CsOnlineuser $cq.TimeoutActionTarget.Id
+            $TimeoutActionTarget = $(Get-CsOnlineuser $cq.TimeoutActionTarget.Id).DisplayName
         }
         ElseIf($cq.TimeoutAction -eq "SharedVoicemail")
         {
