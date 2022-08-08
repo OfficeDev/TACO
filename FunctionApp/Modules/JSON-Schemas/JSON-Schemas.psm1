@@ -947,7 +947,7 @@ Switch ($schemaName) {
 '@ }
 
 # JSON schema definition for Export-CallQueue    
-'Export-AutoAttendant' { Return @'
+'Export-CallQueue' { Return @'
     {
         "type": "object",
         "title": "Export-CallQueue API JSON body definition",  
