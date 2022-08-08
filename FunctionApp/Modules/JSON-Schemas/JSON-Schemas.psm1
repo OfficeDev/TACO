@@ -926,6 +926,46 @@ Switch ($schemaName) {
     }
 '@ }
 
+# JSON schema definition for Export-AutoAttendant    
+'Export-AutoAttendant' { Return @'
+    {
+        "type": "object",
+        "title": "Export-AutoAttendant API JSON body definition",  
+        "required": [
+            "Identity"
+        ],
+        "properties": {
+            "Identity": {
+                "type": "string",
+                "title": "Specifies the identity of the auto attendant",
+                "examples": [
+                    "contoso it"
+                ]
+            } 
+        }
+    }
+'@ }
+
+# JSON schema definition for Export-CallQueue    
+'Export-AutoAttendant' { Return @'
+    {
+        "type": "object",
+        "title": "Export-CallQueue API JSON body definition",  
+        "required": [
+            "Identity"
+        ],
+        "properties": {
+            "Identity": {
+                "type": "string",
+                "title": "Specifies the identity of the call queue",
+                "examples": [
+                    "contoso it helpdesk queue"
+                ]
+            } 
+        }
+    }
+'@ }
+
 # No match found - Return empty JSON definition  
 Default { Return @'
     {}
