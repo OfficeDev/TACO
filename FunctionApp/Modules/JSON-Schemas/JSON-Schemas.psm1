@@ -48,14 +48,14 @@ Switch ($schemaName) {
                     "60"
                 ]
             },    			
-            "TimeoutSharedVoicemailTarget": {
+            "TimeoutVoicemailTarget": {
                 "type": "string",
                 "title": "Specifies the O365 group where the voicemail needs to be delivered",
                 "examples": [
                     "it-helpdesk@contoso.com"
                 ]
             },             
-            "TimeoutSharedVoiceMailTranscription": {
+            "TimeoutVoiceMailTranscription": {
                 "type": "boolean",
                 "title": "Specifies if voicemail transcription is enabled or not",
                 "examples": [
@@ -92,7 +92,7 @@ Switch ($schemaName) {
 'Set-CallQueueOverFlowAction' { Return @'
     {
         "type": "object",
-        "title": "Set-CallQueueTimeOutAction API JSON body definition",  
+        "title": "Set-CallQueueOverFlowAction API JSON body definition",  
         "required": [
             "Identity"
         ],
@@ -129,14 +129,14 @@ Switch ($schemaName) {
                     "10"
                 ]
             }, 			
-            "OverflowSharedVoicemailTarget": {
+            "OverflowVoicemailTarget": {
                 "type": "string",
                 "title": "Specifies the O365 group where the voicemail needs to be delivered",
                 "examples": [
                     "it-helpdesk@contoso.com"
                 ]
             },              
-            "OverflowSharedVoicemailTranscription": {
+            "OverflowVoicemailTranscription": {
                 "type": "boolean",
                 "title": "Specifies voice transcription should be on or off",
                 "examples": [
