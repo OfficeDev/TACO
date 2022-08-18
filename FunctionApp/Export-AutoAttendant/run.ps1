@@ -28,11 +28,7 @@ $output = @()
 # Validate the request JSON body against the schema_validator
 $Schema = Get-jsonSchema ('Export-AutoAttendant')
 
-If (-Not $Request.Body) {
-    $Resp = @{ "Error" = "Missing JSON body in the POST request"}
-    $StatusCode =  [HttpStatusCode]::BadRequest 
-}
-Else {
+If ($Request.Body.Identity -ne $null) {
     # Test JSON format and content
     $Result = $Request.Body | ConvertTo-Json | Test-Json -Schema $Schema
 

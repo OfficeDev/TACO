@@ -137,10 +137,10 @@ If ($AAGreetingHours -eq "after business hours")
                 $Greeting = New-CsAutoAttendantPrompt -TextToSpeechPrompt $AAGreetingTTSAH -ErrorAction Stop
                 $($AutoAttendant.CallFlows| where-object {$_.Name -eq "$($AutoAttendant.Name) After hours call flow"}).Greetings = @($Greeting)
             }
-            ElseIf ($AAGreetingTypeBH -eq "No greeting")
+            ElseIf ($AAGreetingTypeAH -eq "No greeting")
             {
                 Write-Host "Remove greeting"
-                $AutoAttendant.DefaultCallFlow.Greetings = $null
+                $($AutoAttendant.CallFlows| where-object {$_.Name -eq "$($AutoAttendant.Name) After hours call flow"}).Greetings = $null
             }                                                                    
 
         }

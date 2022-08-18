@@ -99,13 +99,16 @@ If ($StatusCode -eq [HttpStatusCode]::OK) {
         }
 }
 #Retrieving current holiday call handling item
-$HolidayCallHandling = $AutoAttendant.CallHandlingAssociations|where type -like "Holiday"
+$HolidayCallHandling = $AutoAttendant.CallHandlingAssociations|Where-Object type -like "Holiday"
 
 #Retrieving CurrentCallHandling id
-$CurrentCallHandling = $AutoAttendant.CallHandlingAssociations|where type -like "Afterhours"
+$CurrentCallHandling = $AutoAttendant.CallHandlingAssociations|Where-Object type -like "Afterhours"
 
 #Retrieving current call flow id
-$CallFlow = $AutoAttendant.CallFlows | where name -eq "$($AutoAttendant.Name) After hours call flow"
+$CallFlow = $AutoAttendant.CallFlows |Where-Object name -eq "$($AutoAttendant.Name) After hours call flow"
+
+#Retrieving business hours schedule
+$schedule = $aa.schedules |Where-Object{$_.Name -like "*After Hours*"}
 
 #Monday timeranges
 If(($AAMondayStartTime1 -ne $null -and $AAMondayStartTime1 -ne "none" -and $AAMondayEndTime1 -ne "0:00 (next day)") -and ($AAMondayStartTime2 -ne $null -and $AAMondayStartTime2 -ne "none" -and $AAMondayEndTime2 -ne "0:00 (next day)"))
@@ -124,7 +127,16 @@ ElseIf($AAMondayStartTime1 -ne $null -and $AAMondayStartTime1 -ne "none" -and $A
 }
 ElseIf($AAMondayStartTime1 -ne $null -and $AAMondayStartTime1 -ne "none" -and $AAMondayEndTime1 -eq "0:00 (next day)")
 {
-    $MondayTimeRange1 = New-CsOnlineTimeRange -Start $AAMondayStartTime1 -End "1.00:00:00"-ErrorAction Stop
+    $MondayTimeRange1 = New-CsOnlineTimeRange -Start $AAMondayStartTime1 -End "1.00:00:00" -ErrorAction Stop
+}
+Elseif($schedule.WeeklyRecurrentSchedule.MondayHours.count -eq 2 -and $AAMondayStartTime1 -eq $null -and $AAMondayStartTime2 -eq $null)
+{
+	$MondayTimeRange1 = New-CsOnlineTimeRange -Start $schedule.WeeklyRecurrentSchedule.MondayHours.Start[0] -End $schedule.WeeklyRecurrentSchedule.MondayHours.End[0] -ErrorAction Stop
+	$MondayTimeRange2 = New-CsOnlineTimeRange -Start $schedule.WeeklyRecurrentSchedule.MondayHours.Start[1] -End $schedule.WeeklyRecurrentSchedule.MondayHours.End[1] -ErrorAction Stop
+}
+Elseif($schedule.WeeklyRecurrentSchedule.MondayHours.count -eq 1 -and $AAMondayStartTime1 -eq $null)
+{
+	$MondayTimeRange1 = New-CsOnlineTimeRange -Start $schedule.WeeklyRecurrentSchedule.MondayHours.Start -End $schedule.WeeklyRecurrentSchedule.MondayHours.End -ErrorAction Stop
 }
 
 #Tuesday timeranges
@@ -146,6 +158,15 @@ ElseIf($AATuesdayStartTime1 -ne $null -and $AATuesdayStartTime1 -ne "none" -and 
 {
     $TuesdayTimeRange1 = New-CsOnlineTimeRange -Start $AATuesdayStartTime1 -End "1.00:00:00"-ErrorAction Stop
 }
+Elseif($schedule.WeeklyRecurrentSchedule.TuesdayHours.count -eq 2 -and $AATuesdayStartTime1 -eq $null -and $AATuesdayStartTime2 -eq $null)
+{
+	$TuesdayTimeRange1 = New-CsOnlineTimeRange -Start $schedule.WeeklyRecurrentSchedule.TuesdayHours.Start[0] -End $schedule.WeeklyRecurrentSchedule.TuesdayHours.End[0] -ErrorAction Stop
+	$TuesdayTimeRange2 = New-CsOnlineTimeRange -Start $schedule.WeeklyRecurrentSchedule.TuesdayHours.Start[1] -End $schedule.WeeklyRecurrentSchedule.TuesdayHours.End[1] -ErrorAction Stop
+}
+Elseif($schedule.WeeklyRecurrentSchedule.TuesdayHours.count -eq 1 -and $AATuesdayStartTime1 -eq $null)
+{
+	$TuesdayTimeRange1 = New-CsOnlineTimeRange -Start $schedule.WeeklyRecurrentSchedule.TuesdayHours.Start -End $schedule.WeeklyRecurrentSchedule.TuesdayHours.End -ErrorAction Stop
+}
 
 #Wednesday timeranges
 If(($AAWednesdayStartTime1 -ne $null -and $AAWednesdayStartTime1 -ne "none" -and $AAWednesdayEndTime1 -ne "0:00 (next day)") -and ($AAWednesdayStartTime2 -ne $null -and $AAWednesdayStartTime2 -ne "none" -and $AAWednesdayEndTime2 -ne "0:00 (next day)"))
@@ -165,6 +186,15 @@ ElseIf($AAWednesdayStartTime1 -ne $null -and $AAWednesdayStartTime1 -ne "none" -
 ElseIf($AAWednesdayStartTime1 -ne $null -and $AAWednesdayStartTime1 -ne "none" -and $AAWednesdayEndTime1 -eq "0:00 (next day)")
 {
     $WednesdayTimeRange1 = New-CsOnlineTimeRange -Start $AAWednesdayStartTime1 -End "1.00:00:00"-ErrorAction Stop
+}
+Elseif($schedule.WeeklyRecurrentSchedule.WednesdayHours.count -eq 2 -and $AAWednesdayStartTime1 -eq $null -and $AAWednesdayStartTime2 -eq $null)
+{
+	$WednesdayTimeRange1 = New-CsOnlineTimeRange -Start $schedule.WeeklyRecurrentSchedule.WednesdayHours.Start[0] -End $schedule.WeeklyRecurrentSchedule.WednesdayHours.End[0] -ErrorAction Stop
+	$WednesdayTimeRange2 = New-CsOnlineTimeRange -Start $schedule.WeeklyRecurrentSchedule.WednesdayHours.Start[1] -End $schedule.WeeklyRecurrentSchedule.WednesdayHours.End[1] -ErrorAction Stop
+}
+Elseif($schedule.WeeklyRecurrentSchedule.WednesdayHours.count -eq 1 -and $AAWednesdayStartTime1 -eq $null)
+{
+	$WednesdayTimeRange1 = New-CsOnlineTimeRange -Start $schedule.WeeklyRecurrentSchedule.WednesdayHours.Start -End $schedule.WeeklyRecurrentSchedule.WednesdayHours.End -ErrorAction Stop
 }
 
 #Thursday timeranges
@@ -186,6 +216,15 @@ ElseIf($AAThursdayStartTime1 -ne $null -and $AAThursdayStartTime1 -ne "none" -an
 {
     $ThursdayTimeRange1 = New-CsOnlineTimeRange -Start $AAThursdayStartTime1 -End "1.00:00:00"-ErrorAction Stop
 }
+Elseif($schedule.WeeklyRecurrentSchedule.ThursdayHours.count -eq 2 -and $AAThursdayStartTime1 -eq $null -and $AAThursdayStartTime2 -eq $null)
+{
+	$ThursdayTimeRange1 = New-CsOnlineTimeRange -Start $schedule.WeeklyRecurrentSchedule.ThursdayHours.Start[0] -End $schedule.WeeklyRecurrentSchedule.ThursdayHours.End[0] -ErrorAction Stop
+	$ThursdayTimeRange2 = New-CsOnlineTimeRange -Start $schedule.WeeklyRecurrentSchedule.ThursdayHours.Start[1] -End $schedule.WeeklyRecurrentSchedule.ThursdayHours.End[1] -ErrorAction Stop
+}
+Elseif($schedule.WeeklyRecurrentSchedule.ThursdayHours.count -eq 1 -and $AAThursdayStartTime1 -eq $null)
+{
+	$ThursdayTimeRange1 = New-CsOnlineTimeRange -Start $schedule.WeeklyRecurrentSchedule.ThursdayHours.Start -End $schedule.WeeklyRecurrentSchedule.ThursdayHours.End -ErrorAction Stop
+}
 
 #Friday timeranges
 If(($AAFridayStartTime1 -ne $null -and $AAFridayStartTime1 -ne "none" -and $AAFridayEndTime1 -ne "0:00 (next day)") -and ($AAFridayStartTime2 -ne $null -and $AAFridayStartTime2 -ne "none" -and $AAFridayEndTime2 -ne "0:00 (next day)"))
@@ -205,6 +244,15 @@ ElseIf($AAFridayStartTime1 -ne $null -and $AAFridayStartTime1 -ne "none" -and $A
 ElseIf($AAFridayStartTime1 -ne $null -and $AAFridayStartTime1 -ne "none" -and $AAFridayEndTime1 -eq "0:00 (next day)")
 {
     $FridayTimeRange1 = New-CsOnlineTimeRange -Start $AAFridayStartTime1 -End "1.00:00:00"-ErrorAction Stop
+}
+Elseif($schedule.WeeklyRecurrentSchedule.FridayHours.count -eq 2 -and $AAFridayStartTime1 -eq $null -and $AAFridayStartTime2 -eq $null)
+{
+	$FridayTimeRange1 = New-CsOnlineTimeRange -Start $schedule.WeeklyRecurrentSchedule.FridayHours.Start[0] -End $schedule.WeeklyRecurrentSchedule.FridayHours.End[0] -ErrorAction Stop
+	$FridayTimeRange2 = New-CsOnlineTimeRange -Start $schedule.WeeklyRecurrentSchedule.FridayHours.Start[1] -End $schedule.WeeklyRecurrentSchedule.FridayHours.End[1] -ErrorAction Stop
+}
+Elseif($schedule.WeeklyRecurrentSchedule.FridayHours.count -eq 1 -and $AAFridayStartTime1 -eq $null)
+{
+	$FridayTimeRange1 = New-CsOnlineTimeRange -Start $schedule.WeeklyRecurrentSchedule.FridayHours.Start -End $schedule.WeeklyRecurrentSchedule.FridayHours.End -ErrorAction Stop
 }
 
 #Saturday timeranges
@@ -226,6 +274,15 @@ ElseIf($AASaturdayStartTime1 -ne $null -and $AASaturdayStartTime1 -ne "none" -an
 {
     $SaturdayTimeRange1 = New-CsOnlineTimeRange -Start $AASaturdayStartTime1 -End "1.00:00:00"-ErrorAction Stop
 }
+Elseif($schedule.WeeklyRecurrentSchedule.SaturdayHours.count -eq 2 -and $AASaturdayStartTime1 -eq $null -and $AASaturdayStartTime2 -eq $null)
+{
+	$SaturdayTimeRange1 = New-CsOnlineTimeRange -Start $schedule.WeeklyRecurrentSchedule.SaturdayHours.Start[0] -End $schedule.WeeklyRecurrentSchedule.SaturdayHours.End[0] -ErrorAction Stop
+	$SaturdayTimeRange2 = New-CsOnlineTimeRange -Start $schedule.WeeklyRecurrentSchedule.SaturdayHours.Start[1] -End $schedule.WeeklyRecurrentSchedule.SaturdayHours.End[1] -ErrorAction Stop
+}
+Elseif($schedule.WeeklyRecurrentSchedule.SaturdayHours.count -eq 1 -and $AASaturdayStartTime1 -eq $null)
+{
+	$SaturdayTimeRange1 = New-CsOnlineTimeRange -Start $schedule.WeeklyRecurrentSchedule.SaturdayHours.Start -End $schedule.WeeklyRecurrentSchedule.SaturdayHours.End -ErrorAction Stop
+}
 
 #Sunday timeranges
 If(($AASundayStartTime1 -ne $null -and $AASundayStartTime1 -ne "none" -and $AASundayEndTime1 -ne "0:00 (next day)") -and ($AASundayStartTime2 -ne $null -and $AASundayStartTime2 -ne "none" -and $AASundayEndTime2 -ne "0:00 (next day)"))
@@ -246,7 +303,15 @@ ElseIf($AASundayStartTime1 -ne $null -and $AASundayStartTime1 -ne "none" -and $A
 {
     $SundayTimeRange1 = New-CsOnlineTimeRange -Start $AASundayStartTime1 -End "1.00:00:00"-ErrorAction Stop
 }
-
+Elseif($schedule.WeeklyRecurrentSchedule.SundayHours.count -eq 2 -and $AASundayStartTime1 -eq $null -and $AASundayStartTime2 -eq $null)
+{
+	$SundayTimeRange1 = New-CsOnlineTimeRange -Start $schedule.WeeklyRecurrentSchedule.SundayHours.Start[0] -End $schedule.WeeklyRecurrentSchedule.SundayHours.End[0] -ErrorAction Stop
+	$SundayTimeRange2 = New-CsOnlineTimeRange -Start $schedule.WeeklyRecurrentSchedule.SundayHours.Start[1] -End $schedule.WeeklyRecurrentSchedule.SundayHours.End[1] -ErrorAction Stop
+}
+Elseif($schedule.WeeklyRecurrentSchedule.SundayHours.count -eq 1 -and $AASundayStartTime1 -eq $null)
+{
+	$SundayTimeRange1 = New-CsOnlineTimeRange -Start $schedule.WeeklyRecurrentSchedule.SundayHours.Start -End $schedule.WeeklyRecurrentSchedule.SundayHours.End -ErrorAction Stop
+}
 
 # Creating new schedule
 If ($StatusCode -eq [HttpStatusCode]::OK) {

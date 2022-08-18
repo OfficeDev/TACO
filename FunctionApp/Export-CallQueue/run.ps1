@@ -28,11 +28,7 @@ $output = @()
 # Validate the request JSON body against the schema_validator
 $Schema = Get-jsonSchema ('Export-CallQueue')
 
-If (-Not $Request.Body) {
-    $Resp = @{ "Error" = "Missing JSON body in the POST request"}
-    $StatusCode =  [HttpStatusCode]::BadRequest 
-}
-Else {
+If ($Request.Body.Identity -ne $null) {
     # Test JSON format and content
     $Result = $Request.Body | ConvertTo-Json | Test-Json -Schema $Schema
 
@@ -66,7 +62,6 @@ Import-Module $AuthentionModuleLocation
 $GroupModuleLocation = ".\Modules\GetGroupInfo\GetGroupInfo.psd1"
 Import-Module $GroupModuleLocation
 
-        Connect-MicrosoftTeams -Credential $Credential -ErrorAction Stop
 # Connect to Microsoft Teams
 If ($StatusCode -eq [HttpStatusCode]::OK) {
     Try {
@@ -118,16 +113,16 @@ foreach ($CQName in $CallQueues)
         }
         Else
         {
-            $OverflowActionTarget = $($cq.OverflowActionTarget.Id).split(":")[0]
+            $OverflowActionTarget = $($cq.OverflowActionTarget.Id).split(":")[1]
         }
     }
 
     # Retrieving displayname for timeout action target
     If($cq.TimeoutActionTarget -ne $null)
     {
-        If($(Test-IsGuid -StringGuid $cq.TimeoutActionTarget) -and $cq.TimeoutAction -ne "SharedVoicemail")
+        If($(Test-IsGuid -StringGuid $cq.TimeoutActionTarget.Id) -and $cq.TimeoutAction -ne "SharedVoicemail")
         {
-            $TimeoutActionTarget = Get-CsOnlineuser $cq.TimeoutActionTarget
+            $TimeoutActionTarget = $(Get-CsOnlineuser $cq.TimeoutActionTarget.Id).DisplayName
         }
         ElseIf($cq.TimeoutAction -eq "SharedVoicemail")
         {
@@ -136,7 +131,7 @@ foreach ($CQName in $CallQueues)
         }    
         Else
         {
-            $TimeoutActionTarget = $($cq.TimeoutActionTarget).split(":")[0]
+            $TimeoutActionTarget = $($cq.TimeoutActionTarget.Id).split(":")[1]
         }
     }
 
@@ -195,7 +190,7 @@ foreach ($CQName in $CallQueues)
     }
     ElseIf($cq.OverflowAction -eq "Forward" -and $cq.TimeoutActionTarget -eq "ApplicationEndpoint") 
     {
-        $TimeoutwAction = "Redirect: Voice app"
+        $TimeoutAction = "Redirect: Voice app"
     }
     ElseIf($cq.TimeOutAction -eq "Forward" -and $cq.TimeoutActionTarget -eq "Phone") 
     {

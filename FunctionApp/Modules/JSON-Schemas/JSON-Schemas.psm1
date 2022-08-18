@@ -34,7 +34,7 @@ Switch ($schemaName) {
                 ]
             },
             "TimeoutTarget": {
-                "type": "string",
+                "type": ["number","null"],
                 "title": "Specifies where to send the call to, this can be either a UPN or phonenumber",
                 "examples": [
                     "+31301234567",
@@ -48,14 +48,14 @@ Switch ($schemaName) {
                     "60"
                 ]
             },    			
-            "TimeoutSharedVoicemailTarget": {
+            "TimeoutVoicemailTarget": {
                 "type": "string",
                 "title": "Specifies the O365 group where the voicemail needs to be delivered",
                 "examples": [
                     "it-helpdesk@contoso.com"
                 ]
             },             
-            "TimeoutSharedVoiceMailTranscription": {
+            "TimeoutVoiceMailTranscription": {
                 "type": "boolean",
                 "title": "Specifies if voicemail transcription is enabled or not",
                 "examples": [
@@ -92,7 +92,7 @@ Switch ($schemaName) {
 'Set-CallQueueOverFlowAction' { Return @'
     {
         "type": "object",
-        "title": "Set-CallQueueTimeOutAction API JSON body definition",  
+        "title": "Set-CallQueueOverFlowAction API JSON body definition",  
         "required": [
             "Identity"
         ],
@@ -115,7 +115,7 @@ Switch ($schemaName) {
                 ]
             },
             "OverflowTarget": {
-                "type": "string",
+                "type": ["number","null"],
                 "title": "Specifies where to send the call to, this can be either a UPN or phonenumber",
                 "examples": [
                     "+31301234567",
@@ -129,14 +129,14 @@ Switch ($schemaName) {
                     "10"
                 ]
             }, 			
-            "OverflowSharedVoicemailTarget": {
+            "OverflowVoicemailTarget": {
                 "type": "string",
                 "title": "Specifies the O365 group where the voicemail needs to be delivered",
                 "examples": [
                     "it-helpdesk@contoso.com"
                 ]
             },              
-            "OverflowSharedVoicemailTranscription": {
+            "OverflowVoicemailTranscription": {
                 "type": "boolean",
                 "title": "Specifies voice transcription should be on or off",
                 "examples": [
@@ -922,6 +922,46 @@ Switch ($schemaName) {
                     "1st Christmas day"
                 ]
             }              
+        }
+    }
+'@ }
+
+# JSON schema definition for Export-AutoAttendant    
+'Export-AutoAttendant' { Return @'
+    {
+        "type": "object",
+        "title": "Export-AutoAttendant API JSON body definition",  
+        "required": [
+            "Identity"
+        ],
+        "properties": {
+            "Identity": {
+                "type": "string",
+                "title": "Specifies the identity of the auto attendant",
+                "examples": [
+                    "contoso it"
+                ]
+            } 
+        }
+    }
+'@ }
+
+# JSON schema definition for Export-CallQueue    
+'Export-CallQueue' { Return @'
+    {
+        "type": "object",
+        "title": "Export-CallQueue API JSON body definition",  
+        "required": [
+            "Identity"
+        ],
+        "properties": {
+            "Identity": {
+                "type": "string",
+                "title": "Specifies the identity of the call queue",
+                "examples": [
+                    "contoso it helpdesk queue"
+                ]
+            } 
         }
     }
 '@ }
