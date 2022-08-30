@@ -34,7 +34,7 @@ Switch ($schemaName) {
                 ]
             },
             "TimeoutTarget": {
-                "type": ["number","null"],
+                "type": ["string","number","null"],
                 "title": "Specifies where to send the call to, this can be either a UPN or phonenumber",
                 "examples": [
                     "+31301234567",
@@ -115,7 +115,7 @@ Switch ($schemaName) {
                 ]
             },
             "OverflowTarget": {
-                "type": ["number","null"],
+                "type": ["string","number","null"],
                 "title": "Specifies where to send the call to, this can be either a UPN or phonenumber",
                 "examples": [
                     "+31301234567",
