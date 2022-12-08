@@ -1,0 +1,33 @@
+name: pack-solution
+description: Pack solution
+inputs:
+  name:
+    description: Name of the solution to unpack
+    required: true
+  solution-type:
+    description: "Managed, unmanaged, or Both"
+    required: true
+    default: "Both"
+
+runs:
+  using: composite
+  steps:
+    - name: pack ${{ inputs.name }}
+      uses: microsoft/powerplatform-actions/pack-solution@v0
+      with:
+        solution-file: packed-solutions/${{ inputs.name }}.zip
+        solution-folder: solutions/${{ inputs.name }}/src
+        solution-type: ${{ inputs.solution-type }}
+#
+# Usage:
+#
+# - name: check for new or changed stubs
+#   id: diff
+#   uses: ./.github/actions/stub-diff
+#   with:
+#     path: "./stubs"
+#     pattern: ".py"
+#   #   summary: true
+
+# - name: Create Pull Request ( if relevant changes)
+#   if: ${{steps.diff.outputs.changed == 'true'}}
