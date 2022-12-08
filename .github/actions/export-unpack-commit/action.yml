@@ -1,0 +1,83 @@
+name: "export-unpack-commit"
+description: "Export, unpack, and commit a Power Platform solution"
+inputs:
+  message:
+    description: Message to use for the commit
+    required: true
+
+  environment-url:
+    description: 'URL of Power Platform environment to connect with; e.g. "https://test-env.crm.dynamics.com"'
+    required: true
+
+  app-id:
+    description: 'The application id to authenticate with. Setting this input makes app-id, tenant-id and client-secret required; specifying alternate "username" credential set of inputs will result in an error.'
+    required: false
+
+  client-secret:
+    description: "The client secret to authenticate with. Required if authenticating with app-id."
+    required: false
+
+  tenant-id:
+    description: "AAD Tenant id of the AAD App registration, Required if using app-id & client secret to authenticate."
+    required: false
+
+  solution-name:
+    description: "Name of solution to export"
+    required: true
+
+  solution-type:
+    description: 'Export Both or only Unmanaged'
+    required: true 
+    default: 'Both' 
+
+  process-canvas-apps:
+    description: (Preview) While processing the solution, unpack any Canvas apps .msapp file into its YAML source format
+    required: false
+    default: 'true'
+
+runs:
+  using: composite
+  steps:
+    - name: Export unmanaged solution ${{ inputs.solution-name }} from ${{ inputs.environment-url }}
+      uses: microsoft/powerplatform-actions/export-solution@v0
+      with:
+        environment-url: ${{ inputs.environment-url }}
+        app-id: ${{ inputs.app-id }}
+        client-secret: ${{ inputs.client-secret }}
+        tenant-id: ${{ inputs.tenant-id }}
+        solution-output-file: solutions/${{ inputs.solution-name }}.zip
+        solution-name: ${{ inputs.solution-name }}
+
+    - name: Export managed solution ${{ inputs.solution-name }} from ${{ inputs.environment-url }}
+      uses: microsoft/powerplatform-actions/export-solution@v0
+      with:
+        environment-url: ${{ inputs.environment-url }}
+        app-id: ${{ inputs.app-id }}
+        client-secret: ${{ inputs.client-secret }}
+        tenant-id: ${{ inputs.tenant-id }}
+        solution-output-file: solutions/${{ inputs.solution-name }}_managed.zip
+        solution-name: ${{ inputs.solution-name }}
+        managed: true
+
+    - uses: actions/upload-artifact@v3
+      with:
+        name: solution-packages
+        path: solutions/${{ inputs.solution-name }}*.zip
+
+    - name: Clear existing solution folder
+      run: |
+        rm -rf solutions/${{ inputs.solution-name }}/src
+      shell: bash
+
+    - name: Unpack solution to solutions/${{ inputs.solution-name }}/src
+      uses: microsoft/powerplatform-actions/unpack-solution@v0
+      with:
+        solution-file: solutions/${{ inputs.solution-name }}.zip
+        solution-folder: solutions/${{ inputs.solution-name }}/src
+        solution-type: ${{ inputs.solution-type}}
+        process-canvas-apps: ${{ inputs.process-canvas-apps }}
+
+    - name: Commit the changes
+      uses: EndBug/add-and-commit@v8
+      with:
+        message: ${{ inputs.message }}

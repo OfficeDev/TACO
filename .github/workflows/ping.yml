@@ -1,0 +1,27 @@
+name: ping-environment
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to check access to'
+        type: environment
+        required: true 
+
+
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Ping environment ${{ inputs.environment }}
+        id: ping
+        uses: microsoft/powerplatform-actions/who-am-i@v0
+        with:
+          environment-url:  "${{ secrets.CSD_ENVIRONMENT_URL }}"
+          tenant-id: "${{ secrets.APP_TENANT_ID }}"
+          app-id: "${{ secrets.APP_ID }}"
+          client-secret: "${{ secrets.APP_SECRET }}"
+
