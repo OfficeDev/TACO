@@ -1,0 +1,13 @@
+<environmentvariabledefinition schemaname="new_VARFunctionKey">
+  <description default="Host key of the function app">
+    <label description="Host key of the function app" languagecode="1033" />
+  </description>
+  <displayname default="VAR - FunctionKey">
+    <label description="VAR - FunctionKey" languagecode="1033" />
+  </displayname>
+  <introducedversion>1.0.0.1</introducedversion>
+  <iscustomizable>1</iscustomizable>
+  <isrequired>0</isrequired>
+  <secretstore>0</secretstore>
+  <type>100000000</type>
+</environmentvariabledefinition>

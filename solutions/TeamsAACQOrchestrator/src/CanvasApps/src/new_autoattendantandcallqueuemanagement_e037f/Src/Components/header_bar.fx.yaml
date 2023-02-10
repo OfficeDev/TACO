@@ -1,0 +1,54 @@
+header_bar As CanvasComponent:
+    Fill: =RGBA(0, 34, 64, 1)
+    Height: =65
+    Width: =App.Width
+    X: =0
+    Y: =0
+    ZIndex: =1
+
+    lbl_title As label:
+        Color: =RGBA(255, 255, 255, 1)
+        FontWeight: =Semibold
+        Height: =36
+        Size: =14
+        Text: ="Teams AA/CQ Orchestrator (TACO)"
+        Width: =355
+        X: =10
+        Y: =13
+        ZIndex: =3
+
+    lbl_username As text:
+        Align: =Right
+        BorderStyle: =BorderStyle.None
+        BorderThickness: =0
+        Color: =RGBA(255, 255, 255, 1)
+        Default: =Concatenate("Welcome, ", Office365Users.MyProfileV2().displayName)
+        Fill: =RGBA(0, 0, 0, 0)
+        FontWeight: =Semibold
+        Height: =38
+        Size: =12
+        Width: =352
+        X: =934
+        Y: =13
+        ZIndex: =4
+
+    img_user As image:
+        Height: =56
+        Image: =If(Office365Users.UserPhotoMetadata(User().Email).HasPhoto,Office365Users.UserPhotoV2(User().Email))
+        RadiusBottomLeft: =90
+        RadiusBottomRight: =90
+        RadiusTopLeft: =90
+        RadiusTopRight: =90
+        Width: =56
+        X: =1296
+        Y: =5
+        ZIndex: =5
+
+    Image1 As image:
+        Height: =42
+        Image: ='taco-white-logo-transparent'
+        Width: =58
+        X: =664
+        Y: =13
+        ZIndex: =7
+

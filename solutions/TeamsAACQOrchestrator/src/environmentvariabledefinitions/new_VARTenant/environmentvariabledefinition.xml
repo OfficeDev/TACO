@@ -1,0 +1,13 @@
+<environmentvariabledefinition schemaname="new_VARTenant">
+  <description default="Tenant name, for example. contoso.onmicrosoft.com">
+    <label description="Tenant name, for example. contoso.onmicrosoft.com" languagecode="1033" />
+  </description>
+  <displayname default="VAR - Tenant">
+    <label description="VAR - Tenant" languagecode="1033" />
+  </displayname>
+  <introducedversion>1.0.0.1</introducedversion>
+  <iscustomizable>1</iscustomizable>
+  <isrequired>0</isrequired>
+  <secretstore>0</secretstore>
+  <type>100000000</type>
+</environmentvariabledefinition>

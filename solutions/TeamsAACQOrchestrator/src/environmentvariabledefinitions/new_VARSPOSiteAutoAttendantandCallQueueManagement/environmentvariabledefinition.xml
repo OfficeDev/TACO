@@ -1,0 +1,15 @@
+<environmentvariabledefinition schemaname="new_VARSPOSiteAutoAttendantandCallQueueManagement">
+  <apiid>/providers/microsoft.powerapps/apis/shared_sharepointonline</apiid>
+  <description default="SharePoint Site address where the applications Lists are stored">
+    <label description="SharePoint Site address where the applications Lists are stored" languagecode="1033" />
+  </description>
+  <displayname default="VAR - SPO Site AutoAttendant and CallQueue Management">
+    <label description="VAR - SPO Site AutoAttendant and CallQueue Management" languagecode="1033" />
+  </displayname>
+  <introducedversion>1.0.0.1</introducedversion>
+  <iscustomizable>1</iscustomizable>
+  <isrequired>0</isrequired>
+  <parameterkey>dataset</parameterkey>
+  <secretstore>0</secretstore>
+  <type>100000004</type>
+</environmentvariabledefinition>

@@ -1,0 +1,1513 @@
+"'Auto Attendant Holiday Edit Screen' As screen":
+    Fill: =RGBA(243, 242, 241, 1)
+    Height: =Max(App.Height, App.DesignHeight)
+    OnHidden: =ResetForm(frm_AA_Holiday);
+    OnVisible: |-
+        =UpdateContext({
+            locDropBoxUpdated:
+                {
+                    GreetingTypeHoliday: false,
+                    CallRoutingHoliday: false
+                }
+        });
+        
+        Set(locCurrentTab, "Holidays");
+    Width: =Max(App.Width, App.DesignWidth)
+
+    rec_AutoAttendantName_bar_1 As rectangle:
+        Fill: =RGBA(202, 202, 202, 1)
+        Height: =80
+        Width: =Parent.Width - cmp_left_menu_1.Width
+        X: =cmp_left_menu_1.X + cmp_left_menu_1.Width
+        Y: =cmp_header_1.Y + cmp_header.Height
+        ZIndex: =1
+
+    cmp_header_2 As header_bar:
+        ZIndex: =2
+
+    rec_AutAttendantForm_BottomButtons_bar_1 As rectangle:
+        Fill: =RGBA(255, 255, 255, 1)
+        Height: =92
+        Width: =1302
+        X: =60
+        Y: =676
+        ZIndex: =9
+
+    btn_AutoAttendantHolidayForm_Cancel As button:
+        BorderColor: =RGBA(51, 52, 74, 1)
+        BorderThickness: =1
+        Fill: =ColorValue(CancelColor)
+        FocusedBorderThickness: =1
+        HoverBorderColor: =RGBA(51, 52, 74, 1)
+        HoverColor: =RGBA(51, 52, 74, 1)
+        HoverFill: =
+        OnSelect: |-
+            =ResetForm(frm_AA_Holiday);
+            Navigate('Auto Attendant Edit Screen',ScreenTransition.None)
+        PressedBorderColor: =RGBA(51, 52, 74, 1)
+        PressedColor: =RGBA(51, 52, 74, 1)
+        PressedFill: =
+        RadiusBottomLeft: =0
+        RadiusBottomRight: =0
+        RadiusTopLeft: =0
+        RadiusTopRight: =0
+        Text: ="Cancel"
+        X: =948
+        Y: =702
+        ZIndex: =10
+
+    lbl_AutoAttendantName_1 As label:
+        Height: =37
+        Text: =If(frm_AA_Holiday.Mode = FormMode.Edit, Concatenate("Auto Attendants \ Edit Auto Attendant \ ", gal_AutoAttendant_Holiday.Selected.'Auto Attendant'.Value, " \ ", gal_AutoAttendant_Holiday.Selected.Holiday.Value), Concatenate("Auto Attendants \ Edit Auto Attendant \ ", gal_AutoAttendant_Holiday.Selected.'Auto Attendant'.Value))
+        Width: =729
+        X: =150
+        Y: =105
+        ZIndex: =11
+
+    btn_AutoAttendantHolidayForm_Next As button:
+        BorderColor: =RGBA(51, 52, 74, 1)
+        BorderThickness: =0
+        Fill: =RGBA(98, 100, 167, 1)
+        HoverBorderColor: =RGBA(51, 52, 74, 1)
+        HoverFill: =
+        OnSelect: |+
+            =If(locCurrentTab = "Greeting",Set(locCurrentTab,"Call routing"),If(locCurrentTab = "Call routing",Set(locCurrentTab,"Business hours"),If(locCurrentTab = "Business hours",Set(locCurrentTab,"ABH_Greeting"),If(locCurrentTab = "ABH_Greeting",Set(locCurrentTab,"ABH_Call routing"),""))));
+            
+        PressedBorderColor: =RGBA(51, 52, 74, 1)
+        PressedColor: =RGBA(255, 255, 255, 1)
+        PressedFill: =RGBA(51, 52, 74, 1)
+        Text: ="Next"
+        Visible: =If(locCurrentTab = "Holidays", false, true)
+        X: =614
+        Y: =702
+        ZIndex: =12
+
+    btn_AutoAttendantHolidayForm_Submit As button:
+        BorderColor: =RGBA(51, 52, 74, 1)
+        BorderThickness: =0
+        DisabledColor: =RGBA(255, 255, 255, 1)
+        DisabledFill: =RGBA(219, 219, 219, 1)
+        DisplayMode: =
+        Fill: =ColorValue(UpdateColor)
+        HoverBorderColor: =RGBA(51, 52, 74, 1)
+        HoverFill: =
+        OnSelect: |-
+            =SubmitForm(frm_AA_Holiday);
+            Navigate('Auto Attendant Edit Screen',ScreenTransition.None)
+        PressedBorderColor: =RGBA(51, 52, 74, 1)
+        PressedColor: =RGBA(255, 255, 255, 1)
+        PressedFill: =RGBA(51, 52, 74, 1)
+        RadiusBottomLeft: =0
+        RadiusBottomRight: =0
+        RadiusTopLeft: =0
+        RadiusTopRight: =0
+        Text: =If(AAHolidayStatus = "delete", "Delete", If(AAHolidayStatus = "new", "Add", "Update"))
+        X: =568
+        Y: =702
+        ZIndex: =13
+
+    btn_AutoAttendantHolidayForm_Back As button:
+        BorderColor: =RGBA(51, 52, 74, 1)
+        BorderThickness: =If(DisplayMode.Edit,1,0)
+        DisabledColor: =RGBA(255, 255, 255, 1)
+        DisabledFill: =RGBA(219, 219, 219, 1)
+        DisplayMode: =If(locCurrentTab = "Greeting and music", Disabled, Edit)
+        Fill: =ColorValue(BackColor)
+        FocusedBorderThickness: =1
+        HoverBorderColor: =RGBA(51, 52, 74, 1)
+        HoverColor: =RGBA(51, 52, 74, 1)
+        HoverFill: =
+        OnSelect: |-
+            =Set(locCurrentTab,"Holidays");
+            Navigate('Auto Attendant Edit Screen',ScreenTransition.None);
+        PressedBorderColor: =RGBA(51, 52, 74, 1)
+        PressedColor: =RGBA(51, 52, 74, 1)
+        PressedFill: =
+        RadiusBottomLeft: =0
+        RadiusBottomRight: =0
+        RadiusTopLeft: =0
+        RadiusTopRight: =0
+        Text: ="Back"
+        X: =200
+        Y: =702
+        ZIndex: =14
+
+    lbl_AA_Day_1 As label:
+        Text: ="Day"
+        Visible: =locCurrentTab="Business hours"
+        X: =420
+        Y: =168
+        ZIndex: =17
+
+    grp_AA_Holiday_Upload_Window_Popup As group:
+        Height: =5
+        Width: =5
+        X: =40
+        Y: =40
+        ZIndex: =17
+
+        lbl_AA_UploadForm_Overlay_1 As label:
+            Fill: =RGBA(128, 128, 128, 0.2)
+            Height: =App.Height
+            Text: =
+            Visible: =locShowPopupForm
+            Width: =App.Width
+            ZIndex: =22
+
+        lbl_AA_UploadForm_Window_1 As label:
+            Fill: =RGBA(243, 242, 241, 1)
+            Height: =375
+            Text: =
+            Visible: =locShowPopupForm
+            Width: =1152
+            X: =187
+            Y: =187
+            ZIndex: =23
+
+        att_AA_AudioPrompt_UploadForm_1 As attachments:
+            BorderColor: =Color.White
+            BorderThickness: =0
+            DisplayMode: =Edit
+            Fill: =RGBA(243, 242, 241, 1)
+            Height: =161
+            IsInDataCard: =true
+            Items: =
+            MaxAttachments: =1
+            MaxAttachmentSize: =5
+            OnAddFile: |-
+                =If(Not(EndsWith(First(Self.Attachments).Name, ".mp3")) And Not(EndsWith(First(Self.Attachments).Name, ".wav")) And Not(EndsWith(First(Self.Attachments).Name, ".wma")),Notify("The filetype you uploaded is not support. Please upload a file of one of the following types: mp3, wav and wma.", NotificationType.Error); Reset(Self))
+            PaddingBottom: =5
+            PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+            PaddingRight: =5
+            PaddingTop: =5
+            Tooltip: =
+            Visible: =locShowPopupForm
+            Width: =431
+            X: =472
+            Y: =248
+            ZIndex: =24
+
+        btn_AA_Submit_UploadForm_1 As button:
+            BorderThickness: =0
+            DisplayMode: |-
+                =If(
+                    CountRows(att_AA_AudioPrompt_UploadForm_1.Attachments) > 0,
+                    DisplayMode.Edit,
+                    DisplayMode.Disabled
+                )
+            Fill: =RGBA(98, 100, 167, 1)
+            HoverFill: =RGBA(51, 52, 74, 1)
+            OnSelect: |-
+                =UploadFile.Run(
+                    {
+                        contentBytes: First(att_AA_AudioPrompt_UploadForm_1.Attachments).Value,
+                        name: First(att_AA_AudioPrompt_UploadForm_1.Attachments).Name
+                    },
+                    DataCardValue22.Selected.Value,
+                    Concatenate(Substitute(locPromptType, " ", "_"),"_",Substitute(DataCardValue21.Selected.Value, " ", "_"))
+                );
+                
+                If(locPromptType = "greeting holiday", Set(GreetingHolidayAudioPromptFile, Concatenate(Substitute(locPromptType, " ", "_"),"_",Substitute(DataCardValue21.Selected.Value, " ", "_"),".",Trim(Last(FirstN(Split(First(att_AA_AudioPrompt_UploadForm_1.Attachments).Name, "."),2)).Result))));
+                
+                
+                Reset(att_AA_AudioPrompt_UploadForm_1);
+                
+                UpdateContext({
+                    locShowPopupForm: false
+                });
+            PressedBorderColor: =RGBA(51, 52, 74, 1)
+            PressedColor: =RGBA(255, 255, 255, 1)
+            PressedFill: =RGBA(51, 52, 74, 1)
+            Text: ="Upload"
+            Visible: =locShowPopupForm
+            X: =570
+            Y: =438
+            ZIndex: =26
+
+        ctn_AA_Header_UploadForm_1 As groupContainer.manualLayoutContainer:
+            ContentLanguage: =
+            Fill: =RGBA(72, 70, 68, 1)
+            Height: =47
+            Visible: =locShowPopupForm
+            Width: =1152
+            X: =187
+            Y: =180
+            ZIndex: =27
+
+            lbl_AA_Title_UploadForm_1 As label:
+                Align: =Align.Center
+                Color: =RGBA(255, 255, 255, 1)
+                Fill: =RGBA(72, 70, 68, 1)
+                Height: =35
+                Size: =20
+                Text: ="Upload " & locPromptType & " audio file"
+                Width: =626
+                X: =207
+                Y: =6
+                ZIndex: =1
+
+        btn_AA_Cancel_UploadForm_1 As button:
+            BorderThickness: =0
+            Fill: =RGBA(98, 100, 167, 1)
+            HoverBorderColor: =RGBA(51, 52, 74, 1)
+            HoverFill: =RGBA(51, 52, 74, 1)
+            OnSelect: |-
+                =UpdateContext({
+                    locShowPopupForm: false
+                });
+            PressedBorderColor: =RGBA(51, 52, 74, 1)
+            PressedColor: =RGBA(255, 255, 255, 1)
+            PressedFill: =RGBA(51, 52, 74, 1)
+            Text: ="Cancel"
+            Visible: =locShowPopupForm
+            X: =799
+            Y: =438
+            ZIndex: =28
+
+    lbl_AA_StartAt_1 As label:
+        Text: ="Start at"
+        Visible: =locCurrentTab="Business hours"
+        X: =680
+        Y: =168
+        ZIndex: =18
+
+    lbl_AA_EndAt_1 As label:
+        Text: ="End at"
+        Visible: =locCurrentTab="Business hours"
+        X: =929
+        Y: =163
+        ZIndex: =19
+
+    frm_AA_Holiday As form:
+        AcceptsFocus: =false
+        DataSource: ='Auto Attendant - holidays'
+        Item: =gal_AutoAttendant_Holiday.Selected
+        NumberOfColumns: =4
+        OnSuccess: =Notify("Successfully submitted the holiday",NotificationType.Success);
+        Width: =1122
+        X: =120
+        Y: =160
+        ZIndex: =20
+
+        crd_AutoAttendantHolidayForm_Status As typedDataCard.comboBoxEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Provisioningstatus"
+            Default: =ThisItem.Status
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: =DataSourceInfo([@'Auto Attendant - holidays'],DataSourceInfo.DisplayName,"Provisioningstatus")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =DataCardValue50.Selected
+            Visible: =false
+            Width: =280
+            X: =1
+            Y: =0
+            ZIndex: =1
+
+            DataCardKey14 As label:
+                AutoHeight: =true
+                Height: =34
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            DataCardValue50 As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                DefaultSelectedItems: |-
+                    ={Value: AAHolidayStatus}
+                DisplayFields: =["Value"]
+                DisplayMode: =Parent.DisplayMode
+                IsSearchable: =false
+                Items: =Choices([@'Auto Attendant - holidays'].Status)
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["Value"]
+                SearchItems: =[]
+                SelectMultiple: =false
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardKey14.Y + DataCardKey14.Height + 5
+                ZIndex: =2
+
+            ErrorMessage50 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue50.Y + DataCardValue50.Height
+                ZIndex: =3
+
+            StarVisible47 As label:
+                Align: =Align.Center
+                Height: =DataCardKey14.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey14.Y
+                ZIndex: =4
+
+        "'Provisioning status_DataCard3' As typedDataCard.comboBoxEditCard":
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Provisioningstatus0"
+            Default: =ThisItem.'Provisioning status'
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: =DataSourceInfo([@'Auto Attendant - holidays'],DataSourceInfo.DisplayName,"Provisioningstatus0")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =DataCardValue68.Selected
+            Visible: =false
+            Width: =280
+            X: =2
+            Y: =3
+            ZIndex: =1
+
+            DataCardKey33 As label:
+                AutoHeight: =true
+                Height: =34
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            DataCardValue68 As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                DefaultSelectedItems: =If(frm_AA_Holiday.Unsaved,LookUp(Choices('Auto Attendant - holidays'.'Provisioning status'),Value="not provisioned"),Parent.Default)
+                DisplayFields: =["Value"]
+                DisplayMode: =Parent.DisplayMode
+                IsSearchable: =false
+                Items: =Choices([@'Auto Attendant - holidays'].'Provisioning status')
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["Value"]
+                SearchItems: =[]
+                SelectMultiple: =false
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardKey33.Y + DataCardKey33.Height + 5
+                ZIndex: =2
+
+            ErrorMessage68 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue68.Y + DataCardValue68.Height
+                ZIndex: =3
+
+            StarVisible68 As label:
+                Align: =Align.Center
+                Height: =DataCardKey33.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey33.Y
+                ZIndex: =4
+
+        crd_AutoAttendantHolidayForm_Title As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Title"
+            Default: =Concatenate(DataCardValue22.Selected.Value,"-",DataCardValue21.Selected.Value)
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: =DataSourceInfo([@'Auto Attendant - holidays'],DataSourceInfo.DisplayName,"Title")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            MaxLength: =DataSourceInfo([@'Auto Attendant - holidays'], DataSourceInfo.MaxLength, "Title")
+            Required: =true
+            Update: =DataCardValue9.Text
+            Visible: =false
+            Width: =280
+            X: =0
+            Y: =0
+            ZIndex: =28
+
+            DataCardKey1 As label:
+                AutoHeight: =true
+                Height: =34
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            DataCardValue9 As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                MaxLength: =Parent.MaxLength
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardKey1.Y + DataCardKey1.Height + 5
+                ZIndex: =2
+
+            ErrorMessage9 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue9.Y + DataCardValue9.Height
+                ZIndex: =3
+
+            StarVisible6 As label:
+                Align: =Align.Center
+                Height: =DataCardKey1.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey1.Y
+                ZIndex: =4
+
+        crd_AutoAttendantHolidayForm_AutoAttendant As typedDataCard.comboBoxEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="AutoAttendant"
+            Default: =If(AAHolidayStatus = "edit",ThisItem.'Auto Attendant')
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: =DataSourceInfo([@'Auto Attendant - holidays'],DataSourceInfo.DisplayName,"AutoAttendant")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =DataCardValue22.Selected
+            Visible: =false
+            Width: =280
+            X: =2
+            Y: =0
+            ZIndex: =28
+
+            DataCardKey3 As label:
+                AutoHeight: =true
+                Height: =34
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            DataCardValue22 As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                DefaultSelectedItems: |-
+                    =If(frm_AA_Holiday.Mode=FormMode.Edit, Parent.Default,
+                    {
+                      '@odata.type' : "#Microsoft.Azure.Connectors.SharePoint.SPListExpandedReference",
+                      Id: LookUp(Choices('Auto Attendant - holidays'.'Auto Attendant'), Value = AAName.Title).Id,
+                      Value: LookUp(Choices('Auto Attendant - holidays'.'Auto Attendant'), Value = AAName.Title).Value
+                    })
+                DisplayFields: =["Value"]
+                DisplayMode: =Parent.DisplayMode
+                IsSearchable: =false
+                Items: =LookUp(Choices('Auto Attendant - holidays'.'Auto Attendant'), Value = AAName.Title)
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["Value"]
+                SearchItems: =[]
+                SelectMultiple: =false
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardKey3.Y + DataCardKey3.Height + 5
+                ZIndex: =2
+
+            ErrorMessage22 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue22.Y + DataCardValue22.Height
+                ZIndex: =3
+
+            StarVisible11 As label:
+                Align: =Align.Center
+                Height: =DataCardKey3.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey3.Y
+                ZIndex: =4
+
+        crd_AutoAttendantHolidayForm_Overflow_VoicemailTarget As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Holiday_x003a_CalloverflowShared"
+            Default: |-
+                =ThisItem.'Call overflow Shared Voicemail target: holiday'
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: =DataSourceInfo([@'Auto Attendant - holidays'],DataSourceInfo.DisplayName,"Holiday_x003a_CalloverflowShared")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            MaxLength: =DataSourceInfo([@'Auto Attendant - holidays'], DataSourceInfo.MaxLength, "Holiday_x003a_CalloverflowShared")
+            Required: =false
+            Update: =DataCardValue42.Text
+            Visible: |-
+                =If(DataCardValue38.Selected.Value = "Redirect: Voicemail", true, false)
+            Width: =280
+            X: =3
+            Y: =0
+            ZIndex: =28
+
+            DataCardKey9 As label:
+                AutoHeight: =true
+                Height: =34
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            DataCardValue42 As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                MaxLength: =Parent.MaxLength
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardKey9.Y + DataCardKey9.Height + 5
+                ZIndex: =2
+
+            ErrorMessage42 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue42.Y + DataCardValue42.Height
+                ZIndex: =3
+
+            StarVisible40 As label:
+                Align: =Align.Center
+                Height: =DataCardKey9.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey9.Y
+                ZIndex: =4
+
+        crd_AutoAttendantHolidayForm_Overflow_VoicemailSuppression As typedDataCard.toggleEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Callroutingvoicemailpromptsuppre"
+            Default: |-
+                =ThisItem.'Call routing voicemail prompt suppression: holiday'
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: =DataSourceInfo([@'Auto Attendant - holidays'],DataSourceInfo.DisplayName,"Callroutingvoicemailpromptsuppre")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =DataCardValue43.Value
+            Visible: |-
+                =If(DataCardValue38.Selected.Value = "Redirect: Voicemail", true, false)
+            Width: =280
+            X: =0
+            Y: =1
+            ZIndex: =28
+
+            DataCardKey10 As label:
+                AutoHeight: =true
+                Height: =34
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            DataCardValue43 As toggleSwitch:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                Default: =Parent.Default
+                DisplayMode: =Parent.DisplayMode
+                Tooltip: =Parent.DisplayName
+                X: =30
+                Y: =DataCardKey10.Y + DataCardKey10.Height + 5
+                ZIndex: =2
+
+            ErrorMessage43 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue43.Y + DataCardValue43.Height
+                ZIndex: =3
+
+            StarVisible42 As label:
+                Align: =Align.Center
+                Height: =DataCardKey10.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey10.Y
+                ZIndex: =4
+
+        crd_AutoAttendantHolidayForm_Holiday As typedDataCard.comboBoxEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Holiday"
+            Default: =ThisItem.Holiday
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: =DataSourceInfo([@'Auto Attendant - holidays'],DataSourceInfo.DisplayName,"Holiday")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =DataCardValue21.Selected
+            Width: =560
+            X: =1
+            Y: =1
+            ZIndex: =28
+
+            DataCardKey2 As label:
+                AutoHeight: =true
+                Color: =ColorValue(HeaderColor)
+                FontWeight: =Semibold
+                Height: =34
+                Size: =11
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            DataCardValue21 As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                ChevronBackground: =ColorValue(HeaderColor)
+                DefaultSelectedItems: =Parent.Default
+                DisplayFields: =["Value"]
+                DisplayMode: =Parent.DisplayMode
+                Height: =36
+                IsSearchable: =false
+                Items: =Choices([@'Auto Attendant - holidays'].Holiday)
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["Value"]
+                SearchItems: =[]
+                SelectMultiple: =false
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 150
+                X: =30
+                Y: =DataCardKey2.Y + DataCardKey2.Height + 5
+                ZIndex: =2
+
+            ErrorMessage21 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue21.Y + DataCardValue21.Height
+                ZIndex: =3
+
+            StarVisible10 As label:
+                Align: =Align.Center
+                Height: =DataCardKey2.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey2.Y
+                ZIndex: =4
+
+        crd_AutoAttendantHolidayForm_Greeting_Options As typedDataCard.comboBoxEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Greetingoptions"
+            Default: |-
+                =ThisItem.'Greeting options: holiday'
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: =DataSourceInfo([@'Auto Attendant - holidays'],DataSourceInfo.DisplayName,"Greetingoptions")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =DataCardValue23.Selected
+            Width: =560
+            X: =0
+            Y: =2
+            ZIndex: =28
+
+            DataCardKey4 As label:
+                AutoHeight: =true
+                Color: =ColorValue(HeaderColor)
+                FontWeight: =Semibold
+                Height: =34
+                Size: =11
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            DataCardValue23 As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                ChevronBackground: =ColorValue(HeaderColor)
+                DefaultSelectedItems: =Parent.Default
+                DisplayFields: =["Value"]
+                DisplayMode: =Parent.DisplayMode
+                Height: =36
+                IsSearchable: =false
+                Items: |-
+                    =Choices([@'Auto Attendant - holidays'].'Greeting options: holiday')
+                OnChange: |-
+                    =UpdateContext({locDropBoxUpdated: 
+                        Patch(locDropBoxUpdated, {GreetingTypeHoliday: true})
+                    });
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["Value"]
+                SearchItems: =[]
+                SelectMultiple: =false
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardKey4.Y + DataCardKey4.Height + 5
+                ZIndex: =2
+
+            ErrorMessage23 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue23.Y + DataCardValue23.Height
+                ZIndex: =3
+
+            StarVisible23 As label:
+                Align: =Align.Center
+                Height: =DataCardKey4.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey4.Y
+                ZIndex: =4
+
+        crd_AutoAttendantHolidayForm_Greeting_Audio As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Greetingaudio"
+            Default: |-
+                =If([@GreetingHolidayAudioPromptFile] = "" And DataCardValue23.Selected.Value  = "Play an audio file" And locDropBoxUpdated.GreetingTypeHoliday = false,ThisItem.'Greeting audio: holiday',[@GreetingHolidayAudioPromptFile])
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: =DataSourceInfo([@'Auto Attendant - holidays'],DataSourceInfo.DisplayName,"Greetingaudio")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            MaxLength: =DataSourceInfo([@'Auto Attendant - holidays'], DataSourceInfo.MaxLength, "Greetingaudio")
+            Required: =false
+            Update: =DataCardValue24.Text
+            Visible: =If(DataCardValue23.Selected.Value = "Play an audio file",true,false)
+            Width: =560
+            X: =2
+            Y: =2
+            ZIndex: =28
+
+            DataCardKey5 As label:
+                AutoHeight: =true
+                Height: =34
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            DataCardValue24 As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                MaxLength: =Parent.MaxLength
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 100
+                X: =30
+                Y: =DataCardKey5.Y + DataCardKey5.Height + 5
+                ZIndex: =2
+
+            ErrorMessage24 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue24.Y + DataCardValue24.Height
+                ZIndex: =3
+
+            StarVisible24 As label:
+                Align: =Align.Center
+                Height: =DataCardKey5.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey5.Y
+                ZIndex: =4
+
+            btn_AutoAttendantGreetingAHAudio_1 As icon.Add:
+                Height: =40
+                Icon: =Icon.Edit
+                OnSelect: |-
+                    =UpdateContext({
+                        locShowPopupForm: true,
+                        locPromptType: "greeting holiday"
+                    });
+                Width: =40
+                X: =DataCardValue24.X + DataCardValue24.Width + 5
+                Y: =lbl_AutoAttendantGreetingAHAudio.Y + lbl_AutoAttendantGreetingAHAudio.Height + 5
+                ZIndex: =5
+
+        crd_AutoAttendantHolidayForm_Greeting_Text As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Greetingtext"
+            Default: |-
+                =If(locDropBoxUpdated.GreetingTypeHoliday = true, "",ThisItem.'Greeting text: holiday')
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: =DataSourceInfo([@'Auto Attendant - holidays'],DataSourceInfo.DisplayName,"Greetingtext")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =200
+            MaxLength: =DataSourceInfo([@'Auto Attendant - holidays'], DataSourceInfo.MaxLength, "Greetingtext")
+            Required: =false
+            Update: =DataCardValue37.Text
+            Visible: =If(DataCardValue23.Selected.Value = "Add a greeting message",true,false)
+            Width: =560
+            X: =0
+            Y: =3
+            ZIndex: =28
+
+            DataCardKey6 As label:
+                AutoHeight: =true
+                Height: =34
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            DataCardValue37 As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                Height: =100
+                MaxLength: =Parent.MaxLength
+                Mode: =TextMode.MultiLine
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardKey6.Y + DataCardKey6.Height + 5
+                ZIndex: =2
+
+            ErrorMessage37 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue37.Y + DataCardValue37.Height
+                ZIndex: =3
+
+            StarVisible25 As label:
+                Align: =Align.Center
+                Height: =DataCardKey6.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey6.Y
+                ZIndex: =4
+
+        crd_AutoAttendantHolidayForm_Routing_Options As typedDataCard.comboBoxEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Holiday_x003a_Callroutingoptions"
+            Default: |-
+                =ThisItem.'Call routing options: holiday'
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: =DataSourceInfo([@'Auto Attendant - holidays'],DataSourceInfo.DisplayName,"Holiday_x003a_Callroutingoptions")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =DataCardValue38.Selected
+            Width: =560
+            X: =0
+            Y: =4
+            ZIndex: =28
+
+            DataCardKey7 As label:
+                AutoHeight: =true
+                Color: =ColorValue(HeaderColor)
+                FontWeight: =Semibold
+                Height: =34
+                Size: =11
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            DataCardValue38 As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                ChevronBackground: =ColorValue(HeaderColor)
+                DefaultSelectedItems: =Parent.Default
+                DisplayFields: =["Value"]
+                DisplayMode: =Parent.DisplayMode
+                Height: =36
+                IsSearchable: =false
+                Items: |-
+                    =Choices([@'Auto Attendant - holidays'].'Call routing options: holiday')
+                OnChange: |-
+                    =UpdateContext({locDropBoxUpdated: 
+                        Patch(locDropBoxUpdated, {CallRoutingHoliday: true})
+                    });
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["Value"]
+                SearchItems: =[]
+                SelectMultiple: =false
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardKey7.Y + DataCardKey7.Height + 5
+                ZIndex: =2
+
+            ErrorMessage38 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue38.Y + DataCardValue38.Height
+                ZIndex: =3
+
+            StarVisible26 As label:
+                Align: =Align.Center
+                Height: =DataCardKey7.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey7.Y
+                ZIndex: =4
+
+        crd_AutoAttendantHolidayForm_Routing_Target As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Holiday_x003a_Callroutingtarget"
+            Default: |-
+                =ThisItem.'Call routing target: holiday'
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: =DataSourceInfo([@'Auto Attendant - holidays'],DataSourceInfo.DisplayName,"Holiday_x003a_Callroutingtarget")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            MaxLength: =DataSourceInfo([@'Auto Attendant - holidays'], DataSourceInfo.MaxLength, "Holiday_x003a_Callroutingtarget")
+            Required: =false
+            Update: =DataCardValue40.Text
+            Visible: |-
+                =If(DataCardValue38.Selected.Value = "Redirect: Person in organization" Or DataCardValue38.Selected.Value = "Redirect: Voice app" Or DataCardValue38.Selected.Value = "Redirect: External phone number",true, false)
+            Width: =560
+            X: =2
+            Y: =4
+            ZIndex: =28
+
+            DataCardKey8 As label:
+                AutoHeight: =true
+                Height: =34
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            DataCardValue40 As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                MaxLength: =Parent.MaxLength
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardKey8.Y + DataCardKey8.Height + 5
+                ZIndex: =2
+
+            ErrorMessage40 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue40.Y + DataCardValue40.Height
+                ZIndex: =3
+
+            StarVisible39 As label:
+                Align: =Align.Center
+                Height: =DataCardKey8.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey8.Y
+                ZIndex: =4
+
+    Icon3 As icon.Add:
+        Color: =ColorValue(HeaderColor)
+        Height: =36
+        Icon: =Icon.Add
+        OnSelect: |-
+            =UpdateContext({locShowPopupFormNewHoliday: true});
+        Width: =36
+        X: =579
+        Y: =203
+        ZIndex: =25
+
+    cmp_left_menu_2 As left_menu_bar:
+        Default: ="Auto Attendants Screen"
+        Height: =703
+        Y: =65
+        ZIndex: =36
+
+    grp_AA_NewHoliday As group:
+        Height: =5
+        Width: =5
+        X: =40
+        Y: =40
+        ZIndex: =36
+
+        lbl_NewHolidayForm_Overlay As label:
+            Fill: =RGBA(128, 128, 128, 0.2)
+            Height: =App.Height
+            Text: =
+            Visible: =locShowPopupFormNewHoliday
+            Width: =App.Width
+            ZIndex: =29
+
+        lbl_NewHolidayForm_Background As label:
+            Fill: =RGBA(243, 242, 241, 1)
+            Height: =375
+            Text: =""
+            Visible: =locShowPopupFormNewHoliday
+            Width: =1152
+            X: =187
+            Y: =187
+            ZIndex: =30
+
+        btn_NewHolidayForm_Submit As button:
+            BorderThickness: =0
+            Fill: =ColorValue(HeaderColor)
+            HoverFill: =RGBA(51, 52, 74, 1)
+            OnSelect: |-
+                =SubmitForm(frm_NewHoliday);
+                Refresh(Holidays);
+            PressedBorderColor: =RGBA(51, 52, 74, 1)
+            PressedColor: =RGBA(255, 255, 255, 1)
+            PressedFill: =RGBA(51, 52, 74, 1)
+            RadiusBottomLeft: =0
+            RadiusBottomRight: =0
+            RadiusTopLeft: =0
+            RadiusTopRight: =0
+            Size: =12
+            Text: ="Create"
+            Visible: =locShowPopupFormNewHoliday
+            X: =570
+            Y: =478
+            ZIndex: =31
+
+        ctn_NewHolidayForm_Header As groupContainer.manualLayoutContainer:
+            ContentLanguage: =
+            Fill: =ColorValue(AAColor)
+            Height: =47
+            Visible: =locShowPopupFormNewHoliday
+            Width: =1152
+            X: =187
+            Y: =180
+            ZIndex: =32
+
+            lbl__NewHoliday_WindowTitle As label:
+                Align: =Align.Center
+                Color: =RGBA(255, 255, 255, 1)
+                FontWeight: =Semibold
+                Height: =44
+                Size: =12
+                Text: ="Create New Holiday"
+                Width: =1123
+                Y: =3
+                ZIndex: =1
+
+        btn_NewHolidayForm_Cancel As button:
+            BorderThickness: =0
+            Fill: =ColorValue(CancelColor)
+            HoverBorderColor: =RGBA(51, 52, 74, 1)
+            HoverFill: =RGBA(51, 52, 74, 1)
+            OnSelect: |-
+                =UpdateContext({
+                    locShowPopupFormNewHoliday: false
+                });
+            PressedBorderColor: =RGBA(51, 52, 74, 1)
+            PressedColor: =RGBA(255, 255, 255, 1)
+            PressedFill: =RGBA(51, 52, 74, 1)
+            RadiusBottomLeft: =0
+            RadiusBottomRight: =0
+            RadiusTopLeft: =0
+            RadiusTopRight: =0
+            Size: =12
+            Text: ="Cancel"
+            Visible: =locShowPopupFormNewHoliday
+            X: =799
+            Y: =482
+            ZIndex: =33
+
+        frm_NewHoliday As form:
+            AcceptsFocus: =false
+            DataSource: =Holidays
+            DefaultMode: =FormMode.New
+            Height: =213
+            NumberOfColumns: =2
+            OnFailure: =Notify("Something went wrong", NotificationType.Error)
+            OnSuccess: |-
+                =UpdateContext({
+                    locShowPopupFormNewHoliday: false
+                });
+                Notify("Holiday successfully added", NotificationType.Success);
+                ResetForm(frm_NewHoliday)
+            Visible: =locShowPopupFormNewHoliday
+            Width: =511
+            X: =518
+            Y: =231
+            ZIndex: =34
+
+            Title_DataCard2 As typedDataCard.textualEditCard:
+                BorderStyle: =BorderStyle.Solid
+                DataField: ="Title"
+                Default: =ThisItem.Title
+                DisplayMode: =Parent.DisplayMode
+                DisplayName: =DataSourceInfo([@Holidays],DataSourceInfo.DisplayName,"Title")
+                Fill: =RGBA(0, 0, 0, 0)
+                Height: =50
+                MaxLength: =DataSourceInfo([@Holidays], DataSourceInfo.MaxLength, "Title")
+                Required: =true
+                Update: =DataCardValue44.Text
+                Width: =425
+                X: =0
+                Y: =0
+                ZIndex: =36
+
+                DataCardKey11 As label:
+                    AutoHeight: =true
+                    Color: =ColorValue(HeaderColor)
+                    FontWeight: =Semibold
+                    Height: =34
+                    Size: =11
+                    Text: =Parent.DisplayName
+                    Width: =Parent.Width - 60
+                    Wrap: =false
+                    X: =30
+                    Y: =10
+                    ZIndex: =1
+
+                DataCardValue44 As text:
+                    BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                    BorderThickness: =1
+                    Default: =Parent.Default
+                    DelayOutput: =true
+                    DisplayMode: =Parent.DisplayMode
+                    MaxLength: =Parent.MaxLength
+                    PaddingLeft: =5
+                    RadiusBottomLeft: =0
+                    RadiusBottomRight: =0
+                    RadiusTopLeft: =0
+                    RadiusTopRight: =0
+                    Size: =10
+                    Tooltip: =Parent.DisplayName
+                    Width: =Parent.Width - 60
+                    X: =30
+                    Y: =DataCardKey11.Y + DataCardKey11.Height + 5
+                    ZIndex: =2
+
+                ErrorMessage44 As label:
+                    AutoHeight: =true
+                    Height: =10
+                    Live: =Live.Assertive
+                    PaddingBottom: =0
+                    PaddingLeft: =0
+                    PaddingRight: =0
+                    PaddingTop: =0
+                    Text: =Parent.Error
+                    Visible: =Parent.DisplayMode=DisplayMode.Edit
+                    Width: =Parent.Width - 60
+                    X: =30
+                    Y: =DataCardValue44.Y + DataCardValue44.Height
+                    ZIndex: =3
+
+                StarVisible44 As label:
+                    Align: =Align.Center
+                    Height: =DataCardKey11.Height
+                    Text: ="*"
+                    Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                    Width: =30
+                    Wrap: =false
+                    Y: =DataCardKey11.Y
+                    ZIndex: =4
+
+            StartDate_DataCard1 As typedDataCard.dateEditCard:
+                BorderStyle: =BorderStyle.Solid
+                DataField: ="StartDate"
+                Default: =ThisItem.StartDate
+                DisplayMode: =Parent.DisplayMode
+                DisplayName: =DataSourceInfo([@Holidays],DataSourceInfo.DisplayName,"StartDate")
+                Fill: =RGBA(0, 0, 0, 0)
+                Height: =50
+                Required: =false
+                Update: =DataCardValue45.SelectedDate
+                Width: =255
+                X: =0
+                Y: =1
+                ZIndex: =36
+
+                DataCardKey12 As label:
+                    AutoHeight: =true
+                    Color: =ColorValue(HeaderColor)
+                    FontWeight: =Semibold
+                    Height: =34
+                    Size: =11
+                    Text: =Parent.DisplayName
+                    Width: =Parent.Width - 60
+                    Wrap: =false
+                    X: =30
+                    Y: =10
+                    ZIndex: =1
+
+                DataCardValue45 As datepicker:
+                    BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                    BorderThickness: =1
+                    DefaultDate: =Parent.Default
+                    DisplayMode: =Parent.DisplayMode
+                    EndYear: =Year(Today())+100
+                    IconBackground: =ColorValue(HeaderColor)
+                    IsEditable: =true
+                    PaddingBottom: =0
+                    PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                    StartYear: =1899
+                    Tooltip: =Parent.DisplayName
+                    Width: =Parent.Width - 60
+                    X: =30
+                    Y: =DataCardKey12.Y + DataCardKey12.Height + 5
+                    ZIndex: =2
+
+                ErrorMessage45 As label:
+                    AutoHeight: =true
+                    Height: =10
+                    Live: =Live.Assertive
+                    PaddingBottom: =0
+                    PaddingLeft: =0
+                    PaddingRight: =0
+                    PaddingTop: =0
+                    Text: =Parent.Error
+                    Visible: =Parent.DisplayMode=DisplayMode.Edit
+                    Width: =Parent.Width - 60
+                    X: =30
+                    Y: =DataCardValue45.Y + DataCardValue45.Height
+                    ZIndex: =3
+
+                StarVisible45 As label:
+                    Align: =Align.Center
+                    Height: =DataCardKey12.Height
+                    Text: ="*"
+                    Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                    Width: =30
+                    Wrap: =false
+                    Y: =DataCardKey12.Y
+                    ZIndex: =4
+
+            EndDate_DataCard1 As typedDataCard.dateEditCard:
+                BorderStyle: =BorderStyle.Solid
+                DataField: ="EndDate"
+                Default: =ThisItem.EndDate
+                DisplayMode: =Parent.DisplayMode
+                DisplayName: =DataSourceInfo([@Holidays],DataSourceInfo.DisplayName,"EndDate")
+                Fill: =RGBA(0, 0, 0, 0)
+                Height: =50
+                Required: =false
+                Update: =DataCardValue49.SelectedDate
+                Width: =255
+                X: =1
+                Y: =1
+                ZIndex: =36
+
+                DataCardKey13 As label:
+                    AutoHeight: =true
+                    Color: =ColorValue(HeaderColor)
+                    FontWeight: =Semibold
+                    Height: =34
+                    Size: =11
+                    Text: =Parent.DisplayName
+                    Width: =Parent.Width - 60
+                    Wrap: =false
+                    X: =30
+                    Y: =10
+                    ZIndex: =1
+
+                DataCardValue49 As datepicker:
+                    BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                    BorderThickness: =1
+                    DefaultDate: =Parent.Default
+                    DisplayMode: =Parent.DisplayMode
+                    EndYear: =Year(Today())+100
+                    IconBackground: =ColorValue(HeaderColor)
+                    IsEditable: =true
+                    PaddingBottom: =0
+                    PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                    StartYear: =1899
+                    Tooltip: =Parent.DisplayName
+                    Width: =Parent.Width - 60
+                    X: =30
+                    Y: =DataCardKey13.Y + DataCardKey13.Height + 5
+                    ZIndex: =2
+
+                ErrorMessage49 As label:
+                    AutoHeight: =true
+                    Height: =10
+                    Live: =Live.Assertive
+                    PaddingBottom: =0
+                    PaddingLeft: =0
+                    PaddingRight: =0
+                    PaddingTop: =0
+                    Text: =Parent.Error
+                    Visible: =Parent.DisplayMode=DisplayMode.Edit
+                    Width: =Parent.Width - 60
+                    X: =30
+                    Y: =DataCardValue49.Y + DataCardValue49.Height
+                    ZIndex: =3
+
+                StarVisible46 As label:
+                    Align: =Align.Center
+                    Height: =DataCardKey13.Height
+                    Text: ="*"
+                    Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                    Width: =30
+                    Wrap: =false
+                    Y: =DataCardKey13.Y
+                    ZIndex: =4
+
+    lbl_AutoAttendant_name_header_6 As label:
+        Color: =RGBA(255, 255, 255, 1)
+        Fill: =ColorValue(AAColor)
+        FontWeight: =FontWeight.Bold
+        Height: =6
+        PaddingBottom: =15
+        PaddingLeft: =15
+        PaddingRight: =15
+        PaddingTop: =15
+        Text: =""
+        Width: =1306
+        X: =60
+        Y: =762
+        ZIndex: =37
+

@@ -1,0 +1,165 @@
+"'Call Queues Screen' As screen":
+    Fill: =RGBA(237, 237, 237, 1)
+    Height: =Max(App.Height, App.DesignHeight)
+    OnVisible: =Set(locCurrentTab, Blank())
+    Width: =Max(App.Width, App.DesignWidth)
+
+    rec_AutoAttendantName_bar_4 As rectangle:
+        Fill: =RGBA(202, 202, 202, 1)
+        Height: =80
+        Width: =Parent.Width - cmp_left_menu_1.Width
+        X: =cmp_left_menu_1.X + cmp_left_menu_1.Width
+        Y: =cmp_header_1.Y + cmp_header.Height
+        ZIndex: =1
+
+    "gal_Call_Queues As gallery.'BrowseLayout_Vertical_ThreeTextVariant_ver4.0'":
+        Fill: =RGBA(255, 255, 255, 1)
+        Height: =547
+        Items: =Filter('Call Queue management', Title in Filter('User administration', User.DisplayName = locUserFullName).Title)
+        Layout: =Layout.Vertical
+        TemplatePadding: =0
+        TemplateSize: =58
+        Width: =1187
+        X: =left_menu_bar_2.X + left_menu_bar_2.Width + 15
+        Y: =202
+        ZIndex: =2
+
+        Button3 As button:
+            Color: =RGBA(204, 204, 204, 1)
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =58
+            HoverBorderColor: =ColorFade(ColorValue(CQColor),.90)
+            HoverFill: =ColorFade(ColorValue(CQColor),.90)
+            OnSelect: =Select(Parent)
+            RadiusBottomLeft: =0
+            RadiusBottomRight: =0
+            RadiusTopLeft: =0
+            RadiusTopRight: =0
+            Text: =""
+            Width: =1187
+            ZIndex: =1
+
+        Title5 As label:
+            FontWeight: =Normal
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =13
+            Text: =ThisItem.Title
+            Width: =578
+            X: =11
+            Y: =8
+            ZIndex: =2
+
+        Subtitle4 As label:
+            Height: =36
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =13
+            Text: =ThisItem.'Call overflow threshold'
+            Width: =83
+            X: =604
+            Y: =8
+            ZIndex: =3
+
+        Body2 As label:
+            Height: =36
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =13
+            Text: =ThisItem.'Call timeout Maximum wait time'
+            Width: =89
+            X: =818
+            Y: =8
+            ZIndex: =4
+
+        NextArrow5 As icon.ChevronRight:
+            AccessibleLabel: =Self.Tooltip
+            Color: =ColorValue(CQColor)
+            Height: =40
+            Icon: =Icon.ChevronRight
+            OnSelect: |-
+                =Navigate('Call Queue Edit Screen',ScreenTransition.None,{CQName:ThisItem, CurrentTab:"Greeting and music"})
+            PaddingLeft: =10
+            PaddingRight: =10
+            TabIndex: =0
+            Tooltip: ="View item details"
+            Width: =40
+            X: =1137
+            Y: =12
+            ZIndex: =5
+
+        Separator6 As rectangle:
+            Fill: =RGBA(179, 179, 179, 1)
+            Height: =1
+            OnSelect: =Select(Parent)
+            Width: =Parent.TemplateWidth
+            Y: =Parent.TemplateHeight - 1
+            ZIndex: =6
+
+    header_bar_1 As header_bar:
+        ZIndex: =3
+
+    left_menu_bar_1 As left_menu_bar:
+        Default: ="Call Queues Screen"
+        Height: =703
+        Y: =65
+        ZIndex: =4
+
+    lbl_Title_CallQueueName As label:
+        FontWeight: =FontWeight.Bold
+        Text: ="Call Queue name"
+        Width: =317
+        X: =75
+        Y: =154
+        ZIndex: =5
+
+    lbl_Title_MaximumCalls As label:
+        FontWeight: =FontWeight.Bold
+        Text: ="Maximum calls"
+        Width: =184
+        X: =669
+        Y: =154
+        ZIndex: =6
+
+    lbl_Title_MaximumWaitTime As label:
+        FontWeight: =FontWeight.Bold
+        Text: ="Maximum wait time"
+        Width: =218
+        X: =886
+        Y: =154
+        ZIndex: =7
+
+    lbl_AutoAttendant_name_header_1 As label:
+        Color: =RGBA(255, 255, 255, 1)
+        Fill: =ColorValue(CQColor)
+        FontWeight: =Semibold
+        Height: =6
+        PaddingBottom: =15
+        PaddingLeft: =15
+        PaddingRight: =15
+        PaddingTop: =15
+        Size: =14
+        Text: =""
+        Width: =1306
+        X: =60
+        Y: =762
+        ZIndex: =8
+
+    Label2_1 As label:
+        FontWeight: =Semibold
+        Height: =36
+        Text: ="Call Queue Administration"
+        Width: =394
+        X: =164
+        Y: =94
+        ZIndex: =9
+

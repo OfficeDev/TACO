@@ -1,0 +1,238 @@
+ColorMe As screen:
+    Fill: =RGBA(237, 237, 237, 1)
+
+    rec_AutAttendantForm_BottomButtons_bar_3 As rectangle:
+        Fill: =RGBA(255, 255, 255, 1)
+        Height: =92
+        Width: =1306
+        X: =60
+        Y: =676
+        ZIndex: =1
+
+    Rectangle3 As rectangle:
+        Fill: =RGBA(255, 255, 255, 1)
+        Height: =115
+        Width: =360
+        X: =660
+        Y: =511
+        ZIndex: =2
+
+    txtAAcolor As text:
+        BorderThickness: =1
+        Default: =AAColor
+        Height: =44
+        RadiusBottomLeft: =0
+        RadiusBottomRight: =0
+        RadiusTopLeft: =0
+        RadiusTopRight: =0
+        Size: =10
+        Width: =101
+        X: =289
+        Y: =291
+        ZIndex: =3
+
+    txtCQcolor As text:
+        BorderThickness: =1
+        Default: =CQColor
+        Height: =44
+        RadiusBottomLeft: =0
+        RadiusBottomRight: =0
+        RadiusTopLeft: =0
+        RadiusTopRight: =0
+        Size: =10
+        Width: =101
+        X: =289
+        Y: =347
+        ZIndex: =4
+
+    Button1 As button:
+        Height: =49
+        OnSelect: |-
+            =Set(AAColor, txtAAcolor.Text);
+            Set(CQColor, txtCQcolor.Text);
+        Text: ="Color Me ?"
+        Width: =151
+        X: =757
+        Y: =544
+        ZIndex: =5
+
+    left_menu_bar_7 As left_menu_bar:
+        Height: =703
+        Y: =65
+        ZIndex: =6
+
+    header_bar_7 As header_bar:
+        ZIndex: =7
+
+    Label3 As label:
+        Text: ="Auto Attendant"
+        X: =100
+        Y: =295
+        ZIndex: =9
+
+    Label3_1 As label:
+        Text: ="Call Queue"
+        X: =100
+        Y: =347
+        ZIndex: =10
+
+    Label3_2 As label:
+        Text: ="Header / Nav"
+        X: =100
+        Y: =176
+        ZIndex: =11
+
+    Rectangle4 As rectangle:
+        Fill: =ColorValue(txtAAcolor.Text)
+        Height: =44
+        Width: =132
+        X: =439
+        Y: =291
+        ZIndex: =12
+
+    Rectangle4_1 As rectangle:
+        Fill: =ColorValue(txtCQcolor.Text)
+        Height: =44
+        Width: =132
+        X: =439
+        Y: =347
+        ZIndex: =13
+
+    Button4 As button:
+        Fill: =ColorValue(HeaderColor)
+        HoverFill: =ColorFade(Self.Fill, -20%)
+        RadiusBottomLeft: =0
+        RadiusBottomRight: =0
+        RadiusTopLeft: =0
+        RadiusTopRight: =0
+        Size: =12
+        Text: ="Update"
+        X: =647
+        Y: =702
+        ZIndex: =14
+
+    txtHeaderColor As text:
+        BorderThickness: =1
+        Default: =HeaderColor
+        Height: =44
+        RadiusBottomLeft: =0
+        RadiusBottomRight: =0
+        RadiusTopLeft: =0
+        RadiusTopRight: =0
+        Size: =10
+        Width: =101
+        X: =289
+        Y: =170
+        ZIndex: =15
+
+    Button4_1 As button:
+        Fill: =RGBA(105, 0, 0, 1)
+        HoverFill: =ColorFade(Self.Fill, -20%)
+        RadiusBottomLeft: =0
+        RadiusBottomRight: =0
+        RadiusTopLeft: =0
+        RadiusTopRight: =0
+        Size: =12
+        Text: ="Cancel"
+        X: =1020
+        Y: =702
+        ZIndex: =16
+
+    Button4_2 As button:
+        Fill: =RGBA(99, 139, 44, 1)
+        HoverFill: =ColorFade(Self.Fill, -20%)
+        RadiusBottomLeft: =0
+        RadiusBottomRight: =0
+        RadiusTopLeft: =0
+        RadiusTopRight: =0
+        Size: =12
+        Text: ="Next"
+        X: =833
+        Y: =702
+        ZIndex: =17
+
+    Button4_3 As button:
+        Fill: =RGBA(0, 94, 146, 1)
+        HoverFill: =ColorFade(Self.Fill, -20%)
+        RadiusBottomLeft: =0
+        RadiusBottomRight: =0
+        RadiusTopLeft: =0
+        RadiusTopRight: =0
+        Size: =12
+        Text: ="Back"
+        X: =462
+        Y: =702
+        ZIndex: =18
+
+    Rectangle4_2 As rectangle:
+        Fill: =ColorValue(txtHeaderColor.Text)
+        Height: =44
+        Width: =132
+        X: =439
+        Y: =170
+        ZIndex: =19
+
+    rec_AutoAttendantName_bar_7 As rectangle:
+        Fill: =RGBA(202, 202, 202, 1)
+        Height: =80
+        Width: =Parent.Width - cmp_left_menu_1.Width
+        X: =cmp_left_menu_1.X + cmp_left_menu_1.Width
+        Y: =cmp_header_1.Y + cmp_header.Height
+        ZIndex: =20
+
+    txtCQcolor_1 As text:
+        BorderThickness: =1
+        Default: =UAColor
+        Height: =44
+        RadiusBottomLeft: =0
+        RadiusBottomRight: =0
+        RadiusTopLeft: =0
+        RadiusTopRight: =0
+        Size: =10
+        Width: =101
+        X: =289
+        Y: =406
+        ZIndex: =21
+
+    Label3_3 As label:
+        Text: ="User Admin"
+        X: =100
+        Y: =406
+        ZIndex: =22
+
+    Rectangle4_3 As rectangle:
+        Fill: =ColorValue(txtCQcolor_1.Text)
+        Height: =44
+        Width: =132
+        X: =439
+        Y: =406
+        ZIndex: =23
+
+    txtCQcolor_2 As text:
+        BorderThickness: =1
+        Default: =inactiveColor
+        Height: =44
+        RadiusBottomLeft: =0
+        RadiusBottomRight: =0
+        RadiusTopLeft: =0
+        RadiusTopRight: =0
+        Size: =10
+        Width: =101
+        X: =289
+        Y: =230
+        ZIndex: =24
+
+    Label3_4 As label:
+        Text: ="Inactive Color"
+        X: =100
+        Y: =235
+        ZIndex: =25
+
+    Rectangle4_4 As rectangle:
+        Fill: =ColorValue(txtCQcolor_2.Text)
+        Height: =44
+        Width: =132
+        X: =439
+        Y: =230
+        ZIndex: =26
+

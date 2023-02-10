@@ -1,0 +1,374 @@
+"'Home Screen' As screen":
+    Fill: =RGBA(237, 237, 237, 1)
+    Height: =Max(App.Height, App.DesignHeight)
+    OnVisible: |-
+        =Set(locCurrentTab, Blank());
+        Set(AAColor, "#327BB3");
+        Set(CQColor, "#FF6F1B");
+        Set(UAColor, "#747474");
+        Set(HeaderColor, "#002240");
+        Set(inactiveColor, "#757474");
+        Set(BackColor, "#005E92");
+        Set(NextColor, "#638B2C");
+        Set(UpdateColor, "#002240");
+        Set(CancelColor, "#690000");
+        Set(AAControls, AAColor);
+        Set(CQControls, CQColor);
+        Set(locshowAA, Blank());
+        Set(locshowCQ, Blank());
+        UpdateContext({locshowAA: true});
+        UpdateContext({locshowCQ: false});
+        UpdateContext({AAControls: AAColor});
+        UpdateContext({CQControls: inactiveColor});
+    Width: =Max(App.Width, App.DesignWidth)
+
+    Rectangle1 As rectangle:
+        Fill: =RGBA(255, 255, 255, 1)
+        Height: =237
+        Width: =1167
+        X: =104
+        Y: =506
+        ZIndex: =2
+
+    header_bar_2 As header_bar:
+        ZIndex: =4
+
+    left_menu_bar_2 As left_menu_bar:
+        Default: ="Home Screen"
+        Height: =703
+        Y: =65
+        ZIndex: =5
+
+    lbl_aa_overview_header As label:
+        Align: =Center
+        Color: =ColorValue(AAControls)
+        FontWeight: =Semibold
+        Height: =38
+        Size: =12
+        Text: ="AUTO ATTENDANTS"
+        Width: =187
+        X: =104
+        Y: =151
+        ZIndex: =7
+
+    lbl_aa_count_header As label:
+        Align: =Align.Center
+        Color: =ColorValue(AAControls)
+        FontWeight: =Semibold
+        Size: =32
+        Text: =CountRows(gal_AutoAttendants.AllItems)
+        Width: =43
+        X: =176
+        Y: =105
+        ZIndex: =8
+
+    lbl_audit_overview As label:
+        Color: =RGBA(116, 116, 116, 1)
+        FontWeight: =Semibold
+        Height: =38
+        Size: =12
+        Text: ="RECENT ACTIVITIES"
+        Width: =187
+        X: =104
+        Y: =506
+        ZIndex: =9
+
+    lbl_cq_overview_header_1 As label:
+        Align: =Align.Center
+        Color: =ColorValue(CQControls)
+        FontWeight: =Semibold
+        Height: =38
+        Size: =12
+        Text: ="CALL QUEUES"
+        Width: =131
+        X: =308
+        Y: =151
+        ZIndex: =11
+
+    lbl_cq_count_header_1 As label:
+        Align: =Align.Center
+        Color: =ColorValue(CQControls)
+        FontWeight: =Semibold
+        Size: =32
+        Text: =CountRows(gal_CallQueues.AllItems)
+        Width: =43
+        X: =352
+        Y: =105
+        ZIndex: =12
+
+    "gal_recent_activities As gallery.'BrowseLayout_Vertical_TwoTextOneImageVariant_ver4.0'":
+        Height: =195
+        Items: |
+            =LastN(
+            SortByColumns(
+                'Voice management audit log',
+                            "Timestamp",Ascending
+            ),
+            3)
+        Layout: =Layout.Vertical
+        TemplatePadding: =0
+        TemplateSize: =46
+        Width: =1157
+        X: =114
+        Y: =539
+        ZIndex: =13
+
+        Separator4 As rectangle:
+            Fill: =RGBA(179, 179, 179, 1)
+            Height: =1
+            OnSelect: =Select(Parent)
+            Width: =Parent.TemplateWidth
+            Y: =44
+            ZIndex: =5
+
+        HtmlText1 As htmlViewer:
+            Color: =RGBA(87, 87, 87, 1)
+            Height: =36
+            HtmlText: |-
+                ="<font color='#346BF5'>" & ThisItem.User & "</font> " & If(ThisItem.Result="Success","Successfully","Unsuccessfully") & " updated <strong>" & ThisItem.'Affected Object' & "</strong> <i>(" & ThisItem.Timestamp & ")</i>."
+            OnSelect: =Select(Parent)
+            Size: =12
+            Width: =1157
+            Y: =5
+            ZIndex: =7
+
+    "'btn-AA-View' As button":
+        BorderThickness: =0
+        Fill: =RGBA(0, 0, 0, 0)
+        Height: =100
+        HoverColor: =
+        HoverFill: =
+        OnSelect: |-
+            =UpdateContext({locshowAA: true});
+            UpdateContext({locshowCQ: false});
+            UpdateContext({AAControls: AAColor});
+            UpdateContext({CQControls: inactiveColor});
+        RadiusBottomLeft: =0
+        RadiusBottomRight: =0
+        RadiusTopLeft: =0
+        RadiusTopRight: =0
+        Text: =""
+        Width: =187
+        X: =104
+        Y: =95
+        ZIndex: =14
+
+    "'btn-CQ-View' As button":
+        BorderThickness: =0
+        Fill: =RGBA(0, 0, 0, 0)
+        Height: =100
+        HoverColor: =
+        HoverFill: =
+        OnSelect: |-
+            =UpdateContext({locshowAA: false});
+            UpdateContext({locshowCQ: true});
+            UpdateContext({AAControls: inactiveColor});
+            UpdateContext({CQControls: CQColor});
+        RadiusBottomLeft: =0
+        RadiusBottomRight: =0
+        RadiusTopLeft: =0
+        RadiusTopRight: =0
+        Text: =""
+        Width: =163
+        X: =291
+        Y: =95
+        ZIndex: =15
+
+    Rectangle1_1 As rectangle:
+        Fill: =RGBA(255, 255, 255, 1)
+        Height: =283
+        Width: =379
+        X: =892
+        Y: =195
+        ZIndex: =16
+
+    Rectangle5 As rectangle:
+        Fill: =ColorValue(AAColor)
+        Height: =6
+        Width: =653
+        X: =60
+        Y: =762
+        ZIndex: =18
+
+    grpAA As group:
+        Height: =5
+        Width: =5
+        X: =40
+        Y: =40
+        ZIndex: =18
+
+        "gal_AutoAttendants As gallery.'BrowseLayout_Vertical_OneTextVariant_ver4.0'":
+            Default: ={}
+            Fill: =White
+            Height: =250
+            Items: =Filter('Auto Attendant management', Title in Filter('User administration', User.DisplayName = locUserFullName).Title)
+            Layout: =Layout.Vertical
+            ShowScrollbar: =If(CountRows(gal_AutoAttendant.AllItems) > 5,true,false)
+            TemplateFill: =White
+            TemplatePadding: =0
+            TemplateSize: =41
+            Visible: =locshowAA
+            Width: =744
+            X: =104
+            Y: =195
+            ZIndex: =3
+
+            sep_aa_overview As rectangle:
+                Fill: =RGBA(179, 179, 179, 1)
+                Height: =1
+                OnSelect: =Select(Parent)
+                Width: =Parent.TemplateWidth
+                Y: =Parent.TemplateHeight - 1
+                ZIndex: =1
+
+            Rectangle2 As rectangle:
+                Fill: =RGBA(0, 0, 0, 0)
+                Height: =50
+                HoverFill: =ColorValue(AAColor)
+                OnSelect: =Select(Parent)
+                Visible: |
+                    =true
+                Width: =604
+                ZIndex: =2
+
+            lbl_aa_overview_title As label:
+                Color: =RGBA(87, 87, 87, 1)
+                Fill: =RGBA(255, 255, 255, 1)
+                HoverFill: =ColorFade(ColorValue(AAColor),.90)
+                OnSelect: |-
+                    =Navigate('Auto Attendant Edit Screen',ScreenTransition.None,{AAName:ThisItem, CurrentTab:"Greeting"})
+                PaddingBottom: =15
+                PaddingLeft: =15
+                PaddingRight: =15
+                PaddingTop: =15
+                Size: =11
+                Text: =ThisItem.Title
+                Width: =744
+                ZIndex: =3
+
+            ico_aa_overview_arrow As icon.ChevronRight:
+                AccessibleLabel: =Self.Tooltip
+                Color: =ColorValue(AAColor)
+                Height: =40
+                Icon: =Icon.ChevronRight
+                OnSelect: |-
+                    =Navigate('Auto Attendant Edit Screen',ScreenTransition.None,{AAName:ThisItem, CurrentTab:"Greeting"})
+                PaddingBottom: =10
+                PaddingLeft: =10
+                PaddingRight: =10
+                PaddingTop: =10
+                TabIndex: =0
+                Tooltip: ="View item details"
+                Width: =40
+                X: =Parent.TemplateWidth - Self.Width - 5
+                Y: =(Parent.TemplateHeight / 2) - (Self.Height / 2)
+                ZIndex: =4
+
+        rec_aa_header As rectangle:
+            Fill: =White
+            Visible: =locshowAA
+            Width: =187
+            X: =104
+            Y: =95
+            ZIndex: =6
+
+    Rectangle5_1 As rectangle:
+        Fill: =ColorValue(CQColor)
+        Height: =6
+        Width: =653
+        X: =713
+        Y: =762
+        ZIndex: =19
+
+    grpCQ As group:
+        Height: =5
+        Width: =5
+        X: =40
+        Y: =40
+        ZIndex: =19
+
+        "gal_CallQueues As gallery.'BrowseLayout_Vertical_OneTextVariant_ver4.0'":
+            Default: ={}
+            Fill: |
+                =White
+            Height: =250
+            Items: =Filter('Call Queue management', Title in Filter('User administration', User.DisplayName = locUserFullName).Title)
+            Layout: =Layout.Vertical
+            ShowScrollbar: =If(CountRows(gal_CallQueues.AllItems) > 5,true,false)
+            TemplateFill: =White
+            TemplatePadding: =0
+            TemplateSize: =41
+            Visible: =locshowCQ
+            Width: =744
+            X: =104
+            Y: =195
+            ZIndex: =1
+
+            lbl_cq_overview_title As label:
+                Color: =RGBA(87, 87, 87, 1)
+                HoverFill: =ColorFade(ColorValue(CQColor),.90)
+                OnSelect: =Select(Parent)
+                PaddingBottom: =15
+                PaddingLeft: =15
+                PaddingRight: =15
+                PaddingTop: =15
+                Size: =11
+                Text: =ThisItem.Title
+                Width: =744
+                ZIndex: =1
+
+            ico_cq_overview_arrow As icon.ChevronRight:
+                AccessibleLabel: =Self.Tooltip
+                Color: =ColorValue(CQColor)
+                Height: =40
+                Icon: =Icon.ChevronRight
+                OnSelect: |-
+                    =Navigate('Call Queue Edit Screen',ScreenTransition.None,{CQName:ThisItem,CurrentTab:"Greeting and music"})
+                PaddingBottom: =10
+                PaddingLeft: =10
+                PaddingRight: =10
+                PaddingTop: =10
+                TabIndex: =0
+                Tooltip: ="View item details"
+                Width: =40
+                X: =Parent.TemplateWidth - Self.Width - 5
+                Y: =(Parent.TemplateHeight / 2) - (Self.Height / 2)
+                ZIndex: =2
+
+            sep_cq_overview As rectangle:
+                Fill: =RGBA(179, 179, 179, 1)
+                Height: =0
+                OnSelect: =Select(Parent)
+                Width: =Parent.TemplateWidth
+                Y: =40
+                ZIndex: =3
+
+        rec_cq_header As rectangle:
+            Fill: =RGBA(255, 255, 255, 1)
+            Visible: =locshowCQ
+            Width: =163
+            X: =291
+            Y: =95
+            ZIndex: =10
+
+    Button5 As button:
+        Align: =Left
+        BorderThickness: =0
+        Color: =ColorValue(HeaderColor)
+        Fill: =RGBA(255, 255, 255, 1)
+        Height: =33
+        HoverColor: =Self.Color
+        HoverFill: =
+        OnSelect: =If(locshowAA=true,Navigate('Auto Attendants Screen'),Navigate('Call Queues Screen'))
+        PaddingLeft: =15
+        RadiusBottomLeft: =0
+        RadiusBottomRight: =0
+        RadiusTopLeft: =0
+        RadiusTopRight: =0
+        Size: =10
+        Text: ="See More"
+        Width: =744
+        X: =104
+        Y: =445
+        ZIndex: =20
+

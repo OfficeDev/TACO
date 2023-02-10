@@ -1,0 +1,554 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_keyvault_1": {
+        "runtimeSource": "invoker",
+        "connection": {
+          "connectionReferenceLogicalName": "new_CONVault"
+        },
+        "api": {
+          "name": "shared_keyvault"
+        }
+      },
+      "shared_sharepointonline_1": {
+        "runtimeSource": "invoker",
+        "connection": {
+          "connectionReferenceLogicalName": "new_sharedsharepointonline_89176"
+        },
+        "api": {
+          "name": "shared_sharepointonline"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        },
+        "VAR - Tenant (new_VARTenant)": {
+          "defaultValue": "M365x14050590.onmicrosoft.com",
+          "type": "String",
+          "metadata": {
+            "schemaName": "new_VARTenant",
+            "description": "Tenant name, for example. contoso.onmicrosoft.com"
+          }
+        },
+        "VAR - application id (new_VARapplicationid)": {
+          "defaultValue": "c4b9ee70-6da2-42b4-9fee-cf7b1531d268",
+          "type": "String",
+          "metadata": {
+            "schemaName": "new_VARapplicationid"
+          }
+        },
+        "VAR - FunctionApp (new_VARFunctionApp)": {
+          "defaultValue": "TACO-ukwtg",
+          "type": "String",
+          "metadata": {
+            "schemaName": "new_VARFunctionApp",
+            "description": "Name of the function app"
+          }
+        },
+        "VAR - FunctionKey (new_VARFunctionKey)": {
+          "defaultValue": "_adr3AsPuBTbs8ZCSujYTlyn3T7hwJ-swA7ibJuyRBjfAzFufDi2IQ==",
+          "type": "String",
+          "metadata": {
+            "schemaName": "new_VARFunctionKey",
+            "description": "Host key of the function app"
+          }
+        },
+        "VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)": {
+          "defaultValue": "https://m365x14050590.sharepoint.com/sites/AACQMgt",
+          "type": "String",
+          "metadata": {
+            "schemaName": "new_VARSPOSiteAutoAttendantandCallQueueManagement",
+            "description": "SharePoint Site address where the applications Lists are stored"
+          }
+        },
+        "VAR - SPO List - Call Queue Management (new_VARSPOListCallQueueManagement)": {
+          "defaultValue": "2a46921d-22cc-414e-95e9-3a4d1d7a2955",
+          "type": "String",
+          "metadata": {
+            "schemaName": "new_VARSPOListCallQueueManagement",
+            "description": "Call Queue Management"
+          }
+        },
+        "VAR - SPO List - Voice management audit (new_VARSPOListVoicemanagementaudit)": {
+          "defaultValue": "28e7817f-0a5c-450a-ae02-6b8b2203c6ac",
+          "type": "String",
+          "metadata": {
+            "schemaName": "new_VARSPOListVoicemanagementaudit",
+            "description": "Voice management audit"
+          }
+        }
+      },
+      "triggers": {
+        "manual": {
+          "metadata": {
+            "operationMetadataId": "c00dce8a-425e-4fa3-a5ef-e08b6306bb89"
+          },
+          "type": "Request",
+          "kind": "Button",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {},
+              "required": []
+            }
+          }
+        }
+      },
+      "actions": {
+        "Get_secret": {
+          "runAfter": {
+            "Initialize_result_variable": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "b969db2f-b55f-4249-8130-130b028c6e22"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_keyvault_1",
+              "operationId": "GetSecret",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_keyvault"
+            },
+            "parameters": {
+              "secretName": "TACO-appSecret"
+            },
+            "authentication": {
+              "type": "Raw",
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+            }
+          }
+        },
+        "HTTP": {
+          "runAfter": {
+            "Get_secret": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "d2a370ab-a6a5-46ca-aae6-a8fd38c32b75"
+          },
+          "type": "Http",
+          "inputs": {
+            "method": "POST",
+            "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Export-CallQueue",
+            "headers": {
+              "x-functions-key": "@parameters('VAR - FunctionKey (new_VARFunctionKey)')"
+            },
+            "authentication": {
+              "type": "ActiveDirectoryOAuth",
+              "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+              "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+              "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+              "secret": "@outputs('Get_secret')?['body/value']"
+            }
+          }
+        },
+        "Condition": {
+          "actions": {
+            "Parse_JSON": {
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "8f369a66-4e92-4797-a20c-3fa187ceb7e2"
+              },
+              "type": "ParseJson",
+              "inputs": {
+                "content": "@body('HTTP')",
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "Name": {
+                        "type": "string"
+                      },
+                      "AgentAlertTime": {},
+                      "OverflowThreshold": {},
+                      "OverflowAction": {},
+                      "OverflowActionTarget": {},
+                      "OverflowSharedTextToSpeechPrompt": {},
+                      "OverflowSharedVoicemailAudioFilePromptFileName": {},
+                      "TimeoutThreshold": {},
+                      "TimeoutAction": {},
+                      "TimeoutActionTarget": {},
+                      "TimeoutSharedTextToSpeechPrompt": {},
+                      "TimeoutSharedVoicemailAudioFilePromptFileName": {},
+                      "UseDefaultWelcomeMusic": {},
+                      "WelcomeMusicFileName": {},
+                      "UseDefaultMusicOnHold": {},
+                      "MusicOnHoldFileName": {}
+                    },
+                    "required": [
+                      "Name"
+                    ]
+                  }
+                }
+              }
+            },
+            "Apply_to_each": {
+              "foreach": "@body('Parse_JSON')",
+              "actions": {
+                "Get_items": {
+                  "runAfter": {},
+                  "metadata": {
+                    "operationMetadataId": "75090f08-a6b9-49e0-a216-297b7da69d85"
+                  },
+                  "type": "OpenApiConnection",
+                  "inputs": {
+                    "host": {
+                      "connectionName": "shared_sharepointonline_1",
+                      "operationId": "GetItems",
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                    },
+                    "parameters": {
+                      "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                      "table": "@parameters('VAR - SPO List - Call Queue Management (new_VARSPOListCallQueueManagement)')",
+                      "$filter": "Title eq '@{items('Apply_to_each')['Name']}'",
+                      "$top": 1
+                    },
+                    "authentication": {
+                      "type": "Raw",
+                      "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+                    }
+                  }
+                },
+                "Condition_2": {
+                  "actions": {
+                    "Update_item_2": {
+                      "runAfter": {},
+                      "metadata": {
+                        "operationMetadataId": "21c5a7d2-d259-442a-be0f-e598817f80fe"
+                      },
+                      "type": "OpenApiConnection",
+                      "inputs": {
+                        "host": {
+                          "connectionName": "shared_sharepointonline_1",
+                          "operationId": "PatchItem",
+                          "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                        },
+                        "parameters": {
+                          "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                          "table": "@parameters('VAR - SPO List - Call Queue Management (new_VARSPOListCallQueueManagement)')",
+                          "id": "@outputs('Compose')",
+                          "item/Title": "@items('Apply_to_each')['Name']",
+                          "item/Greetingtype/Value": "@items('Apply_to_each')?['UseDefaultWelcomeMusic']",
+                          "item/Alerttime": "@items('Apply_to_each')?['WelcomeMusicFileName']",
+                          "item/MusiconHoldType/Value": "@items('Apply_to_each')?['UseDefaultMusicOnHold']",
+                          "item/MusiconHold": "@items('Apply_to_each')?['MusicOnHoldFileName']",
+                          "item/Callagentalerttime": "@items('Apply_to_each')?['AgentAlertTime']",
+                          "item/Calloverflowthreshold": "@items('Apply_to_each')?['OverflowThreshold']",
+                          "item/Calloverflowaction/Value": "@items('Apply_to_each')?['OverflowAction']",
+                          "item/Maximumcallsinqueue": "@if(equals(item()?['OverflowAction'], 'Redirect: Voicemail'),'',item()?['OverflowActionTarget'])",
+                          "item/CalloverflowSharedVoicemailtarge": "@if(equals(item()?['OverflowAction'], 'Redirect: Voicemail'),item()?['OverflowActionTarget'],'')",
+                          "item/Calloverflowsharedvoicemailtype/Value": "@if(equals(item()?['OverflowSharedTextToSpeechPrompt'], ''),if(equals(item()?['OverflowSharedVoicemailAudioFilePromptFileName']), '','','audio file'),'text')",
+                          "item/Calloverflowaudio": "@items('Apply_to_each')?['OverflowSharedVoicemailAudioFilePromptFileName']",
+                          "item/Calloverflowtext": "@items('Apply_to_each')?['OverflowSharedTextToSpeechPrompt']",
+                          "item/CallTimeoutHandling/Value": "@items('Apply_to_each')?['TimeoutAction']",
+                          "item/Target": "@if(equals(item()?['TimeoutAction'], 'Redirect: Voicemail'),'',item()?['TimeoutActionTarget'])",
+                          "item/CallTimeoutSharedVoicemailtarget": "@if(equals(item()?['TimeoutAction'], 'Redirect: Voicemail'),item()?['TimeoutActionTarget'],'')",
+                          "item/Calltimeoutsharedvoicemailtype/Value": "@if(equals(item()?['TimeoutSharedTextToSpeechPrompt'], ''),if(equals(item()?['TimeoutSharedVoicemailAudioFilePromptFileName']), '','','audio file'),'text')",
+                          "item/Calltimeoutaudio": "@items('Apply_to_each')?['TimeoutSharedVoicemailAudioFilePromptFileName']",
+                          "item/Calltimeouttext": "@items('Apply_to_each')?['TimeoutSharedTextToSpeechPrompt']",
+                          "item/CalltimeoutMaximumwaittime": "@items('Apply_to_each')?['TimeoutThreshold']",
+                          "item/Provisioningstatus/Value": "provisioned"
+                        },
+                        "authentication": {
+                          "type": "Raw",
+                          "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+                        }
+                      }
+                    },
+                    "Set_variable": {
+                      "runAfter": {
+                        "Update_item_2": [
+                          "Succeeded"
+                        ]
+                      },
+                      "metadata": {
+                        "operationMetadataId": "e154d987-477f-41d8-a66c-fd184047f503"
+                      },
+                      "type": "SetVariable",
+                      "inputs": {
+                        "name": "result",
+                        "value": "Success"
+                      }
+                    },
+                    "Set_variable_2": {
+                      "runAfter": {
+                        "Set_variable": [
+                          "Succeeded"
+                        ]
+                      },
+                      "metadata": {
+                        "operationMetadataId": "926e7389-ab2e-4403-8e6c-779c4bc9bbef"
+                      },
+                      "type": "SetVariable",
+                      "inputs": {
+                        "name": "action",
+                        "value": "Updated settings from: @{items('Apply_to_each')['Name']}"
+                      }
+                    },
+                    "Create_item_2": {
+                      "runAfter": {
+                        "Set_variable_2": [
+                          "Succeeded"
+                        ]
+                      },
+                      "metadata": {
+                        "operationMetadataId": "62e9a694-7d50-4f9b-adc7-8dba805b577b"
+                      },
+                      "type": "OpenApiConnection",
+                      "inputs": {
+                        "host": {
+                          "connectionName": "shared_sharepointonline_1",
+                          "operationId": "PostItem",
+                          "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                        },
+                        "parameters": {
+                          "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                          "table": "@parameters('VAR - SPO List - Voice management audit (new_VARSPOListVoicemanagementaudit)')",
+                          "item/Title": "Updated Call Queue",
+                          "item/Timestamp": "@utcNow()",
+                          "item/Result": "@variables('result')",
+                          "item/AffectedObject": "@items('Apply_to_each')['Name']",
+                          "item/User": "@outputs('Update_item_2')?['body/Editor/DisplayName']",
+                          "item/Message": "@variables('action')"
+                        },
+                        "authentication": {
+                          "type": "Raw",
+                          "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+                        }
+                      }
+                    }
+                  },
+                  "runAfter": {
+                    "Compose": [
+                      "Succeeded"
+                    ]
+                  },
+                  "else": {
+                    "actions": {
+                      "Create_item": {
+                        "runAfter": {},
+                        "metadata": {
+                          "operationMetadataId": "0369940d-559d-439a-b588-b4ea3fd0bed6"
+                        },
+                        "type": "OpenApiConnection",
+                        "inputs": {
+                          "host": {
+                            "connectionName": "shared_sharepointonline_1",
+                            "operationId": "PostItem",
+                            "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                          },
+                          "parameters": {
+                            "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                            "table": "@parameters('VAR - SPO List - Call Queue Management (new_VARSPOListCallQueueManagement)')",
+                            "item/Title": "@items('Apply_to_each')['Name']",
+                            "item/Greetingtype/Value": "@items('Apply_to_each')?['UseDefaultWelcomeMusic']",
+                            "item/Alerttime": "@items('Apply_to_each')?['WelcomeMusicFileName']",
+                            "item/MusiconHoldType/Value": "@items('Apply_to_each')?['UseDefaultMusicOnHold']",
+                            "item/MusiconHold": "@items('Apply_to_each')?['MusicOnHoldFileName']",
+                            "item/Callagentalerttime": "@items('Apply_to_each')?['AgentAlertTime']",
+                            "item/Calloverflowthreshold": "@items('Apply_to_each')?['OverflowThreshold']",
+                            "item/Calloverflowaction/Value": "@items('Apply_to_each')?['OverflowAction']",
+                            "item/Maximumcallsinqueue": "@if(equals(item()?['OverflowAction'], 'Redirect: Voicemail'),'',item()?['OverflowActionTarget'])",
+                            "item/CalloverflowSharedVoicemailtarge": "@if(equals(item()?['OverflowAction'], 'Redirect: Voicemail'),item()?['OverflowActionTarget'],'')",
+                            "item/Calloverflowsharedvoicemailtype/Value": "@if(equals(item()?['OverflowSharedTextToSpeechPrompt'], ''),if(equals(item()?['OverflowSharedVoicemailAudioFilePromptFileName']), '','','audio file'),'text')",
+                            "item/Calloverflowaudio": "@items('Apply_to_each')?['OverflowSharedVoicemailAudioFilePromptFileName']",
+                            "item/Calloverflowtext": "@items('Apply_to_each')?['OverflowSharedTextToSpeechPrompt']",
+                            "item/CallTimeoutHandling/Value": "@items('Apply_to_each')?['TimeoutAction']",
+                            "item/Target": "@if(equals(item()?['TimeoutAction'], 'Redirect: Voicemail'),'',item()?['TimeoutActionTarget'])",
+                            "item/CallTimeoutSharedVoicemailtarget": "@if(equals(item()?['TimeoutAction'], 'Redirect: Voicemail'),item()?['TimeoutActionTarget'],'')",
+                            "item/Calltimeoutsharedvoicemailtype/Value": "@if(equals(item()?['TimeoutSharedTextToSpeechPrompt'], ''),if(equals(item()?['TimeoutSharedVoicemailAudioFilePromptFileName']), '','','audio file'),'text')",
+                            "item/Calltimeoutaudio": "@items('Apply_to_each')?['TimeoutSharedVoicemailAudioFilePromptFileName']",
+                            "item/Calltimeouttext": "@items('Apply_to_each')?['TimeoutSharedTextToSpeechPrompt']",
+                            "item/CalltimeoutMaximumwaittime": "@items('Apply_to_each')?['TimeoutThreshold']",
+                            "item/Provisioningstatus/Value": "provisioned"
+                          },
+                          "authentication": {
+                            "type": "Raw",
+                            "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+                          }
+                        }
+                      },
+                      "Create_item_3": {
+                        "runAfter": {
+                          "Set_variable_4": [
+                            "Succeeded"
+                          ]
+                        },
+                        "metadata": {
+                          "operationMetadataId": "04ce558c-6b3f-412b-bf47-e39175505bb0"
+                        },
+                        "type": "OpenApiConnection",
+                        "inputs": {
+                          "host": {
+                            "connectionName": "shared_sharepointonline_1",
+                            "operationId": "PostItem",
+                            "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                          },
+                          "parameters": {
+                            "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                            "table": "@parameters('VAR - SPO List - Voice management audit (new_VARSPOListVoicemanagementaudit)')",
+                            "item/Title": "Added Call Queue",
+                            "item/Timestamp": "@utcNow()",
+                            "item/Result": "@variables('result')",
+                            "item/AffectedObject": "@items('Apply_to_each')['Name']",
+                            "item/User": "@outputs('Create_item')?['body/Editor/DisplayName']",
+                            "item/Message": "@variables('action')"
+                          },
+                          "authentication": {
+                            "type": "Raw",
+                            "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+                          }
+                        }
+                      },
+                      "Set_variable_3": {
+                        "runAfter": {
+                          "Create_item": [
+                            "Succeeded"
+                          ]
+                        },
+                        "metadata": {
+                          "operationMetadataId": "3f1f1c96-948b-4ee2-ac5a-b77d775d15e9"
+                        },
+                        "type": "SetVariable",
+                        "inputs": {
+                          "name": "result",
+                          "value": "Success"
+                        }
+                      },
+                      "Set_variable_4": {
+                        "runAfter": {
+                          "Set_variable_3": [
+                            "Succeeded"
+                          ]
+                        },
+                        "metadata": {
+                          "operationMetadataId": "fb16764c-035a-4a95-870f-5148b97082c3"
+                        },
+                        "type": "SetVariable",
+                        "inputs": {
+                          "name": "action",
+                          "value": "Added Call Queue: @{items('Apply_to_each')['Name']}"
+                        }
+                      }
+                    }
+                  },
+                  "expression": {
+                    "greater": [
+                      "@length(outputs('Compose'))",
+                      0
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "7ce549af-b713-4c10-a384-6a5912c5ba3d"
+                  },
+                  "type": "If"
+                },
+                "Compose": {
+                  "runAfter": {
+                    "Select": [
+                      "Succeeded"
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "fb144d09-dbcb-472e-add0-b4849f5dcf5e"
+                  },
+                  "type": "Compose",
+                  "inputs": "@join(body('Select'),';')"
+                },
+                "Select": {
+                  "runAfter": {
+                    "Get_items": [
+                      "Succeeded"
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "ac97a82c-91a6-462c-a462-915e2d5fc00f"
+                  },
+                  "type": "Select",
+                  "inputs": {
+                    "from": "@outputs('Get_items')?['body/value']",
+                    "select": "@item()?['ID']"
+                  }
+                }
+              },
+              "runAfter": {
+                "Parse_JSON": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "53687cc0-ee2d-4591-b6f3-c2360da127be"
+              },
+              "type": "Foreach"
+            }
+          },
+          "runAfter": {
+            "HTTP": [
+              "Succeeded"
+            ]
+          },
+          "expression": {
+            "equals": [
+              "@outputs('HTTP')['statusCode']",
+              200
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "36ad878b-4b20-4b7a-b579-510f1905c28c"
+          },
+          "type": "If"
+        },
+        "Initialize_action_variable": {
+          "runAfter": {},
+          "metadata": {
+            "operationMetadataId": "1b9dfea1-8301-4a92-bbd7-dbb394607f72"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "action",
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "Initialize_result_variable": {
+          "runAfter": {
+            "Initialize_action_variable": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "fba88850-be37-4257-b7da-754347f33c71"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "result",
+                "type": "string"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}

@@ -1,0 +1,18 @@
+<environmentvariabledefinition schemaname="new_VARSPOListAutoAttendantHolidays">
+  <apiid>/providers/microsoft.powerapps/apis/shared_sharepointonline</apiid>
+  <description default="Auto Attendant Holidays">
+    <label description="Auto Attendant Holidays" languagecode="1033" />
+  </description>
+  <displayname default="VAR - SPO List - Auto Attendant Holidays">
+    <label description="VAR - SPO List - Auto Attendant Holidays" languagecode="1033" />
+  </displayname>
+  <introducedversion>1.0.0.1</introducedversion>
+  <iscustomizable>1</iscustomizable>
+  <isrequired>0</isrequired>
+  <parameterkey>table</parameterkey>
+  <parentdefinitionid>
+    <schemaname>new_VARSPOSiteAutoAttendantandCallQueueManagement</schemaname>
+  </parentdefinitionid>
+  <secretstore>0</secretstore>
+  <type>100000004</type>
+</environmentvariabledefinition>

@@ -1,0 +1,4252 @@
+"'Auto Attendant Edit Screen' As screen":
+    Fill: =RGBA(243, 242, 241, 1)
+    Height: =Max(App.Height, App.DesignHeight)
+    OnHidden: =ResetForm(frm_AutoAttendant);
+    OnVisible: |-
+        =UpdateContext({
+            locShowValidation: {
+                CallRoutingTargetBH: false,
+                CallRoutingTargetAH: false
+            }
+        });
+        UpdateContext({
+            locDropBoxUpdated:
+                {
+                    GreetingTypeBH: false,
+                    GreetingTypeAH: false,
+                    CallRoutingBH: false,
+                    CallRoutingAH: false
+                }
+        });
+        UpdateContext({
+            locAdditionalTimeRange:
+                {
+                    Monday: false,
+                    Tuesday: false,
+                    Wednesday: false,
+                    Thursday: false,
+                    Friday: false,
+                    Saturday: false,
+                    Sunday: false
+                }
+        });
+        
+        UpdateContext({
+            locUPN:
+                {
+                    BH: "",
+                    AH: ""
+                }
+        });
+        
+        UpdateContext({locUPN:
+            Patch(locUPN, {BH: First(Office365Users.SearchUser({searchTerm:txt_AACallRoutingBHTarget.Text})).DisplayName})
+        });
+        
+        UpdateContext({locUPN:
+            Patch(locUPN, {AH: First(Office365Users.SearchUser({searchTerm:txt_AACallRoutingAHTarget.Text})).DisplayName})
+        });
+        
+        If(CurrentTab = "Greeting" And locCurrentTab = Blank(), Set(locCurrentTab, "Greeting"));
+        
+        UpdateContext({locSelectedAAPressed: false});
+    Width: =Max(App.Width, App.DesignWidth)
+
+    cmp_header_1 As header_bar:
+
+    "gal_AutoAttendant_Holiday As gallery.'BrowseLayout_Vertical_TwoTextVariant_ver4.0'":
+        Default: ={}
+        Height: =313
+        Items: =Filter('Auto Attendant - holidays', 'Auto Attendant'.Value = AAName.Name)
+        Layout: =Layout.Vertical
+        OnSelect: =
+        TemplateFill: =If(ThisItem.IsSelected,RGBA(0, 0, 0, 0),RGBA(0, 0, 0, 0))
+        TemplatePadding: =0
+        TemplateSize: =52
+        Visible: =locCurrentTab = "Holidays"
+        Width: =921
+        X: =137
+        Y: =294
+        ZIndex: =1
+
+        lbl_gal_AutoAttendant_HolidayName As label:
+            FontWeight: =If(ThisItem.IsSelected,FontWeight.Bold,FontWeight.Normal)
+            Height: =Self.Size * 1.8
+            OnSelect: |
+                =
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =11
+            Text: =ThisItem.Holiday.Value
+            VerticalAlign: =VerticalAlign.Top
+            Width: =Parent.TemplateWidth - 104
+            X: =32
+            Y: =16
+            ZIndex: =2
+
+        rec_gal_AutoAttendant_Holiday As rectangle:
+            Height: =1
+            OnSelect: =Select(Parent)
+            Width: =Parent.TemplateWidth
+            Y: =Parent.TemplateHeight - 1
+            ZIndex: =4
+
+    cmp_left_menu_1 As left_menu_bar:
+        Default: ="Auto Attendants Screen"
+        Height: =703
+        Y: =65
+        ZIndex: =2
+
+    rec_AutoAttendantName_bar As rectangle:
+        Fill: =RGBA(202, 202, 202, 1)
+        Height: =80
+        Width: =Parent.Width - cmp_left_menu_1.Width
+        X: =cmp_left_menu_1.X + cmp_left_menu_1.Width
+        Y: =cmp_header_1.Y + cmp_header.Height
+        ZIndex: =3
+
+    btn_AutoAttendantMenu_BH_Greeting As button:
+        Align: =Center
+        BorderThickness: =0
+        Color: =RGBA(0, 0, 0, 1)
+        Fill: =RGBA(0, 0, 0, 0)
+        FontWeight: =If(locCurrentTab = "Greeting", FontWeight.Bold,FontWeight.Normal)
+        Height: =32
+        HoverColor: =Black
+        HoverFill: =RGBA(0, 0, 0, 0)
+        OnSelect: =Set(locCurrentTab, Self.Text)
+        PressedColor: =Black
+        PressedFill: =RGBA(0,0,0,0)
+        RadiusBottomLeft: =0
+        RadiusBottomRight: =0
+        RadiusTopLeft: =0
+        RadiusTopRight: =0
+        Size: =10
+        Text: ="Greeting"
+        Width: =98
+        X: =123
+        Y: =110
+        ZIndex: =4
+
+    btn_AutoAttendantMenu_BusinessHours As button:
+        Align: =Center
+        BorderThickness: =0
+        Color: =RGBA(0, 0, 0, 1)
+        Fill: =RGBA(0, 0, 0, 0)
+        FontWeight: =If(locCurrentTab = "Business Hours", FontWeight.Bold,FontWeight.Normal)
+        Height: =28
+        HoverColor: =Black
+        HoverFill: =RGBA(0, 0, 0, 0)
+        OnSelect: =Set(locCurrentTab, Self.Text)
+        PressedColor: =Black
+        PressedFill: =RGBA(0,0,0,0)
+        RadiusBottomLeft: =0
+        RadiusBottomRight: =0
+        RadiusTopLeft: =0
+        RadiusTopRight: =0
+        Size: =10
+        Text: ="Business Hours"
+        Width: =142
+        X: =355
+        Y: =114
+        ZIndex: =5
+
+    btn_AutoAttendantMenu_BH_CallRouting As button:
+        Align: =Center
+        BorderThickness: =0
+        Color: =RGBA(0, 0, 0, 1)
+        Fill: =RGBA(0, 0, 0, 0)
+        FontWeight: =If(locCurrentTab = "Call Routing", FontWeight.Bold,FontWeight.Normal)
+        Height: =29
+        HoverColor: =Black
+        HoverFill: =RGBA(0, 0, 0, 0)
+        OnSelect: =Set(locCurrentTab, Self.Text)
+        PressedColor: =Black
+        PressedFill: =RGBA(0,0,0,0)
+        RadiusBottomLeft: =0
+        RadiusBottomRight: =0
+        RadiusTopLeft: =0
+        RadiusTopRight: =0
+        Size: =10
+        Text: ="Call Routing"
+        Width: =113
+        X: =230
+        Y: =113
+        ZIndex: =6
+
+    rec_AutAttendantForm_BottomButtons_bar As rectangle:
+        Fill: =RGBA(255, 255, 255, 1)
+        Height: =92
+        Width: =1306
+        X: =60
+        Y: =676
+        ZIndex: =7
+
+    btn_AutoAttendantForm_Cancel As button:
+        BorderColor: =RGBA(51, 52, 74, 1)
+        BorderThickness: =1
+        Fill: =ColorValue(CancelColor)
+        FocusedBorderThickness: =1
+        HoverBorderColor: =RGBA(51, 52, 74, 1)
+        HoverColor: =RGBA(51, 52, 74, 1)
+        HoverFill: =
+        OnSelect: |-
+            =Set(locCurrentTab,"");
+            Set(GreetingBusinessHoursAudioPromptFile, "");
+            Set(GreetingBusinessAfterHoursAudioPromptFile, "");
+            
+            Navigate('Home Screen',ScreenTransition.None);
+        PressedBorderColor: =RGBA(51, 52, 74, 1)
+        PressedColor: =RGBA(51, 52, 74, 1)
+        PressedFill: =
+        RadiusBottomLeft: =0
+        RadiusBottomRight: =0
+        RadiusTopLeft: =0
+        RadiusTopRight: =0
+        Size: =12
+        Text: ="Cancel"
+        X: =948
+        Y: =702
+        ZIndex: =8
+
+    btn_AutoAttendantForm_Next As button:
+        BorderColor: =RGBA(51, 52, 74, 1)
+        BorderThickness: =0
+        DisplayMode: =If(locCurrentTab = "Holidays", Disabled, Edit)
+        Fill: =ColorValue(NextColor)
+        HoverBorderColor: =RGBA(51, 52, 74, 1)
+        HoverFill: =
+        OnSelect: =If(locCurrentTab = "Greeting",Set(locCurrentTab,"Call Routing"),If(locCurrentTab = "Call Routing",Set(locCurrentTab,"Business Hours"),If(locCurrentTab = "Business Hours",Set(locCurrentTab,"After Business Hours"),If(locCurrentTab = "After Business Hours",Set(locCurrentTab,"Holidays")))));
+        PressedBorderColor: =RGBA(51, 52, 74, 1)
+        PressedColor: =RGBA(255, 255, 255, 1)
+        PressedFill: =RGBA(51, 52, 74, 1)
+        RadiusBottomLeft: =0
+        RadiusBottomRight: =0
+        RadiusTopLeft: =0
+        RadiusTopRight: =0
+        Size: =12
+        Text: ="Next"
+        X: =383
+        Y: =702
+        ZIndex: =9
+
+    btn_AutoAttendantForm_Submit As button:
+        BorderColor: =RGBA(51, 52, 74, 1)
+        BorderThickness: =0
+        DisabledColor: =RGBA(255, 255, 255, 1)
+        DisabledFill: =RGBA(219, 219, 219, 1)
+        DisplayMode: =If(frm_AutoAttendant.Unsaved, DisplayMode.Edit, DisplayMode.Disabled)
+        Fill: =ColorValue(UpdateColor)
+        HoverBorderColor: =RGBA(51, 52, 74, 1)
+        HoverFill: =
+        OnSelect: |-
+            =SubmitForm(frm_AutoAttendant);
+            Set(GreetingBusinessHoursAudioPromptFile, "");
+            Set(GreetingBusinessAfterHoursAudioPromptFile, "");
+            
+            Navigate('Home Screen',ScreenTransition.None);
+        PressedBorderColor: =RGBA(51, 52, 74, 1)
+        PressedColor: =RGBA(255, 255, 255, 1)
+        PressedFill: =RGBA(51, 52, 74, 1)
+        RadiusBottomLeft: =0
+        RadiusBottomRight: =0
+        RadiusTopLeft: =0
+        RadiusTopRight: =0
+        Size: =12
+        Text: ="Update"
+        X: =568
+        Y: =702
+        ZIndex: =10
+
+    btn_AutoAttendantForm_Back As button:
+        BorderColor: =RGBA(51, 52, 74, 1)
+        BorderThickness: =If(DisplayMode.Edit,1,0)
+        DisabledColor: =RGBA(255, 255, 255, 1)
+        DisabledFill: =RGBA(219, 219, 219, 1)
+        DisplayMode: =If(locCurrentTab = "Greeting", Disabled, Edit)
+        Fill: =ColorValue(BackColor)
+        FocusedBorderThickness: =1
+        HoverBorderColor: =RGBA(51, 52, 74, 1)
+        HoverColor: =RGBA(51, 52, 74, 1)
+        HoverFill: =
+        OnSelect: =If(locCurrentTab = "Call Routing",Set(locCurrentTab,"Greeting"),If(locCurrentTab = "Business Hours",Set(locCurrentTab,"Call Routing"),If(locCurrentTab = "After Business Hours",Set(locCurrentTab,"Business Hours"),If(locCurrentTab = "Holidays",Set(locCurrentTab,"After Business Hours")))));
+        PressedBorderColor: =RGBA(51, 52, 74, 1)
+        PressedColor: =RGBA(51, 52, 74, 1)
+        PressedFill: =
+        RadiusBottomLeft: =0
+        RadiusBottomRight: =0
+        RadiusTopLeft: =0
+        RadiusTopRight: =0
+        Size: =12
+        Text: ="Back"
+        X: =200
+        Y: =702
+        ZIndex: =11
+
+    lbl_AA_Day As label:
+        FontWeight: =Semibold
+        Size: =11
+        Text: ="Day"
+        Visible: =locCurrentTab="Business Hours"
+        X: =114
+        Y: =168
+        ZIndex: =12
+
+    lbl_AA_StartAt As label:
+        FontWeight: =Semibold
+        Size: =11
+        Text: ="Start at"
+        Visible: =locCurrentTab="Business Hours"
+        X: =284
+        Y: =168
+        ZIndex: =13
+
+    lbl_AA_EndAt As label:
+        FontWeight: =Semibold
+        Size: =11
+        Text: ="End at"
+        Visible: =locCurrentTab="Business Hours"
+        X: =513
+        Y: =168
+        ZIndex: =14
+
+    rec_AA_AddEditDelete_Menu As rectangle:
+        Fill: =RGBA(250, 249, 248, 1)
+        Height: =43
+        Visible: =locCurrentTab = "Holidays"
+        Width: =919
+        X: =137
+        Y: =174
+        ZIndex: =15
+
+    rec_AA_Gallery_Header As rectangle:
+        BorderColor: =RGBA(255, 255, 255, 1)
+        Fill: =RGBA(255, 255, 255, 1)
+        Height: =43
+        Visible: =locCurrentTab = "Holidays"
+        Width: =919
+        X: =137
+        Y: =231
+        ZIndex: =16
+
+    grp_AA_UploadWindow_Popup As group:
+        Height: =5
+        Width: =5
+        X: =40
+        Y: =40
+        ZIndex: =17
+
+        lbl_AA_UploadForm_Overlay As label:
+            Fill: =RGBA(128, 128, 128, 0.2)
+            Height: =App.Height
+            Text: =
+            Visible: =locShowPopupForm
+            Width: =App.Width
+            ZIndex: =34
+
+        lbl_AA_UploadForm_Window As label:
+            Fill: =RGBA(243, 242, 241, 1)
+            Height: =375
+            Text: =
+            Visible: =locShowPopupForm
+            Width: =1152
+            X: =8
+            Y: =187
+            ZIndex: =35
+
+        att_AA_AudioPrompt_UploadForm As attachments:
+            BorderColor: =Color.White
+            BorderThickness: =0
+            DisplayMode: =Edit
+            Fill: =RGBA(243, 242, 241, 1)
+            Height: =161
+            IsInDataCard: =true
+            Items: =
+            MaxAttachments: =1
+            MaxAttachmentSize: =5
+            OnAddFile: |-
+                =If(Not(EndsWith(First(Self.Attachments).Name, ".mp3")) And Not(EndsWith(First(Self.Attachments).Name, ".wav")) And Not(EndsWith(First(Self.Attachments).Name, ".wma")),Notify("The filetype you uploaded is not support. Please upload a file of one of the following types: mp3, wav and wma.", NotificationType.Error); Reset(Self))
+            PaddingBottom: =5
+            PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+            PaddingRight: =5
+            PaddingTop: =5
+            Tooltip: =
+            Visible: =locShowPopupForm
+            Width: =431
+            X: =232
+            Y: =248
+            ZIndex: =36
+
+        btn_AA_Submit_UploadForm As button:
+            BorderThickness: =0
+            DisplayMode: |-
+                =If(
+                    CountRows(att_AA_AudioPrompt_UploadForm.Attachments) > 0,
+                    DisplayMode.Edit,
+                    DisplayMode.Disabled
+                )
+            Fill: =RGBA(98, 100, 167, 1)
+            HoverFill: =RGBA(51, 52, 74, 1)
+            OnSelect: |-
+                =UploadFile.Run(
+                    {
+                        contentBytes: First(att_AA_AudioPrompt_UploadForm.Attachments).Value,
+                        name: First(att_AA_AudioPrompt_UploadForm.Attachments).Name
+                    },
+                    txt_AutoAttendantTitle_Name,
+                    Substitute(locPromptType, " ", "_")
+                
+                );
+                
+                If(locPromptType = "greeting business hours", Set(GreetingBusinessHoursAudioPromptFile, Concatenate(Substitute(locPromptType, " ", "_"),".",Trim(Last(FirstN(Split(First(att_AA_AudioPrompt_UploadForm.Attachments).Name, "."),2)).Result))));
+                If(locPromptType = "greeting after business hours", Set(GreetingAfterBusinessHoursAudioPromptFile, Concatenate(Substitute(locPromptType, " ", "_"),".",Trim(Last(FirstN(Split(First(att_AA_AudioPrompt_UploadForm.Attachments).Name, "."),2)).Result))));
+                
+                Reset(att_AA_AudioPrompt_UploadForm);
+                
+                UpdateContext({
+                    locShowPopupForm: false
+                });
+            PressedBorderColor: =RGBA(51, 52, 74, 1)
+            PressedColor: =RGBA(255, 255, 255, 1)
+            PressedFill: =RGBA(51, 52, 74, 1)
+            Text: ="Upload"
+            Visible: =locShowPopupForm
+            X: =330
+            Y: =438
+            ZIndex: =37
+
+        ctn_AA_Header_UploadForm As groupContainer.manualLayoutContainer:
+            ContentLanguage: =
+            Fill: =RGBA(72, 70, 68, 1)
+            Height: =47
+            Visible: =locShowPopupForm
+            Width: =1152
+            X: =8
+            Y: =180
+            ZIndex: =38
+
+            lbl_AA_Title_UploadForm As label:
+                Align: =Align.Center
+                Color: =RGBA(255, 255, 255, 1)
+                Fill: =RGBA(72, 70, 68, 1)
+                Height: =35
+                Size: =20
+                Text: ="Upload " & locPromptType & " audio file"
+                Width: =626
+                X: =207
+                Y: =6
+                ZIndex: =1
+
+        btn_AA_Cancel_UploadForm As button:
+            BorderThickness: =0
+            Fill: =RGBA(98, 100, 167, 1)
+            HoverBorderColor: =RGBA(51, 52, 74, 1)
+            HoverFill: =RGBA(51, 52, 74, 1)
+            OnSelect: |-
+                =UpdateContext({
+                    locShowPopupForm: false
+                });
+            PressedBorderColor: =RGBA(51, 52, 74, 1)
+            PressedColor: =RGBA(255, 255, 255, 1)
+            PressedFill: =RGBA(51, 52, 74, 1)
+            Text: ="Cancel"
+            Visible: =locShowPopupForm
+            X: =559
+            Y: =438
+            ZIndex: =39
+
+    btn_AutoAttendantMenu_Holidays As button:
+        Align: =Center
+        BorderThickness: =0
+        Color: =RGBA(0, 0, 0, 1)
+        Fill: =RGBA(0, 0, 0, 0)
+        FontWeight: =If(locCurrentTab = "Holidays", FontWeight.Bold,FontWeight.Normal)
+        Height: =26
+        HoverColor: =Black
+        HoverFill: =RGBA(0, 0, 0, 0)
+        OnSelect: =Set(locCurrentTab, Self.Text)
+        PressedColor: =Black
+        PressedFill: =RGBA(0,0,0,0)
+        RadiusBottomLeft: =0
+        RadiusBottomRight: =0
+        RadiusTopLeft: =0
+        RadiusTopRight: =0
+        Size: =10
+        Text: ="Holidays"
+        Width: =113
+        X: =690
+        Y: =116
+        ZIndex: =21
+
+    Icon4 As icon.Add:
+        Color: =ColorValue(HeaderColor)
+        Height: =36
+        Icon: =Icon.Reload
+        OnSelect: |
+            =Refresh('Auto Attendant - holidays');
+            Reset(gal_AutoAttendant_Holiday);
+        Visible: =locCurrentTab = "Holidays"
+        Width: =36
+        X: =1022
+        Y: =235
+        ZIndex: =24
+
+    Label4 As label:
+        FontWeight: =Semibold
+        Text: =AAName.Name
+        Width: =600
+        X: =98
+        Y: =71
+        ZIndex: =25
+
+    lbl_AutoAttendant_name_header_2 As label:
+        Color: =RGBA(255, 255, 255, 1)
+        Fill: =ColorValue(AAColor)
+        FontWeight: =FontWeight.Bold
+        Height: =6
+        PaddingBottom: =15
+        PaddingLeft: =15
+        PaddingRight: =15
+        PaddingTop: =15
+        Text: =""
+        Width: =1306
+        X: =60
+        Y: =762
+        ZIndex: =26
+
+    "'navbar-greeting-focus' As rectangle":
+        Fill: =ColorValue(AAColor)
+        Height: =4
+        Visible: =If(locCurrentTab = "Greeting",true,false)
+        Width: =btn_AutoAttendantMenu_BH_Greeting.Width
+        X: =btn_AutoAttendantMenu_BH_Greeting.X
+        Y: =141
+        ZIndex: =27
+
+    "'navbar-callrouting-focus' As rectangle":
+        Fill: =ColorValue(AAColor)
+        Height: =4
+        Visible: =If(locCurrentTab = "Call Routing",true,false)
+        Width: =btn_AutoAttendantMenu_BH_CallRouting.Width
+        X: =btn_AutoAttendantMenu_BH_CallRouting.X
+        Y: =141
+        ZIndex: =28
+
+    "'navbar-businesshours-focus' As rectangle":
+        Fill: =ColorValue(AAColor)
+        Height: =4
+        Visible: =If(locCurrentTab = "Business Hours",true,false)
+        Width: =btn_AutoAttendantMenu_BusinessHours.Width
+        X: =btn_AutoAttendantMenu_BusinessHours.X
+        Y: =141
+        ZIndex: =29
+
+    "'navbar-afterbusinesshours-focus' As rectangle":
+        Fill: =ColorValue(AAColor)
+        Height: =4
+        Visible: =If(locCurrentTab = "After Business Hours",true,false)
+        Width: =btn_AutoAttendantMenu_AfterBusinessHours.Width
+        X: =btn_AutoAttendantMenu_AfterBusinessHours.X
+        Y: =141
+        ZIndex: =30
+
+    btn_AutoAttendantMenu_AfterBusinessHours As button:
+        Align: =Center
+        BorderThickness: =0
+        Color: =RGBA(0, 0, 0, 1)
+        Fill: =RGBA(0, 0, 0, 0)
+        FontWeight: =If(locCurrentTab = "After Business Hours", FontWeight.Bold,FontWeight.Normal)
+        Height: =28
+        HoverColor: =Black
+        HoverFill: =RGBA(0, 0, 0, 0)
+        OnSelect: =Set(locCurrentTab, Self.Text)
+        PressedColor: =Black
+        PressedFill: =RGBA(0,0,0,0)
+        RadiusBottomLeft: =0
+        RadiusBottomRight: =0
+        RadiusTopLeft: =0
+        RadiusTopRight: =0
+        Size: =10
+        Text: ="After Business Hours"
+        Width: =185
+        X: =498
+        Y: =114
+        ZIndex: =31
+
+    "'navbar-holidays-focus' As rectangle":
+        Fill: =ColorValue(AAColor)
+        Height: =4
+        Visible: =If(locCurrentTab = "Holidays",true,false)
+        Width: =btn_AutoAttendantMenu_Holidays.Width
+        X: =btn_AutoAttendantMenu_Holidays.X
+        Y: =141
+        ZIndex: =32
+
+    frm_AutoAttendant As form:
+        AcceptsFocus: =false
+        DataSource: ='Auto Attendant management'
+        Height: =463
+        Item: =gal_AutoAttendants.Selected
+        NumberOfColumns: =4
+        OnFailure: |-
+            =Notify(
+                "Failed: form was not saved due to an error",
+                NotificationType.Error
+            );
+        OnSuccess: |-
+            =Notify(
+                "Success: form was successfully saved",
+                NotificationType.Success
+            );
+        SnapToColumns: =false
+        Visible: =Not(locCurrentTab = "Holidays")
+        Width: =1215
+        X: =107
+        Y: =217
+        ZIndex: =33
+
+        crd_AutoAttendantForm_Monday As typedDataCard.blankCard:
+            BorderStyle: =BorderStyle.Solid
+            DisplayMode: =DisplayMode.Edit
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =60
+            Visible: =locCurrentTab="Business Hours"
+            Width: =150
+            X: =0
+            Y: =0
+            ZIndex: =1
+
+            lbl_AA_Monday As label:
+                FontWeight: =FontWeight.Bold
+                Size: =11
+                Text: ="Monday"
+                X: =Parent.X + 5
+                Y: =Parent.Y + 5
+                ZIndex: =1
+
+        crd_AutoAttendantForm_StartTime_Monday_Range1 As typedDataCard.comboBoxEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="MondayStartTime1"
+            Default: =ThisItem.'Monday StartTime1'
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowChangeBusinessHours) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Auto Attendant management'],DataSourceInfo.DisplayName,"MondayStartTime1")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =60
+            Required: =false
+            Update: =DataCardValue11.Selected
+            Visible: =locCurrentTab="Business Hours"
+            Width: =225
+            X: =2
+            Y: =0
+            ZIndex: =1
+
+            DataCardValue11 As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =1
+                ChevronBackground: =ColorValue(HeaderColor)
+                DefaultSelectedItems: =Parent.Default
+                DisplayFields: =["Value"]
+                DisplayMode: =Parent.DisplayMode
+                Height: =35
+                Items: =Choices([@'Auto Attendant management'].'Monday StartTime1')
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["Value"]
+                SearchItems: =Choices('Auto Attendant management'.'Monday StartTime1',DataCardValue11.SearchText)
+                SelectMultiple: =false
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =1
+                ZIndex: =2
+
+            ErrorMessage11 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue11.Y + DataCardValue11.Height
+                ZIndex: =3
+
+            StarVisible13 As label:
+                Align: =Align.Center
+                Height: =
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =
+                ZIndex: =4
+
+        crd_AutoAttendantForm_EndTime_Monday_Range1 As typedDataCard.comboBoxEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="MondayEndTime1"
+            Default: =ThisItem.'Monday EndTime1'
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowChangeBusinessHours) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Auto Attendant management'],DataSourceInfo.DisplayName,"MondayEndTime1")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =60
+            Required: =false
+            Update: =DataCardValue1.Selected
+            Visible: =locCurrentTab="Business Hours"
+            Width: =225
+            WidthFit: =false
+            X: =3
+            Y: =0
+            ZIndex: =1
+
+            DataCardValue1 As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =1
+                ChevronBackground: =ColorValue(HeaderColor)
+                DefaultSelectedItems: =Parent.Default
+                DisplayFields: =["Value"]
+                DisplayMode: =Parent.DisplayMode
+                Height: =35
+                Items: =Choices([@'Auto Attendant management'].'Monday EndTime1')
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["Value"]
+                SearchItems: =Choices('Auto Attendant management'.'Monday EndTime1',DataCardValue1.SearchText)
+                SelectMultiple: =false
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =1
+                ZIndex: =2
+
+            ErrorMessage1 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue1.Y + DataCardValue1.Height
+                ZIndex: =3
+
+            StarVisible3 As label:
+                Align: =Align.Center
+                Height: =
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =
+                ZIndex: =4
+
+        crd_AutoAttendantForm_Monday_ExtraTime As typedDataCard.toggleEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="MondayExtraTimeRange"
+            Default: =ThisItem.'Monday Extra Time Range'
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowChangeBusinessHours) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Auto Attendant management'],DataSourceInfo.DisplayName,"MondayExtraTimeRange")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =60
+            Required: =false
+            Update: =DataCardValue46.Value
+            Visible: =locCurrentTab="Business Hours"
+            Width: =287
+            WidthFit: =false
+            X: =4
+            Y: =0
+            ZIndex: =1
+
+            DataCardValue46 As toggleSwitch:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                Default: =Parent.Default
+                DisplayMode: =Parent.DisplayMode
+                OnCheck: |-
+                    =UpdateContext({locAdditionalTimeRange: 
+                        Patch(locAdditionalTimeRange, {Monday: true})
+                    });
+                OnSelect: =
+                OnUncheck: |-
+                    =UpdateContext({locAdditionalTimeRange: 
+                        Patch(locAdditionalTimeRange, {Monday: false})
+                    });
+                    Reset(DataCardValue12);
+                    Reset(DataCardValue10);
+                Size: =11
+                Tooltip: =Parent.DisplayName
+                TrueFill: =ColorValue(HeaderColor)
+                X: =30
+                Y: =Parent.Y + 5
+                ZIndex: =2
+
+            ErrorMessage46 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue46.Y + DataCardValue46.Height
+                ZIndex: =3
+
+            StarVisible48 As label:
+                Align: =Align.Center
+                Height: =Parent.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =Parent.Y
+                ZIndex: =4
+
+        crd_AutoAttendantForm_Monday_ExtraTime_Fill As typedDataCard.blankCard:
+            BorderStyle: =BorderStyle.Solid
+            DisplayMode: =DisplayMode.Edit
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =56
+            Visible: =If(locCurrentTab="Business Hours" And DataCardValue46.Value = true, true, false)
+            Width: =150
+            X: =0
+            Y: =1
+            ZIndex: =1
+
+        crd_AutoAttendantForm_StartTime_Monday_Range2 As typedDataCard.comboBoxEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="MondayStartTime2"
+            Default: =
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowChangeBusinessHours) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Auto Attendant management'],DataSourceInfo.DisplayName,"MondayStartTime2")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =60
+            Required: =false
+            Update: =DataCardValue12.Selected
+            Visible: =If(locCurrentTab="Business Hours" And DataCardValue46.Value = true, true, false)
+            Width: =225
+            X: =1
+            Y: =1
+            ZIndex: =1
+
+            DataCardValue12 As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =1
+                ChevronBackground: =ColorValue(HeaderColor)
+                DefaultSelectedItems: =Parent.Default
+                DisplayFields: =["Value"]
+                DisplayMode: =Parent.DisplayMode
+                Height: =35
+                Items: =Choices([@'Auto Attendant management'].'Monday StartTime2')
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["Value"]
+                SearchItems: =Choices('Auto Attendant management'.'Monday StartTime2',DataCardValue12.SearchText)
+                SelectMultiple: =false
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =1
+                ZIndex: =2
+
+            ErrorMessage12 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue12.Y + DataCardValue12.Height
+                ZIndex: =3
+
+            StarVisible14 As label:
+                Align: =Align.Center
+                Height: =
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =
+                ZIndex: =4
+
+        crd_AutoAttendantForm_EndTime_Monday_Range2 As typedDataCard.comboBoxEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="MondayEndTime2"
+            Default: =ThisItem.'Monday EndTime2'
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowChangeBusinessHours) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Auto Attendant management'],DataSourceInfo.DisplayName,"MondayEndTime2")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =60
+            Required: =false
+            Update: =DataCardValue10.Selected
+            Visible: =If(locCurrentTab="Business Hours" And DataCardValue46.Value = true, true, false)
+            Width: =225
+            X: =1
+            Y: =1
+            ZIndex: =1
+
+            DataCardValue10 As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =1
+                ChevronBackground: =ColorValue(HeaderColor)
+                DefaultSelectedItems: =Parent.Default
+                DisplayFields: =["Value"]
+                DisplayMode: =Parent.DisplayMode
+                Items: =Choices([@'Auto Attendant management'].'Monday EndTime2')
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["Value"]
+                SearchItems: =Choices('Auto Attendant management'.'Monday EndTime2',DataCardValue10.SearchText)
+                SelectMultiple: =false
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =1
+                ZIndex: =2
+
+            ErrorMessage10 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue10.Y + DataCardValue10.Height
+                ZIndex: =3
+
+            StarVisible12 As label:
+                Align: =Align.Center
+                Height: =
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =
+                ZIndex: =4
+
+        crd_AutoAttendantForm_Tuesday As typedDataCard.blankCard:
+            BorderStyle: =BorderStyle.Solid
+            DisplayMode: =DisplayMode.Edit
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =60
+            Visible: =locCurrentTab="Business Hours"
+            Width: =150
+            X: =2
+            Y: =2
+            ZIndex: =1
+
+            lbl_AA_Tuesday As label:
+                FontWeight: =FontWeight.Bold
+                Size: =11
+                Text: ="Tuesday"
+                X: =Parent.X + 5
+                Y: =Parent.X
+                ZIndex: =1
+
+        crd_AutoAttendantForm_Tuesday_StartTime_Range1 As typedDataCard.comboBoxEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="TuesdayStartTime1"
+            Default: =ThisItem.'Tuesday StartTime1'
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowChangeBusinessHours) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Auto Attendant management'],DataSourceInfo.DisplayName,"TuesdayStartTime1")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =60
+            Required: =false
+            Update: =DataCardValue2.Selected
+            Visible: =locCurrentTab="Business Hours"
+            Width: =225
+            X: =4
+            Y: =2
+            ZIndex: =1
+
+            DataCardValue2 As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =1
+                ChevronBackground: =ColorValue(HeaderColor)
+                DefaultSelectedItems: =Parent.Default
+                DisplayFields: =["Value"]
+                DisplayMode: =Parent.DisplayMode
+                Height: =35
+                Items: =Choices([@'Auto Attendant management'].'Tuesday StartTime1')
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["Value"]
+                SearchItems: =Choices('Auto Attendant management'.'Tuesday StartTime1',DataCardValue2.SearchText)
+                SelectMultiple: =false
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =1
+                ZIndex: =2
+
+            ErrorMessage2 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue2.Y + DataCardValue2.Height
+                ZIndex: =3
+
+            StarVisible1 As label:
+                Align: =Align.Center
+                Height: =
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =
+                ZIndex: =4
+
+        crd_AutoAttendantForm_Tuesday_EndTime_Range1 As typedDataCard.comboBoxEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="TuesdayEndTime1"
+            Default: =ThisItem.'Tuesday EndTime1'
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowChangeBusinessHours) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Auto Attendant management'],DataSourceInfo.DisplayName,"TuesdayEndTime1")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =60
+            Required: =false
+            Update: =DataCardValue3.Selected
+            Visible: =locCurrentTab="Business Hours"
+            Width: =225
+            X: =5
+            Y: =2
+            ZIndex: =1
+
+            DataCardValue3 As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =1
+                ChevronBackground: =ColorValue(HeaderColor)
+                DefaultSelectedItems: =Parent.Default
+                DisplayFields: =["Value"]
+                DisplayMode: =Parent.DisplayMode
+                Height: =35
+                Items: =Choices([@'Auto Attendant management'].'Tuesday EndTime1')
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["Value"]
+                SearchItems: =Choices('Auto Attendant management'.'Tuesday EndTime1',DataCardValue3.SearchText)
+                SelectMultiple: =false
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =1
+                ZIndex: =2
+
+            ErrorMessage3 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue3.Y + DataCardValue3.Height
+                ZIndex: =3
+
+            StarVisible2 As label:
+                Align: =Align.Center
+                Height: =
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =
+                ZIndex: =4
+
+        crd_AutoAttendantForm_Tuesday_ExtraTime As typedDataCard.toggleEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="TuesdayExtraTimeRange"
+            Default: =ThisItem.'Tuesday Extra Time Range'
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowChangeBusinessHours) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Auto Attendant management'],DataSourceInfo.DisplayName,"TuesdayExtraTimeRange")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =60
+            Required: =false
+            Update: =DataCardValue47.Value
+            Visible: =locCurrentTab="Business Hours"
+            Width: =143
+            X: =6
+            Y: =2
+            ZIndex: =1
+
+            DataCardValue47 As toggleSwitch:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                Default: =Parent.Default
+                DisplayMode: =Parent.DisplayMode
+                OnChange: =
+                OnCheck: |-
+                    =UpdateContext({locAdditionalTimeRange: 
+                        Patch(locAdditionalTimeRange, {Tuesday: true})
+                    });
+                OnUncheck: |-
+                    =UpdateContext({locAdditionalTimeRange: 
+                        Patch(locAdditionalTimeRange, {Tuesday: false})
+                    });
+                    Reset(DataCardValue4);
+                    Reset(DataCardValue8);
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                TrueFill: =ColorValue(HeaderColor)
+                X: =30
+                Y: =
+                ZIndex: =2
+
+            ErrorMessage47 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue47.Y + DataCardValue47.Height
+                ZIndex: =3
+
+            StarVisible49 As label:
+                Align: =Align.Center
+                Height: =
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =
+                ZIndex: =4
+
+        crd_AutoAttendantForm_Tuesday_StartTime_Fill As typedDataCard.blankCard:
+            BorderStyle: =BorderStyle.Solid
+            DisplayMode: =DisplayMode.Edit
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =60
+            Visible: =If(locCurrentTab="Business Hours" And DataCardValue47.Value = true, true, false)
+            Width: =150
+            X: =-1
+            Y: =3
+            ZIndex: =1
+
+        crd_AutoAttendantForm_Tuesday_StartTime_Range2 As typedDataCard.comboBoxEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="TuesdayStartTime2"
+            Default: =ThisItem.'Tuesday StartTime2'
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowChangeBusinessHours) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Auto Attendant management'],DataSourceInfo.DisplayName,"TuesdayStartTime2")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =60
+            Required: =false
+            Update: =DataCardValue4.Selected
+            Visible: =If(locCurrentTab="Business Hours" And DataCardValue47.Value = true, true, false)
+            Width: =225
+            X: =0
+            Y: =3
+            ZIndex: =1
+
+            DataCardValue4 As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =1
+                ChevronBackground: =ColorValue(HeaderColor)
+                DefaultSelectedItems: =Parent.Default
+                DisplayFields: =["Value"]
+                DisplayMode: =Parent.DisplayMode
+                Height: =35
+                Items: =Choices([@'Auto Attendant management'].'Tuesday StartTime2')
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["Value"]
+                SearchItems: =Choices('Auto Attendant management'.'Tuesday StartTime2',DataCardValue4.SearchText)
+                SelectMultiple: =false
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =1
+                ZIndex: =2
+
+            ErrorMessage4 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue4.Y + DataCardValue4.Height
+                ZIndex: =3
+
+            StarVisible4 As label:
+                Align: =Align.Center
+                Height: =
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =
+                ZIndex: =4
+
+        crd_AutoAttendantForm_Tuesday_EndTime_Range2 As typedDataCard.comboBoxEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="TuesdayEndTime2"
+            Default: =ThisItem.'Tuesday EndTime2'
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowChangeBusinessHours) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Auto Attendant management'],DataSourceInfo.DisplayName,"TuesdayEndTime2")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =60
+            Required: =false
+            Update: =DataCardValue8.Selected
+            Visible: =If(locCurrentTab="Business Hours" And DataCardValue47.Value = true, true, false)
+            Width: =225
+            X: =1
+            Y: =3
+            ZIndex: =1
+
+            DataCardValue8 As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =1
+                ChevronBackground: =ColorValue(HeaderColor)
+                DefaultSelectedItems: =Parent.Default
+                DisplayFields: =["Value"]
+                DisplayMode: =Parent.DisplayMode
+                Height: =35
+                Items: =Choices([@'Auto Attendant management'].'Tuesday EndTime2')
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["Value"]
+                SearchItems: =Choices('Auto Attendant management'.'Tuesday EndTime2',DataCardValue8.SearchText)
+                SelectMultiple: =false
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =1
+                ZIndex: =2
+
+            ErrorMessage8 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue8.Y + DataCardValue8.Height
+                ZIndex: =3
+
+            StarVisible5 As label:
+                Align: =Align.Center
+                Height: =
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =
+                ZIndex: =4
+
+        crd_AutoAttendantForm_Wednesday As typedDataCard.blankCard:
+            BorderStyle: =BorderStyle.Solid
+            DisplayMode: =DisplayMode.Edit
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =55
+            Visible: =locCurrentTab="Business Hours"
+            Width: =150
+            X: =2
+            Y: =4
+            ZIndex: =1
+
+            lbl_AA_Wednesday As label:
+                FontWeight: =FontWeight.Bold
+                Size: =11
+                Text: ="Wednesday"
+                X: =Parent.X + 5
+                Y: =Parent.X
+                ZIndex: =1
+
+        crd_AutoAttendantForm_Wednesday_StartTime_Range1 As typedDataCard.comboBoxEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="WednesdayStartTime1"
+            Default: =ThisItem.'Wednesday StartTime1'
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowChangeBusinessHours) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Auto Attendant management'],DataSourceInfo.DisplayName,"WednesdayStartTime1")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =60
+            Required: =false
+            Update: =DataCardValue17.Selected
+            Visible: =locCurrentTab="Business Hours"
+            Width: =225
+            X: =3
+            Y: =4
+            ZIndex: =1
+
+            DataCardValue17 As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =1
+                ChevronBackground: =ColorValue(HeaderColor)
+                DefaultSelectedItems: =Parent.Default
+                DisplayFields: =["Value"]
+                DisplayMode: =Parent.DisplayMode
+                Height: =35
+                Items: =Choices([@'Auto Attendant management'].'Wednesday StartTime1')
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["Value"]
+                SearchItems: =Choices('Auto Attendant management'.'Wednesday StartTime1',DataCardValue17.SearchText)
+                SelectMultiple: =false
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =1
+                ZIndex: =2
+
+            ErrorMessage17 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue17.Y + DataCardValue17.Height
+                ZIndex: =3
+
+            StarVisible19 As label:
+                Align: =Align.Center
+                Height: =
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =
+                ZIndex: =4
+
+        crd_AutoAttendantForm_Wednesday_EndTime_Range1 As typedDataCard.comboBoxEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="WednesdayEndTime1"
+            Default: =ThisItem.'Wednesday EndTime1'
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowChangeBusinessHours) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Auto Attendant management'],DataSourceInfo.DisplayName,"WednesdayEndTime1")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =60
+            Required: =false
+            Update: =DataCardValue18.Selected
+            Visible: =locCurrentTab="Business Hours"
+            Width: =225
+            X: =4
+            Y: =4
+            ZIndex: =1
+
+            DataCardValue18 As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =1
+                ChevronBackground: =ColorValue(HeaderColor)
+                DefaultSelectedItems: =Parent.Default
+                DisplayFields: =["Value"]
+                DisplayMode: =Parent.DisplayMode
+                Height: =35
+                Items: =Choices([@'Auto Attendant management'].'Wednesday EndTime1')
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["Value"]
+                SearchItems: =Choices('Auto Attendant management'.'Wednesday EndTime1',DataCardValue18.SearchText)
+                SelectMultiple: =false
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =1
+                ZIndex: =2
+
+            ErrorMessage18 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue18.Y + DataCardValue18.Height
+                ZIndex: =3
+
+            StarVisible20 As label:
+                Align: =Align.Center
+                Height: =
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =
+                ZIndex: =4
+
+        crd_AutoAttendantForm_Wednesday_ExtraTime As typedDataCard.toggleEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="WednesdayExtraTimeRange"
+            Default: =ThisItem.'Wednesday Extra Time Range'
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowChangeBusinessHours) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Auto Attendant management'],DataSourceInfo.DisplayName,"WednesdayExtraTimeRange")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =60
+            Required: =false
+            Update: =DataCardValue5.Value
+            Visible: =locCurrentTab="Business Hours"
+            Width: =143
+            X: =5
+            Y: =4
+            ZIndex: =1
+
+            DataCardValue5 As toggleSwitch:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                Default: =Parent.Default
+                DisplayMode: =Parent.DisplayMode
+                OnCheck: |-
+                    =UpdateContext({locAdditionalTimeRange: 
+                        Patch(locAdditionalTimeRange, {Wednesday: true})
+                    });
+                OnUncheck: |-
+                    =UpdateContext({locAdditionalTimeRange: 
+                        Patch(locAdditionalTimeRange, {Wednesday: false})
+                    });
+                    Reset(DataCardValue19);
+                    Reset(DataCardValue20);
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                TrueFill: =ColorValue(HeaderColor)
+                X: =30
+                Y: =
+                ZIndex: =2
+
+            ErrorMessage5 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue5.Y + DataCardValue5.Height
+                ZIndex: =3
+
+            StarVisible7 As label:
+                Align: =Align.Center
+                Height: =
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =
+                ZIndex: =4
+
+        crd_AutoAttendantForm_Wednesday_ExtraTime_Fill As typedDataCard.blankCard:
+            BorderStyle: =BorderStyle.Solid
+            DisplayMode: =DisplayMode.Edit
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =60
+            Visible: =If(locCurrentTab="Business Hours" And DataCardValue5.Value = true, true, false)
+            Width: =150
+            X: =1
+            Y: =5
+            ZIndex: =1
+
+        crd_AutoAttendantForm_Wednesday_StartTime_Range2 As typedDataCard.comboBoxEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="WednesdayStartTime2"
+            Default: =ThisItem.'Wednesday StartTime2'
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowChangeBusinessHours) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Auto Attendant management'],DataSourceInfo.DisplayName,"WednesdayStartTime2")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =DataCardValue19.Selected
+            Visible: =If(locCurrentTab="Business Hours" And DataCardValue5.Value = true, true, false)
+            Width: =225
+            X: =2
+            Y: =5
+            ZIndex: =1
+
+            DataCardValue19 As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =1
+                ChevronBackground: =ColorValue(HeaderColor)
+                DefaultSelectedItems: =Parent.Default
+                DisplayFields: =["Value"]
+                DisplayMode: =Parent.DisplayMode
+                Height: =35
+                Items: =Choices([@'Auto Attendant management'].'Wednesday StartTime2')
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["Value"]
+                SearchItems: =Choices('Auto Attendant management'.'Wednesday StartTime2',DataCardValue19.SearchText)
+                SelectMultiple: =false
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =1
+                ZIndex: =2
+
+            ErrorMessage19 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue19.Y + DataCardValue19.Height
+                ZIndex: =3
+
+            StarVisible21 As label:
+                Align: =Align.Center
+                Height: =
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =
+                ZIndex: =4
+
+        crd_AutoAttendantForm_Wednesday_EndTime_Range2 As typedDataCard.comboBoxEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="WednesdayEndTime2"
+            Default: =ThisItem.'Wednesday EndTime2'
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowChangeBusinessHours) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Auto Attendant management'],DataSourceInfo.DisplayName,"WednesdayEndTime2")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =DataCardValue20.Selected
+            Visible: =If(locCurrentTab="Business Hours" And DataCardValue5.Value = true, true, false)
+            Width: =225
+            X: =3
+            Y: =5
+            ZIndex: =1
+
+            DataCardValue20 As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =1
+                ChevronBackground: =ColorValue(HeaderColor)
+                DefaultSelectedItems: =Parent.Default
+                DisplayFields: =["Value"]
+                DisplayMode: =Parent.DisplayMode
+                Height: =35
+                Items: =Choices([@'Auto Attendant management'].'Wednesday EndTime2')
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["Value"]
+                SearchItems: =Choices('Auto Attendant management'.'Wednesday EndTime2',DataCardValue20.SearchText)
+                SelectMultiple: =false
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =1
+                ZIndex: =2
+
+            ErrorMessage20 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue20.Y + DataCardValue20.Height
+                ZIndex: =3
+
+            StarVisible22 As label:
+                Align: =Align.Center
+                Height: =
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =
+                ZIndex: =4
+
+        crd_AutoAttendantForm_Thursday As typedDataCard.blankCard:
+            BorderStyle: =BorderStyle.Solid
+            DisplayMode: =DisplayMode.Edit
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =55
+            Visible: =locCurrentTab="Business Hours"
+            Width: =150
+            X: =1
+            Y: =6
+            ZIndex: =1
+
+            lbl_AA_Thursday As label:
+                FontWeight: =Bold
+                Size: =11
+                Text: ="Thursday"
+                X: =Parent.X + 5
+                Y: =Parent.X
+                ZIndex: =1
+
+        crd_AutoAttendantForm_Thursday_StartTime_Range1 As typedDataCard.comboBoxEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="ThursdayStartTime1"
+            Default: =ThisItem.'Thursday StartTime1'
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowChangeBusinessHours) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Auto Attendant management'],DataSourceInfo.DisplayName,"ThursdayStartTime1")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =DataCardValue13.Selected
+            Visible: =locCurrentTab="Business Hours"
+            Width: =225
+            X: =2
+            Y: =6
+            ZIndex: =1
+
+            DataCardValue13 As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =1
+                ChevronBackground: =ColorValue(HeaderColor)
+                DefaultSelectedItems: =Parent.Default
+                DisplayFields: =["Value"]
+                DisplayMode: =Parent.DisplayMode
+                Height: =35
+                Items: =Choices([@'Auto Attendant management'].'Thursday StartTime1')
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["Value"]
+                SearchItems: =Choices('Auto Attendant management'.'Thursday StartTime1',DataCardValue13.SearchText)
+                SelectMultiple: =false
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =1
+                ZIndex: =2
+
+            ErrorMessage13 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue13.Y + DataCardValue13.Height
+                ZIndex: =3
+
+            StarVisible15 As label:
+                Align: =Align.Center
+                Height: =
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =
+                ZIndex: =4
+
+        crd_AutoAttendantForm_Thursday_EndTime_Range1 As typedDataCard.comboBoxEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="ThursdayEndTime1"
+            Default: =ThisItem.'Thursday EndTime1'
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowChangeBusinessHours) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Auto Attendant management'],DataSourceInfo.DisplayName,"ThursdayEndTime1")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =DataCardValue14.Selected
+            Visible: =locCurrentTab="Business Hours"
+            Width: =225
+            X: =3
+            Y: =6
+            ZIndex: =1
+
+            DataCardValue14 As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =1
+                ChevronBackground: =ColorValue(HeaderColor)
+                DefaultSelectedItems: =Parent.Default
+                DisplayFields: =["Value"]
+                DisplayMode: =Parent.DisplayMode
+                Height: =35
+                Items: =Choices([@'Auto Attendant management'].'Thursday EndTime1')
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["Value"]
+                SearchItems: =Choices('Auto Attendant management'.'Thursday EndTime1',DataCardValue14.SearchText)
+                SelectMultiple: =false
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =1
+                ZIndex: =2
+
+            ErrorMessage14 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue14.Y + DataCardValue14.Height
+                ZIndex: =3
+
+            StarVisible16 As label:
+                Align: =Align.Center
+                Height: =
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =
+                ZIndex: =4
+
+        crd_AutoAttendantForm_Thursday_ExtraTime As typedDataCard.toggleEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="ThursdayExtraTimeRange"
+            Default: =ThisItem.'Thursday Extra Time Range'
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowChangeBusinessHours) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Auto Attendant management'],DataSourceInfo.DisplayName,"ThursdayExtraTimeRange")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =DataCardValue6.Value
+            Visible: =locCurrentTab="Business Hours"
+            Width: =143
+            X: =4
+            Y: =6
+            ZIndex: =1
+
+            DataCardValue6 As toggleSwitch:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                Default: =Parent.Default
+                DisplayMode: =Parent.DisplayMode
+                OnCheck: |-
+                    =UpdateContext({locAdditionalTimeRange: 
+                        Patch(locAdditionalTimeRange, {Thursday: true})
+                    });
+                OnUncheck: |-
+                    =UpdateContext({locAdditionalTimeRange: 
+                        Patch(locAdditionalTimeRange, {Thursday: false})
+                    });
+                    Reset(DataCardValue16);
+                    Reset(DataCardValue15);
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                TrueFill: =ColorValue(HeaderColor)
+                X: =30
+                Y: =
+                ZIndex: =2
+
+            ErrorMessage6 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue6.Y + DataCardValue6.Height
+                ZIndex: =3
+
+            StarVisible8 As label:
+                Align: =Align.Center
+                Height: =
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =
+                ZIndex: =4
+
+        crd_AutoAttendantForm_Thursday_ExtraTime_Fill As typedDataCard.blankCard:
+            BorderStyle: =BorderStyle.Solid
+            DisplayMode: =DisplayMode.Edit
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =60
+            Visible: =If(locCurrentTab="Business Hours" And DataCardValue6.Value = true, true, false)
+            Width: =150
+            X: =0
+            Y: =7
+            ZIndex: =1
+
+        crd_AutoAttendantForm_Thursday_StartTime_Range2 As typedDataCard.comboBoxEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="ThursdayStartTime2"
+            Default: =ThisItem.'Thursday StartTime2'
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowChangeBusinessHours) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Auto Attendant management'],DataSourceInfo.DisplayName,"ThursdayStartTime2")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =DataCardValue16.Selected
+            Visible: =If(locCurrentTab="Business Hours" And DataCardValue6.Value = true, true, false)
+            Width: =225
+            X: =1
+            Y: =7
+            ZIndex: =1
+
+            DataCardValue16 As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =1
+                ChevronBackground: =ColorValue(HeaderColor)
+                DefaultSelectedItems: =Parent.Default
+                DisplayFields: =["Value"]
+                DisplayMode: =Parent.DisplayMode
+                Height: =35
+                Items: =Choices([@'Auto Attendant management'].'Thursday StartTime2')
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["Value"]
+                SearchItems: =Choices('Auto Attendant management'.'Thursday StartTime2',DataCardValue16.SearchText)
+                SelectMultiple: =false
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =1
+                ZIndex: =2
+
+            ErrorMessage16 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue16.Y + DataCardValue16.Height
+                ZIndex: =3
+
+            StarVisible18 As label:
+                Align: =Align.Center
+                Height: =
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =
+                ZIndex: =4
+
+        crd_AutoAttendantForm_Thursday_EndTime_Range2 As typedDataCard.comboBoxEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="ThursdayEndTime2"
+            Default: =ThisItem.'Thursday EndTime2'
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowChangeBusinessHours) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Auto Attendant management'],DataSourceInfo.DisplayName,"ThursdayEndTime2")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =DataCardValue15.Selected
+            Visible: =If(locCurrentTab="Business Hours" And DataCardValue6.Value = true, true, false)
+            Width: =225
+            X: =2
+            Y: =7
+            ZIndex: =1
+
+            DataCardValue15 As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =1
+                ChevronBackground: =ColorValue(HeaderColor)
+                DefaultSelectedItems: =Parent.Default
+                DisplayFields: =["Value"]
+                DisplayMode: =Parent.DisplayMode
+                Height: =35
+                Items: =Choices([@'Auto Attendant management'].'Thursday EndTime2')
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["Value"]
+                SearchItems: =Choices('Auto Attendant management'.'Thursday EndTime2',DataCardValue15.SearchText)
+                SelectMultiple: =false
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =1
+                ZIndex: =2
+
+            ErrorMessage15 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue15.Y + DataCardValue15.Height
+                ZIndex: =3
+
+            StarVisible17 As label:
+                Align: =Align.Center
+                Height: =
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =
+                ZIndex: =4
+
+        crd_AutoAttendantForm_Friday As typedDataCard.blankCard:
+            BorderStyle: =BorderStyle.Solid
+            DisplayMode: =DisplayMode.Edit
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =55
+            Visible: =locCurrentTab="Business Hours"
+            Width: =150
+            X: =1
+            Y: =8
+            ZIndex: =1
+
+            lbl_AA_Friday As label:
+                FontWeight: =FontWeight.Bold
+                Size: =11
+                Text: ="Friday"
+                X: =Parent.X + 5
+                Y: =
+                ZIndex: =1
+
+        crd_AutoAttendantForm_AutoAttendantGreetingTypeAH As typedDataCard.comboBoxEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Greetingoptions_x003a_afterbusin"
+            Default: |-
+                =ThisItem.'Greeting options: after business hours'
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowChangeGreeting_AH) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Auto Attendant management'],DataSourceInfo.DisplayName,"Greetingoptions_x003a_afterbusin")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =60
+            Required: =false
+            Update: =drp_AutoAttendantGreetingTypeAH.Selected
+            Visible: =locCurrentTab="After Business Hours"
+            Width: =350
+            X: =1
+            Y: =8
+            ZIndex: =1
+
+            lbl_AutoAttendantGreetingTypeAH As label:
+                AutoHeight: =true
+                Color: =ColorValue(HeaderColor)
+                FontWeight: =Bold
+                Height: =34
+                Size: =11
+                Text: ="Greeting options"
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            drp_AutoAttendantGreetingTypeAH As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), ColorValue(HeaderColor), Color.Red)
+                BorderThickness: =1
+                ChevronBackground: =ColorValue(HeaderColor)
+                DefaultSelectedItems: =Parent.Default
+                DisplayFields: =["Value"]
+                DisplayMode: =Parent.DisplayMode
+                Height: =35
+                Items: |-
+                    =Choices([@'Auto Attendant management'].'Greeting options: after business hours')
+                OnChange: |-
+                    =UpdateContext({locDropBoxUpdated: 
+                        Patch(locDropBoxUpdated, {GreetingTypeAH: true})
+                    });
+                    Set(GreetingAfterBusinessHoursAudioPromptFile, "");
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["Value"]
+                SearchItems: |-
+                    =Choices('Auto Attendant management'.'Greeting options: after business hours',drp_AutoAttendantGreetingTypeAH.SearchText)
+                SelectMultiple: =false
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =lbl_AutoAttendantGreetingTypeAH.Y + lbl_AutoAttendantGreetingTypeAH.Height + 5
+                ZIndex: =2
+
+            lbl_AutoAttendantGreetingTypeAH_Error As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =drp_AutoAttendantGreetingTypeAH.Y + drp_AutoAttendantGreetingTypeAH.Height
+                ZIndex: =3
+
+            lbl_AutoAttendantGreetingTypeAH_Star As label:
+                Align: =Align.Center
+                Height: =lbl_AutoAttendantGreetingTypeAH.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =lbl_AutoAttendantGreetingTypeAH.Y
+                ZIndex: =4
+
+        crd_AutoAttendantForm_Friday_StartTime_Range1 As typedDataCard.comboBoxEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="FridayStartTime1"
+            Default: =ThisItem.'Friday StartTime1'
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowChangeBusinessHours) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Auto Attendant management'],DataSourceInfo.DisplayName,"FridayStartTime1")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =14
+            Required: =false
+            Update: =DataCardValue25.Selected
+            Visible: =locCurrentTab="Business Hours"
+            Width: =225
+            X: =2
+            Y: =8
+            ZIndex: =1
+
+            DataCardValue25 As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), ColorValue(HeaderColor), Color.Red)
+                BorderThickness: =1
+                ChevronBackground: =ColorValue(HeaderColor)
+                DefaultSelectedItems: =Parent.Default
+                DisplayFields: =["Value"]
+                DisplayMode: =Parent.DisplayMode
+                Height: =35
+                Items: =Choices([@'Auto Attendant management'].'Friday StartTime1')
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["Value"]
+                SearchItems: =Choices('Auto Attendant management'.'Friday StartTime1',DataCardValue25.SearchText)
+                SelectMultiple: =false
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =1
+                ZIndex: =2
+
+            ErrorMessage25 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue25.Y + DataCardValue25.Height
+                ZIndex: =3
+
+            StarVisible27 As label:
+                Align: =Align.Center
+                Height: =
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =
+                ZIndex: =4
+
+        ID_DataCard1 As typedDataCard.textualViewCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="ID"
+            Default: =ThisItem.ID
+            DisplayMode: =DisplayMode.View
+            DisplayName: =DataSourceInfo([@'Auto Attendant management'],DataSourceInfo.DisplayName,"ID")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =75
+            Required: =false
+            Visible: =If(locCurrentTab="After Business Hours",true,false)
+            Width: =700
+            X: =2
+            Y: =8
+            ZIndex: =1
+
+        crd_AutoAttendantForm_AutoAttendantGreetingAHText As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Greetingtext_x003a_outofbusiness"
+            Default: |-
+                =If(locDropBoxUpdated.GreetingTypeAH = true, "",ThisItem.'Greeting text: after business hours')
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowChangeGreeting_AH) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Auto Attendant management'],DataSourceInfo.DisplayName,"Greetingtext_x003a_outofbusiness")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =100
+            MaxLength: =1000
+            Required: =false
+            Update: =txt_AutoAttendantGreetingAHText.Text
+            Visible: =If(locCurrentTab="After Business Hours" And drp_AutoAttendantGreetingTypeAH.Selected.Value = "Add a greeting message",true, false)
+            Width: =350
+            X: =2
+            Y: =8
+            ZIndex: =1
+
+            lbl_AutoAttendantGreetingAHText As label:
+                AutoHeight: =true
+                Color: =ColorValue(HeaderColor)
+                FontWeight: =FontWeight.Bold
+                Height: =34
+                Size: =11
+                Text: ="Greeting text prompt"
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            txt_AutoAttendantGreetingAHText As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                Height: =100
+                MaxLength: =Parent.MaxLength
+                Mode: =TextMode.MultiLine
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =lbl_AutoAttendantGreetingAHText.Y + lbl_AutoAttendantGreetingAHText.Height + 5
+                ZIndex: =2
+
+            lbl_AutoAttendantGreetingAHText_Error As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =txt_AutoAttendantGreetingAHText.Y + txt_AutoAttendantGreetingAHText.Height
+                ZIndex: =3
+
+            lbl_AutoAttendantGreetingAHText_Star As label:
+                Align: =Align.Center
+                Height: =lbl_AutoAttendantGreetingAHText.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =lbl_AutoAttendantGreetingAHText.Y
+                ZIndex: =4
+
+        crd_AutoAttendantForm_Friday_EndTime_Range1 As typedDataCard.comboBoxEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="FridayEndTime1"
+            Default: =ThisItem.'Friday EndTime1'
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowChangeBusinessHours) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Auto Attendant management'],DataSourceInfo.DisplayName,"FridayEndTime1")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =DataCardValue26.Selected
+            Visible: =locCurrentTab="Business Hours"
+            Width: =225
+            X: =3
+            Y: =8
+            ZIndex: =1
+
+            DataCardValue26 As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =1
+                ChevronBackground: =ColorValue(HeaderColor)
+                DefaultSelectedItems: =Parent.Default
+                DisplayFields: =["Value"]
+                DisplayMode: =Parent.DisplayMode
+                Height: =35
+                Items: =Choices([@'Auto Attendant management'].'Friday EndTime1')
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["Value"]
+                SearchItems: =Choices('Auto Attendant management'.'Friday EndTime1',DataCardValue26.SearchText)
+                SelectMultiple: =false
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =1
+                ZIndex: =2
+
+            ErrorMessage26 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue26.Y + DataCardValue26.Height
+                ZIndex: =3
+
+            StarVisible28 As label:
+                Align: =Align.Center
+                Height: =
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =
+                ZIndex: =4
+
+        crd_AutoAttendantForm_Friday_ExtraTime As typedDataCard.toggleEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="FridayExtraTimeRange"
+            Default: =ThisItem.'Friday Extra Time Range'
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowChangeBusinessHours) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Auto Attendant management'],DataSourceInfo.DisplayName,"FridayExtraTimeRange")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =DataCardValue7.Value
+            Visible: =locCurrentTab="Business Hours"
+            Width: =143
+            X: =3
+            Y: =8
+            ZIndex: =1
+
+            DataCardValue7 As toggleSwitch:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                Default: =Parent.Default
+                DisplayMode: =Parent.DisplayMode
+                OnChange: =
+                OnCheck: |-
+                    =UpdateContext({locAdditionalTimeRange: 
+                        Patch(locAdditionalTimeRange, {Friday: true})
+                    });
+                OnUncheck: |-
+                    =UpdateContext({locAdditionalTimeRange: 
+                        Patch(locAdditionalTimeRange, {Friday: false})
+                    });
+                    Reset(DataCardValue27);
+                    Reset(DataCardValue28);
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                TrueFill: =ColorValue(HeaderColor)
+                X: =30
+                Y: =
+                ZIndex: =2
+
+            ErrorMessage7 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue7.Y + DataCardValue7.Height
+                ZIndex: =3
+
+            StarVisible9 As label:
+                Align: =Align.Center
+                Height: =
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =
+                ZIndex: =4
+
+        crd_AutoAttendantForm_AutoAttendantGreetingAHAudio As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Greetingaudio_x003a_outofbusines"
+            Default: |-
+                =If(([@GreetingAfterBusinessHoursAudioPromptFile] = "" Or [@GreetingAfterBusinessHoursAudioPromptFile] = Blank()) And drp_AutoAttendantGreetingTypeAH.Selected.Value = "Play an audio file" And locDropBoxUpdated.GreetingTypeAH = false, ThisItem.'Greeting audio: after business hours',[@GreetingAfterBusinessHoursAudioPromptFile])
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowChangeGreeting_AH) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Auto Attendant management'],DataSourceInfo.DisplayName,"Greetingaudio_x003a_outofbusines")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            MaxLength: =DataSourceInfo([@'Auto Attendant management'], DataSourceInfo.MaxLength, "Greetingaudio_x003a_outofbusines")
+            Required: =false
+            Update: =txt_AutoAttendantGreetingAHAudio.Text
+            Visible: =If(locCurrentTab="After Business Hours" And drp_AutoAttendantGreetingTypeAH.Selected.Value = "Play an audio file", true, false)
+            Width: =1000
+            X: =3
+            Y: =8
+            ZIndex: =1
+
+            lbl_AutoAttendantGreetingAHAudio As label:
+                AutoHeight: =true
+                Color: =ColorValue(HeaderColor)
+                FontWeight: =Bold
+                Height: =34
+                Size: =11
+                Text: ="Greeting audio prompt"
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            txt_AutoAttendantGreetingAHAudio As text:
+                BorderColor: =If(IsBlank(Parent.Error), ColorValue(HeaderColor), Color.Red)
+                BorderThickness: =1
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                MaxLength: =Parent.MaxLength
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 500
+                X: =30
+                Y: =lbl_AutoAttendantGreetingAHAudio.Y + lbl_AutoAttendantGreetingAHAudio.Height + 5
+                ZIndex: =2
+
+            lbl_AutoAttendantGreetingAHAudio_Error As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =txt_AutoAttendantGreetingAHAudio.Y + txt_AutoAttendantGreetingAHAudio.Height
+                ZIndex: =3
+
+            lbl_AutoAttendantGreetingAHAudio_Star As label:
+                Align: =Align.Center
+                Height: =lbl_AutoAttendantGreetingAHAudio.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =lbl_AutoAttendantGreetingAHAudio.Y
+                ZIndex: =4
+
+            btn_AutoAttendantGreetingAHAudio As icon.Add:
+                Color: =ColorValue(HeaderColor)
+                Height: =36
+                Icon: =Icon.Edit
+                OnSelect: |-
+                    =UpdateContext({
+                        locShowPopupForm: true,
+                        locPromptType: "greeting after business hours"
+                    });
+                Width: =36
+                X: =txt_AutoAttendantGreetingAHAudio.X + txt_AutoAttendantGreetingAHAudio.Width + 5
+                Y: =lbl_AutoAttendantGreetingAHAudio.Y + lbl_AutoAttendantGreetingAHAudio.Height + 5
+                ZIndex: =5
+
+        crd_AutoAttendantForm_AutoAttendantCallRoutingAHOptions As typedDataCard.comboBoxEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Callroutingoptions_x003a_afterbu"
+            Default: |-
+                =ThisItem.'Call routing options: after business hours'
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowCallRouting_AH) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Auto Attendant management'],DataSourceInfo.DisplayName,"Callroutingoptions_x003a_afterbu")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =drp_AACallRoutingAHOptions.Selected
+            Visible: =locCurrentTab="After Business Hours"
+            Width: =350
+            X: =4
+            Y: =8
+            ZIndex: =1
+
+            lbl_AACallRoutingAHOptions As label:
+                AutoHeight: =true
+                Color: =ColorValue(HeaderColor)
+                FontWeight: =Bold
+                Height: =34
+                Size: =11
+                Text: ="Call routing options"
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            drp_AACallRoutingAHOptions As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), ColorValue(HeaderColor), Color.Red)
+                BorderThickness: =1
+                ChevronBackground: =ColorValue(HeaderColor)
+                DefaultSelectedItems: =Parent.Default
+                DisplayFields: =["Value"]
+                DisplayMode: =Parent.DisplayMode
+                Height: =35
+                Items: |-
+                    =Choices([@'Auto Attendant management'].'Call routing options: after business hours')
+                OnChange: |-
+                    =UpdateContext({locDropBoxUpdated: 
+                        Patch(locDropBoxUpdated, {CallRoutingAH: true})
+                    });
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["Value"]
+                SearchItems: |-
+                    =Choices('Auto Attendant management'.'Call routing options: after business hours',drp_AACallRoutingAHOptions.SearchText)
+                SelectMultiple: =false
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =lbl_AACallRoutingAHOptions.Y + lbl_AACallRoutingAHOptions.Height + 5
+                ZIndex: =2
+
+            lbl_AACallRoutingAHOptions_Error As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =drp_AACallRoutingAHOptions.Y + drp_AACallRoutingAHOptions.Height
+                ZIndex: =3
+
+            lbl_AACallRoutingAHOptions_Star As label:
+                Align: =Align.Center
+                Height: =lbl_AACallRoutingAHOptions.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =lbl_AACallRoutingAHOptions.Y
+                ZIndex: =4
+
+        crd_AutoAttendantGreetingAHTarget As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Callroutingtarget_x003a_afterbus"
+            Default: |
+                =If(locDropBoxUpdated.CallRoutingAH = true,"", ThisItem.'Call routing target: after business hours')
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowCallRouting_AH) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Auto Attendant management'],DataSourceInfo.DisplayName,"Callroutingtarget_x003a_afterbus")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            MaxLength: =DataSourceInfo([@'Auto Attendant management'], DataSourceInfo.MaxLength, "Callroutingtarget_x003a_afterbus")
+            Required: =false
+            Update: =txt_AACallRoutingAHTarget.Text
+            Visible: =If(locCurrentTab="After Business Hours" And Not(drp_AACallRoutingAHOptions.Selected.Value = "Disconnect"),true,false)
+            Width: =287
+            X: =5
+            Y: =8
+            ZIndex: =1
+
+            lbl_AACallRoutingAHTarget As label:
+                AutoHeight: =true
+                Color: =ColorValue(HeaderColor)
+                FontWeight: =Bold
+                Height: =34
+                Size: =11
+                Text: ="Call routing target"
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            txt_AACallRoutingAHTarget As text:
+                BorderColor: =If(IsBlank(Parent.Error), ColorValue(HeaderColor), Color.Red)
+                BorderThickness: =1
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                MaxLength: =Parent.MaxLength
+                OnChange: |-
+                    =If(drp_AACallRoutingAHOptions.Selected.Value = "Redirect: Voicemail", UpdateContext({locShowValidation: 
+                        Patch(locShowValidation, {CallRoutingTargetAH: false})
+                    }), UpdateContext({locShowValidation: 
+                        Patch(locShowValidation, {CallRoutingTargetAH: true})
+                    }));
+                    UpdateContext({locUPN:
+                        Patch(locUPN, {AH: First(Office365Users.SearchUser({searchTerm:txt_AACallRoutingAHTarget.Text})).DisplayName})
+                    });
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 80
+                X: =30
+                Y: =lbl_AACallRoutingAHTarget.Y + lbl_AACallRoutingAHTarget.Height + 5
+                ZIndex: =2
+
+            ico_AACallRoutingAHTarget_Error As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: |-
+                    =If(Parent.Error,Parent.Error,If(drp_AACallRoutingAHOptions.Selected.Value = "Redirect: Person in organization" Or drp_AACallRoutingAHOptions.Selected.Value = "Redirect: Voice app","Please validate the name provided is correct",If(drp_AACallRoutingAHOptions.Selected.Value = "Redirect: External phone number" ,"Please validate the phonenumber provided is correct")))
+                Visible: =ico_AACallRoutingAHTarget_Validation.Icon = Icon.Cancel And ico_AACallRoutingAHTarget_Validation.Visible
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =txt_AACallRoutingAHTarget.Y + txt_AACallRoutingAHTarget.Height
+                ZIndex: =3
+
+            ico_AACallRoutingAHTarget_Star As label:
+                Align: =Align.Center
+                Height: =lbl_AACallRoutingAHTarget.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =lbl_AACallRoutingAHTarget.Y
+                ZIndex: =4
+
+            ico_AACallRoutingAHTarget_Validation As icon.Add:
+                BorderColor: =If(Self.Icon=Icon.Check, DarkGreen, DarkRed)
+                Color: =White
+                Fill: =If(Self.Icon=Icon.Check, Green, Red)
+                Height: =40
+                Icon: |-
+                    =If(
+                        txt_AACallRoutingAHTarget.Text = locUPN.AH Or IsMatch(txt_AACallRoutingAHTarget.Text, "^\+\d{11}"), Icon.Check, Icon.Cancel
+                    )
+                Visible: =locShowValidation.CallRoutingTargetAH
+                Width: =40
+                X: |
+                    =txt_AACallRoutingAHTarget.X + txt_AACallRoutingAHTarget.Width + 5
+                Y: =lbl_AACallRoutingAHTarget.Y + lbl_AACallRoutingAHTarget.Height + 5
+                ZIndex: =5
+
+        crd_AutoAttendantForm_Friday_ExtraTime_Fill As typedDataCard.blankCard:
+            BorderStyle: =BorderStyle.Solid
+            DisplayMode: =DisplayMode.Edit
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =60
+            Visible: =If(locCurrentTab="Business Hours" And DataCardValue7.Value = true, true, false)
+            Width: =150
+            X: =0
+            Y: =9
+            ZIndex: =1
+
+        crd_AutoAttendantForm_Friday_StartTime_Range2 As typedDataCard.comboBoxEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="FridayStartTime2"
+            Default: =ThisItem.'Friday StartTime2'
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowChangeBusinessHours) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Auto Attendant management'],DataSourceInfo.DisplayName,"FridayStartTime2")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =DataCardValue27.Selected
+            Visible: =If(locCurrentTab="Business Hours" And DataCardValue7.Value = true, true, false)
+            Width: =225
+            X: =6
+            Y: =9
+            ZIndex: =1
+
+            DataCardValue27 As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =1
+                ChevronBackground: =ColorValue(HeaderColor)
+                DefaultSelectedItems: =Parent.Default
+                DisplayFields: =["Value"]
+                DisplayMode: =Parent.DisplayMode
+                Height: =35
+                Items: =Choices([@'Auto Attendant management'].'Friday StartTime2')
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["Value"]
+                SearchItems: =Choices('Auto Attendant management'.'Friday StartTime2',DataCardValue27.SearchText)
+                SelectMultiple: =false
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =
+                ZIndex: =2
+
+            ErrorMessage27 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue27.Y + DataCardValue27.Height
+                ZIndex: =3
+
+            StarVisible29 As label:
+                Align: =Align.Center
+                Height: =
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =
+                ZIndex: =4
+
+        crd_AutoAttendantForm_Friday_EndTime_Range2 As typedDataCard.comboBoxEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="FridayEndTime2"
+            Default: =ThisItem.'Friday EndTime2'
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowChangeBusinessHours) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Auto Attendant management'],DataSourceInfo.DisplayName,"FridayEndTime2")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =DataCardValue28.Selected
+            Visible: =If(locCurrentTab="Business Hours" And DataCardValue7.Value = true, true, false)
+            Width: =225
+            X: =7
+            Y: =9
+            ZIndex: =1
+
+            DataCardValue28 As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =1
+                ChevronBackground: =ColorValue(HeaderColor)
+                DefaultSelectedItems: =Parent.Default
+                DisplayFields: =["Value"]
+                DisplayMode: =Parent.DisplayMode
+                Height: =35
+                Items: =Choices([@'Auto Attendant management'].'Friday EndTime2')
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["Value"]
+                SearchItems: =Choices('Auto Attendant management'.'Friday EndTime2',DataCardValue28.SearchText)
+                SelectMultiple: =false
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =1
+                ZIndex: =2
+
+            ErrorMessage28 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue28.Y + DataCardValue28.Height
+                ZIndex: =3
+
+            StarVisible30 As label:
+                Align: =Align.Center
+                Height: =
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =
+                ZIndex: =4
+
+        crd_AutoAttendantForm_Saturday As typedDataCard.blankCard:
+            BorderStyle: =BorderStyle.Solid
+            DisplayMode: =DisplayMode.Edit
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =60
+            Visible: =locCurrentTab="Business Hours"
+            Width: =150
+            X: =0
+            Y: =10
+            ZIndex: =1
+
+            lbl_AA_Saturday As label:
+                FontWeight: =FontWeight.Bold
+                Size: =11
+                Text: ="Saturday"
+                X: =Parent.X + 5
+                Y: =
+                ZIndex: =1
+
+        crd_AutoAttendantForm_Saturday_StartTime_Range1 As typedDataCard.comboBoxEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="SaturdayStartTime1"
+            Default: =ThisItem.'Saturday StartTime1'
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowChangeBusinessHours) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Auto Attendant management'],DataSourceInfo.DisplayName,"SaturdayStartTime1")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =DataCardValue29.Selected
+            Visible: =locCurrentTab="Business Hours"
+            Width: =225
+            X: =1
+            Y: =10
+            ZIndex: =1
+
+            DataCardValue29 As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), ColorValue(HeaderColor), Color.Red)
+                BorderThickness: =1
+                ChevronBackground: =ColorValue(HeaderColor)
+                DefaultSelectedItems: =Parent.Default
+                DisplayFields: =["Value"]
+                DisplayMode: =Parent.DisplayMode
+                Height: =35
+                Items: =Choices([@'Auto Attendant management'].'Saturday StartTime1')
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["Value"]
+                SearchItems: =Choices('Auto Attendant management'.'Saturday StartTime1',DataCardValue29.SearchText)
+                SelectMultiple: =false
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =1
+                ZIndex: =2
+
+            ErrorMessage29 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue29.Y + DataCardValue29.Height
+                ZIndex: =3
+
+            StarVisible31 As label:
+                Align: =Align.Center
+                Height: =
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =
+                ZIndex: =4
+
+        crd_AutoAttendantForm_Saturday_EndTime_Range1 As typedDataCard.comboBoxEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="SaturdayEndTime1"
+            Default: =ThisItem.'Saturday EndTime1'
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowChangeBusinessHours) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Auto Attendant management'],DataSourceInfo.DisplayName,"SaturdayEndTime1")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =DataCardValue30.Selected
+            Visible: =locCurrentTab="Business Hours"
+            Width: =225
+            X: =2
+            Y: =10
+            ZIndex: =1
+
+            DataCardValue30 As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), ColorValue(HeaderColor), Color.Red)
+                BorderThickness: =1
+                ChevronBackground: =ColorValue(HeaderColor)
+                DefaultSelectedItems: =Parent.Default
+                DisplayFields: =["Value"]
+                DisplayMode: =Parent.DisplayMode
+                Height: =35
+                Items: =Choices([@'Auto Attendant management'].'Saturday EndTime1')
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["Value"]
+                SearchItems: =Choices('Auto Attendant management'.'Saturday EndTime1',DataCardValue30.SearchText)
+                SelectMultiple: =false
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =1
+                ZIndex: =2
+
+            ErrorMessage30 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue30.Y + DataCardValue30.Height
+                ZIndex: =3
+
+            StarVisible32 As label:
+                Align: =Align.Center
+                Height: =
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =
+                ZIndex: =4
+
+        crd_AutoAttendantForm_Saturday_ExtraTime As typedDataCard.toggleEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="SaturdayExtraTimeRange"
+            Default: =ThisItem.'Saturday Extra Time Range'
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowChangeBusinessHours) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Auto Attendant management'],DataSourceInfo.DisplayName,"SaturdayExtraTimeRange")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =DataCardValue39.Value
+            Visible: =locCurrentTab="Business Hours"
+            Width: =287
+            X: =3
+            Y: =10
+            ZIndex: =1
+
+            DataCardValue39 As toggleSwitch:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                Default: =Parent.Default
+                DisplayMode: =Parent.DisplayMode
+                OnCheck: |-
+                    =UpdateContext({locAdditionalTimeRange: 
+                        Patch(locAdditionalTimeRange, {Saturday: true})
+                    });
+                OnUncheck: |-
+                    =UpdateContext({locAdditionalTimeRange: 
+                        Patch(locAdditionalTimeRange, {Saturday: false})
+                    });
+                    Reset(DataCardValue31);
+                    Reset(DataCardValue32);
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                TrueFill: =ColorValue(HeaderColor)
+                X: =30
+                Y: =
+                ZIndex: =2
+
+            ErrorMessage39 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue39.Y + DataCardValue39.Height
+                ZIndex: =3
+
+            StarVisible41 As label:
+                Align: =Align.Center
+                Height: =
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =
+                ZIndex: =4
+
+        crd_AutoAttendantForm_AutoAttendantCallRoutingAHVMSuppression As typedDataCard.toggleEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Callroutingvoicemailpromptsuppre0"
+            Default: |-
+                =If(locDropBoxUpdated.CallRoutingAH = true, false,ThisItem.'Call routing voicemail prompt suppression: after business hours')
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowCallRouting_AH) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Auto Attendant management'],DataSourceInfo.DisplayName,"Callroutingvoicemailpromptsuppre0")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =tgl_AutoAttendantCallRoutingAHVMSuppression.Value
+            Visible: |-
+                =If(locCurrentTab="After Business Hours" And drp_AACallRoutingAHOptions.Selected.Value = "Redirect: Voicemail",true,false)
+            Width: =500
+            X: =4
+            Y: =10
+            ZIndex: =1
+
+            lbl_AutoAttendantCallRoutingAHVMSuppression As label:
+                AutoHeight: =true
+                Color: =ColorValue(HeaderColor)
+                FontWeight: =Bold
+                Height: =34
+                Size: =11
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            tgl_AutoAttendantCallRoutingAHVMSuppression As toggleSwitch:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                Default: =Parent.Default
+                DisplayMode: =Parent.DisplayMode
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                X: =30
+                Y: =lbl_AutoAttendantCallRoutingAHVMSuppression.Y + lbl_AutoAttendantCallRoutingAHVMSuppression.Height + 5
+                ZIndex: =2
+
+            lbl_AutoAttendantCallRoutingAHVMSuppression_Error As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =tgl_AutoAttendantCallRoutingAHVMSuppression.Y + tgl_AutoAttendantCallRoutingAHVMSuppression.Height
+                ZIndex: =3
+
+            lbl_AutoAttendantCallRoutingAHVMSuppression_Star As label:
+                Align: =Align.Center
+                Height: =lbl_AutoAttendantCallRoutingAHVMSuppression.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =lbl_AutoAttendantCallRoutingAHVMSuppression.Y
+                ZIndex: =4
+
+        crd_AutoAttendantForm_Saturday_ExtraTime_Fill As typedDataCard.blankCard:
+            BorderStyle: =BorderStyle.Solid
+            DisplayMode: =DisplayMode.Edit
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =60
+            Visible: =If(locCurrentTab="Business Hours" And DataCardValue39.Value = true, true, false)
+            Width: =150
+            X: =0
+            Y: =11
+            ZIndex: =1
+
+        crd_AutoAttendantForm_Saturday_StartTime_Range2 As typedDataCard.comboBoxEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="SaturdayStartTime2"
+            Default: =ThisItem.'Saturday StartTime2'
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowChangeBusinessHours) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Auto Attendant management'],DataSourceInfo.DisplayName,"SaturdayStartTime2")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =DataCardValue31.Selected
+            Visible: =If(locCurrentTab="Business Hours" And DataCardValue39.Value = true, true, false)
+            Width: =225
+            X: =1
+            Y: =11
+            ZIndex: =1
+
+            DataCardValue31 As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =1
+                ChevronBackground: =ColorValue(HeaderColor)
+                DefaultSelectedItems: =Parent.Default
+                DisplayFields: =["Value"]
+                DisplayMode: =Parent.DisplayMode
+                Height: =35
+                Items: =Choices([@'Auto Attendant management'].'Saturday StartTime2')
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["Value"]
+                SearchItems: =Choices('Auto Attendant management'.'Saturday StartTime2',DataCardValue31.SearchText)
+                SelectMultiple: =false
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =1
+                ZIndex: =2
+
+            ErrorMessage31 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue31.Y + DataCardValue31.Height
+                ZIndex: =3
+
+            StarVisible33 As label:
+                Align: =Align.Center
+                Height: =
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =
+                ZIndex: =4
+
+        crd_AutoAttendantForm_Saturday_EndTime_Range2 As typedDataCard.comboBoxEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="SaturdayEndTime2"
+            Default: =ThisItem.'Saturday EndTime2'
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowChangeBusinessHours) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Auto Attendant management'],DataSourceInfo.DisplayName,"SaturdayEndTime2")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =DataCardValue32.Selected
+            Visible: =If(locCurrentTab="Business Hours" And DataCardValue39.Value = true, true, false)
+            Width: =225
+            X: =2
+            Y: =11
+            ZIndex: =1
+
+            DataCardValue32 As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =1
+                ChevronBackground: =ColorValue(HeaderColor)
+                DefaultSelectedItems: =Parent.Default
+                DisplayFields: =["Value"]
+                DisplayMode: =Parent.DisplayMode
+                Height: =35
+                Items: =Choices([@'Auto Attendant management'].'Saturday EndTime2')
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["Value"]
+                SearchItems: =Choices('Auto Attendant management'.'Saturday EndTime2',DataCardValue32.SearchText)
+                SelectMultiple: =false
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =1
+                ZIndex: =2
+
+            ErrorMessage32 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue32.Y + DataCardValue32.Height
+                ZIndex: =3
+
+            StarVisible34 As label:
+                Align: =Align.Center
+                Height: =
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =
+                ZIndex: =4
+
+        crd_AutoAttendantForm_Sunday As typedDataCard.blankCard:
+            BorderStyle: =BorderStyle.Solid
+            DisplayMode: =DisplayMode.Edit
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =60
+            Visible: =locCurrentTab="Business Hours"
+            Width: =150
+            X: =3
+            Y: =12
+            ZIndex: =1
+
+            lbl_AA_Sunday As label:
+                FontWeight: =FontWeight.Bold
+                Size: =11
+                Text: ="Sunday"
+                X: =Parent.X + 5
+                Y: =
+                ZIndex: =1
+
+        crd_AutoAttendantForm_Sunday_StartTime_Range1 As typedDataCard.comboBoxEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="SundayStartTime1"
+            Default: =ThisItem.'Sunday StartTime1'
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowChangeBusinessHours) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Auto Attendant management'],DataSourceInfo.DisplayName,"SundayStartTime1")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =DataCardValue33.Selected
+            Visible: =locCurrentTab="Business Hours"
+            Width: =225
+            X: =5
+            Y: =12
+            ZIndex: =1
+
+            DataCardValue33 As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =1
+                ChevronBackground: =ColorValue(HeaderColor)
+                DefaultSelectedItems: =Parent.Default
+                DisplayFields: =["Value"]
+                DisplayMode: =Parent.DisplayMode
+                Height: =35
+                Items: =Choices([@'Auto Attendant management'].'Sunday StartTime1')
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["Value"]
+                SearchItems: =Choices('Auto Attendant management'.'Sunday StartTime1',DataCardValue33.SearchText)
+                SelectMultiple: =false
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =1
+                ZIndex: =2
+
+            ErrorMessage33 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue33.Y + DataCardValue33.Height
+                ZIndex: =3
+
+            StarVisible35 As label:
+                Align: =Align.Center
+                Height: =
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =
+                ZIndex: =4
+
+        crd_AutoAttendantForm_Sunday_EndTime_Range1 As typedDataCard.comboBoxEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="SundayEndTime1"
+            Default: =ThisItem.'Sunday EndTime1'
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowChangeBusinessHours) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Auto Attendant management'],DataSourceInfo.DisplayName,"SundayEndTime1")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =60
+            Required: =false
+            Update: =DataCardValue34.Selected
+            Visible: =locCurrentTab="Business Hours"
+            Width: =225
+            X: =6
+            Y: =12
+            ZIndex: =1
+
+            DataCardValue34 As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =1
+                ChevronBackground: =ColorValue(HeaderColor)
+                DefaultSelectedItems: =Parent.Default
+                DisplayFields: =["Value"]
+                DisplayMode: =Parent.DisplayMode
+                Height: =35
+                Items: =Choices([@'Auto Attendant management'].'Sunday EndTime1')
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["Value"]
+                SearchItems: =Choices('Auto Attendant management'.'Sunday EndTime1',DataCardValue34.SearchText)
+                SelectMultiple: =false
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =1
+                ZIndex: =2
+
+            ErrorMessage34 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue34.Y + DataCardValue34.Height
+                ZIndex: =3
+
+            StarVisible36 As label:
+                Align: =Align.Center
+                Height: =
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =
+                ZIndex: =4
+
+        crd_AutoAttendantForm_Sunday_ExtraTime As typedDataCard.toggleEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="SundayExtraTimeRange"
+            Default: =ThisItem.'Sunday Extra Time Range'
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowChangeBusinessHours) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Auto Attendant management'],DataSourceInfo.DisplayName,"SundayExtraTimeRange")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =DataCardValue48.Value
+            Visible: =locCurrentTab="Business Hours"
+            Width: =143
+            X: =7
+            Y: =12
+            ZIndex: =1
+
+            DataCardValue48 As toggleSwitch:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                Default: =Parent.Default
+                DisplayMode: =Parent.DisplayMode
+                OnCheck: |-
+                    =UpdateContext({locAdditionalTimeRange: 
+                        Patch(locAdditionalTimeRange, {Sunday: true})
+                    });
+                OnUncheck: |-
+                    =UpdateContext({locAdditionalTimeRange: 
+                        Patch(locAdditionalTimeRange, {Sunday: false})
+                    });
+                    Reset(DataCardValue35);
+                    Reset(DataCardValue36);
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                TrueFill: =ColorValue(HeaderColor)
+                X: =30
+                Y: =
+                ZIndex: =2
+
+            ErrorMessage48 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue48.Y + DataCardValue48.Height
+                ZIndex: =3
+
+            StarVisible50 As label:
+                Align: =Align.Center
+                Height: =
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =
+                ZIndex: =4
+
+        crd_CallAutoAttendantForm_AutoAttendantTitle As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Title"
+            Default: =ThisItem.Title
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: =DataSourceInfo([@'Auto Attendant management'],DataSourceInfo.DisplayName,"Title")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            MaxLength: =DataSourceInfo([@'Auto Attendant management'], DataSourceInfo.MaxLength, "Title")
+            Required: =true
+            Update: =txt_AutoAttendantTitle_Name.Text
+            Visible: =false
+            Width: =287
+            X: =2
+            Y: =13
+            ZIndex: =1
+
+            lbl_AutoAttendantTitle_Name As label:
+                AutoHeight: =true
+                Height: =34
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            txt_AutoAttendantTitle_Name As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                MaxLength: =Parent.MaxLength
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =lbl_AutoAttendantTitle_Name.Y + lbl_AutoAttendantTitle_Name.Height + 5
+                ZIndex: =2
+
+            lbl_AutoAttendantTitleErrorMessage As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =txt_AutoAttendantTitle_Name.Y + txt_AutoAttendantTitle_Name.Height
+                ZIndex: =3
+
+            lbl_AutoAttendantTitle_Star As label:
+                Align: =Align.Center
+                Height: =lbl_AutoAttendantTitle_Name.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =lbl_AutoAttendantTitle_Name.Y
+                ZIndex: =4
+
+        crd_AutoAttendantForm_Sunday_ExtraTime_Fill As typedDataCard.blankCard:
+            BorderStyle: =BorderStyle.Solid
+            DisplayMode: =DisplayMode.Edit
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =60
+            Visible: =If(locCurrentTab="Business Hours" And DataCardValue48.Value = true, true, false)
+            Width: =150
+            X: =3
+            Y: =13
+            ZIndex: =1
+
+        crd_AutoAttendantForm_Sunday_StartTime_Range2 As typedDataCard.comboBoxEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="SundayStartTime2"
+            Default: =ThisItem.'Sunday StartTime2'
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowChangeBusinessHours) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Auto Attendant management'],DataSourceInfo.DisplayName,"SundayStartTime2")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =DataCardValue35.Selected
+            Visible: =If(locCurrentTab="Business Hours" And DataCardValue48.Value = true, true, false)
+            Width: =225
+            X: =4
+            Y: =13
+            ZIndex: =1
+
+            DataCardValue35 As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =1
+                ChevronBackground: =ColorValue(HeaderColor)
+                DefaultSelectedItems: =Parent.Default
+                DisplayFields: =["Value"]
+                DisplayMode: =Parent.DisplayMode
+                Height: =35
+                Items: =Choices([@'Auto Attendant management'].'Sunday StartTime2')
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["Value"]
+                SearchItems: =Choices('Auto Attendant management'.'Sunday StartTime2',DataCardValue35.SearchText)
+                SelectMultiple: =false
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =1
+                ZIndex: =2
+
+            ErrorMessage35 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue35.Y + DataCardValue35.Height
+                ZIndex: =3
+
+            StarVisible37 As label:
+                Align: =Align.Center
+                Height: =
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =
+                ZIndex: =4
+
+        crd_AutoAttendantForm_Sunday_EndTime_Range2 As typedDataCard.comboBoxEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="SundayEndTime2"
+            Default: =ThisItem.'Sunday EndTime2'
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowChangeBusinessHours) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Auto Attendant management'],DataSourceInfo.DisplayName,"SundayEndTime2")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =DataCardValue36.Selected
+            Visible: =If(locCurrentTab="Business Hours" And DataCardValue48.Value = true, true, false)
+            Width: =225
+            X: =5
+            Y: =13
+            ZIndex: =1
+
+            DataCardValue36 As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =1
+                ChevronBackground: =ColorValue(HeaderColor)
+                DefaultSelectedItems: =Parent.Default
+                DisplayFields: =["Value"]
+                DisplayMode: =Parent.DisplayMode
+                Height: =35
+                Items: =Choices([@'Auto Attendant management'].'Sunday EndTime2')
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["Value"]
+                SearchItems: =Choices('Auto Attendant management'.'Sunday EndTime2',DataCardValue36.SearchText)
+                SelectMultiple: =false
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =1
+                ZIndex: =2
+
+            ErrorMessage36 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue36.Y + DataCardValue36.Height
+                ZIndex: =3
+
+            StarVisible38 As label:
+                Align: =Align.Center
+                Height: =
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =
+                ZIndex: =4
+
+        "'Provisioning Status_DataCard1' As typedDataCard.comboBoxEditCard":
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="ProvisioningStatus"
+            Default: =ThisItem.'Provisioning Status'
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: =DataSourceInfo([@'Auto Attendant management'],DataSourceInfo.DisplayName,"ProvisioningStatus")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =DataCardValue65.Selected
+            Visible: =false
+            Width: =287
+            X: =1
+            Y: =15
+            ZIndex: =1
+
+            DataCardKey30 As label:
+                AutoHeight: =true
+                Height: =34
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            DataCardValue65 As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                DefaultSelectedItems: =If(frm_AutoAttendant.Unsaved,LookUp(Choices('Auto Attendant management'.'Provisioning Status'),Value="not provisioned"),Parent.Default)
+                DisplayFields: =["Value"]
+                DisplayMode: =Parent.DisplayMode
+                Items: =Choices([@'Auto Attendant management'].'Provisioning Status')
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["Value"]
+                SearchItems: =Choices('Auto Attendant management'.'Provisioning Status',DataCardValue65.SearchText)
+                SelectMultiple: =false
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardKey30.Y + DataCardKey30.Height + 5
+                ZIndex: =2
+
+            ErrorMessage65 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue65.Y + DataCardValue65.Height
+                ZIndex: =3
+
+            StarVisible65 As label:
+                Align: =Align.Center
+                Height: =DataCardKey30.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey30.Y
+                ZIndex: =4
+
+        crd_AutoAttendantForm_AAGreetingTypeBH As typedDataCard.comboBoxEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Greetingoptions"
+            Default: |-
+                =ThisItem.'Greeting options: business hours'
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowChangeGreeting_BH) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Auto Attendant management'],DataSourceInfo.DisplayName,"Greetingoptions")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =drp_AAGreetingTypeBH.Selected
+            Visible: =locCurrentTab="Greeting"
+            Width: =287
+            X: =0
+            Y: =7
+            ZIndex: =9
+
+            lbl_AAGreetingTypeBH As label:
+                AutoHeight: =true
+                Color: =ColorValue(HeaderColor)
+                FontWeight: =Semibold
+                Height: =34
+                Size: =11
+                Text: ="Greeting type"
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            drp_AAGreetingTypeBH As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), ColorValue(HeaderColor), Color.Red)
+                BorderThickness: =1
+                ChevronBackground: =ColorValue(HeaderColor)
+                ChevronHoverBackground: =ColorFade(ColorValue(AAColor), -20%)
+                DefaultSelectedItems: =Parent.Default
+                DisplayFields: =["Value"]
+                DisplayMode: =Parent.DisplayMode
+                Height: =35
+                Items: |-
+                    =Choices([@'Auto Attendant management'].'Greeting options: business hours')
+                OnChange: |-
+                    =UpdateContext({locDropBoxUpdated: 
+                        Patch(locDropBoxUpdated, {GreetingTypeBH: true})
+                    });
+                    Set(GreetingBusinessHoursAudioPromptFile,"");
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["Value"]
+                SearchItems: |-
+                    =Choices('Auto Attendant management'.'Greeting options: business hours',drp_AAGreetingTypeBH.SearchText)
+                SelectMultiple: =false
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 70
+                X: =30
+                Y: =lbl_AAGreetingTypeBH.Y + lbl_AAGreetingTypeBH.Height + 5
+                ZIndex: =2
+
+            lbl_AAGreetingTypeBH_Error As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =drp_AAGreetingTypeBH.Y + drp_AAGreetingTypeBH.Height
+                ZIndex: =3
+
+            lbl_AAGreetingTypeBH_Star As label:
+                Align: =Align.Center
+                Height: =lbl_AAGreetingTypeBH.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =lbl_AAGreetingTypeBH.Y
+                ZIndex: =4
+
+        crd_AutoAttendantForm_AutoAttendantGreetingBHText As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Greetingtext_x003a_businesshours"
+            Default: |-
+                =If(locDropBoxUpdated.GreetingTypeBH = true, "", ThisItem.'Greeting text: business hours')
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowChangeGreeting_BH) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Auto Attendant management'],DataSourceInfo.DisplayName,"Greetingtext_x003a_businesshours")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =200
+            MaxLength: =1000
+            Required: =false
+            Update: =txt_AAGreetingBHText.Text
+            Visible: =If(locCurrentTab="Greeting" And drp_AAGreetingTypeBH.Selected.Value = "Add a greeting message", true, false)
+            Width: =400
+            X: =2
+            Y: =12
+            ZIndex: =9
+
+            lbl_AAGreetingBHText As label:
+                AutoHeight: =true
+                Color: =ColorValue(HeaderColor)
+                FontWeight: =Semibold
+                Height: =34
+                Size: =11
+                Text: ="Greeting text prompt"
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            txt_AAGreetingBHText As text:
+                BorderColor: =If(IsBlank(Parent.Error), ColorValue(HeaderColor), Color.Red)
+                BorderThickness: =1
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                Height: =148
+                MaxLength: =Parent.MaxLength
+                Mode: =TextMode.MultiLine
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =11
+                Tooltip: =Parent.DisplayName
+                Width: =358
+                X: =30
+                Y: =lbl_AAGreetingBHText.Y + lbl_AAGreetingBHText.Height + 5
+                ZIndex: =2
+
+            lbl_AAGreetingBHText_Error As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =txt_AAGreetingBHText.Y + txt_AAGreetingBHText.Height
+                ZIndex: =3
+
+            lbl_AAGreetingBHText_Star As label:
+                Align: =Align.Center
+                Height: =lbl_AAGreetingBHText.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =lbl_AAGreetingBHText.Y
+                ZIndex: =4
+
+        crd_AutoAttendantForm_AutoAttendantCallRoutingBHOptions As typedDataCard.comboBoxEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Callroutingoptions"
+            Default: =ThisItem.'Call routing options'
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowChangeRouting_BH) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Auto Attendant management'],DataSourceInfo.DisplayName,"Callroutingoptions")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =drp_AACallRoutingBHOptions.Selected
+            Visible: =locCurrentTab="Call Routing"
+            Width: =287
+            X: =1
+            Y: =13
+            ZIndex: =9
+
+            lbl_AACallRoutingBHOptions As label:
+                AutoHeight: =true
+                Color: =ColorValue(HeaderColor)
+                FontWeight: =Bold
+                Height: =34
+                Size: =11
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            drp_AACallRoutingBHOptions As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), ColorValue(HeaderColor), Color.Red)
+                BorderThickness: =1
+                ChevronBackground: =ColorValue(HeaderColor)
+                DefaultSelectedItems: =Parent.Default
+                DisplayFields: =["Value"]
+                DisplayMode: =Parent.DisplayMode
+                Height: =35
+                Items: =Choices([@'Auto Attendant management'].'Call routing options')
+                OnChange: |-
+                    =UpdateContext({locDropBoxUpdated: 
+                        Patch(locDropBoxUpdated, {CallRoutingBH: true})
+                    });
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["Value"]
+                SearchItems: =Choices('Auto Attendant management'.'Call routing options',drp_AACallRoutingBHOptions.SearchText)
+                SelectMultiple: =false
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 100
+                X: =30
+                Y: =lbl_AACallRoutingBHOptions.Y + lbl_AACallRoutingBHOptions.Height + 5
+                ZIndex: =2
+
+            lbl_AACallRoutingBHOptions_Error As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =drp_AACallRoutingBHOptions.Y + drp_AACallRoutingBHOptions.Height
+                ZIndex: =3
+
+            lbl_AACallRoutingBHOptions_Star As label:
+                Align: =Align.Center
+                Height: =lbl_AACallRoutingBHOptions.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =lbl_AACallRoutingBHOptions.Y
+                ZIndex: =4
+
+        crd_AutoAttendantForm_AutoAttendantGreetingBHAudio As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Greetingaudio_x003a_businesshour"
+            Default: |-
+                =If(([@GreetingBusinessHoursAudioPromptFile] = Blank() Or [@GreetingBusinessHoursAudioPromptFile] = "") And drp_AAGreetingTypeBH.Selected.Value  = "Play an audio file" And locDropBoxUpdated.GreetingTypeBH = false,ThisItem.'Greeting audio: business hours',[@GreetingBusinessHoursAudioPromptFile])
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowChangeGreeting_BH) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Auto Attendant management'],DataSourceInfo.DisplayName,"Greetingaudio_x003a_businesshour")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            MaxLength: =DataSourceInfo([@'Auto Attendant management'], DataSourceInfo.MaxLength, "Greetingaudio_x003a_businesshour")
+            Required: =false
+            Update: =txt_AAGreetingBHAudio.Text
+            Visible: =If(locCurrentTab="Greeting" And drp_AAGreetingTypeBH.Selected.Value = "Play an audio file", true, false)
+            Width: =287
+            X: =2
+            Y: =14
+            ZIndex: =9
+
+            lbl_AAGreetingBHAudio As label:
+                AutoHeight: =true
+                Color: =ColorValue(AAColor)
+                FontWeight: =Semibold
+                Height: =34
+                Size: =11
+                Text: ="Greeting audio prompt"
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            txt_AAGreetingBHAudio As text:
+                BorderColor: =If(IsBlank(Parent.Error), ColorValue(AAColor), Color.Red)
+                BorderThickness: =1
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                MaxLength: =Parent.MaxLength
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 90
+                X: =30
+                Y: =lbl_AAGreetingBHAudio.Y + lbl_AAGreetingBHAudio.Height + 5
+                ZIndex: =2
+
+            lbl_AAGreetingBHAudio_Error As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =txt_AAGreetingBHAudio.Y + txt_AAGreetingBHAudio.Height
+                ZIndex: =3
+
+            lbl_AAGreetingBHAudio_Star As label:
+                Align: =Align.Center
+                Height: =lbl_AAGreetingBHAudio.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =lbl_AAGreetingBHAudio.Y
+                ZIndex: =4
+
+            btn_AAGreetingBHAudio_Edit As icon.Add:
+                Color: =ColorValue(AAColor)
+                Height: =36
+                Icon: =Icon.Edit
+                OnSelect: |-
+                    =UpdateContext({
+                        locShowPopupForm: true,
+                        locPromptType: "greeting business hours"
+                    });
+                Width: =36
+                X: =txt_AAGreetingBHAudio.X + txt_AAGreetingBHAudio.Width + 5
+                Y: =lbl_AAGreetingBHAudio.Y + lbl_AAGreetingBHAudio.Height + 5
+                ZIndex: =5
+
+        crd_AutoAttendantForm_AutoAttendantCallRoutingBHTarget As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Callroutingtarget"
+            Default: =If(locDropBoxUpdated.CallRoutingBH = true, "",ThisItem.'Call routing target')
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowChangeRouting_BH) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Auto Attendant management'],DataSourceInfo.DisplayName,"Callroutingtarget")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            MaxLength: =DataSourceInfo([@'Auto Attendant management'], DataSourceInfo.MaxLength, "Callroutingtarget")
+            Required: =false
+            Update: =txt_AACallRoutingBHTarget.Text
+            Visible: =If(locCurrentTab="Call Routing" And Not(drp_AACallRoutingBHOptions.Selected.Value = "Disconnect"), true, false)
+            Width: =287
+            X: =3
+            Y: =14
+            ZIndex: =9
+
+            lbl_AACallRoutingBHTarget As label:
+                AutoHeight: =true
+                Color: =ColorValue(HeaderColor)
+                FontWeight: =Bold
+                Height: =34
+                Size: =11
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            txt_AACallRoutingBHTarget As text:
+                BorderColor: =If(IsBlank(Parent.Error), ColorValue(HeaderColor), ColorValue(CancelColor))
+                BorderThickness: =1
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                Height: =35
+                MaxLength: =Parent.MaxLength
+                OnChange: |-
+                    =If(drp_AACallRoutingBHOptions.Selected.Value = "Redirect: Voicemail", UpdateContext({locShowValidation: 
+                        Patch(locShowValidation, {CallRoutingTargetBH: false})
+                    }), UpdateContext({locShowValidation: 
+                        Patch(locShowValidation, {CallRoutingTargetBH: true})
+                    }));
+                    UpdateContext({locUPN:
+                        Patch(locUPN, {BH: First(Office365Users.SearchUser({searchTerm:txt_AACallRoutingBHTarget.Text})).DisplayName})
+                    });
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 80
+                X: =30
+                Y: =lbl_AACallRoutingBHTarget.Y + lbl_AACallRoutingBHTarget.Height + 5
+                ZIndex: =2
+
+            lbl_AACallRoutingBHTarget_Error As label:
+                Color: =ColorValue(CancelColor)
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =10
+                Text: |-
+                    =If(Parent.Error,Parent.Error,If(drp_AACallRoutingBHOptions.Selected.Value = "Redirect: Person in organization" Or drp_AACallRoutingBHOptions.Selected.Value = "Redirect: Voice app","Please validate the name provided is correct",If(drp_AACallRoutingBHOptions.Selected.Value = "Redirect: External phone number" ,"Please validate the phonenumber provided is correct")))
+                Visible: =ico_AACallRoutingBHTarget_Validation.Icon = Icon.Cancel And ico_AACallRoutingBHTarget_Validation.Visible
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =txt_AACallRoutingBHTarget.Y + txt_AACallRoutingBHTarget.Height
+                ZIndex: =3
+
+            lbl_AACallRoutingBHTarget_Star As label:
+                Align: =Align.Center
+                Height: =lbl_AACallRoutingBHTarget.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =lbl_AACallRoutingBHTarget.Y
+                ZIndex: =4
+
+            ico_AACallRoutingBHTarget_Validation As icon.Add:
+                BorderColor: =If(Self.Icon=Icon.Check, DarkGreen, DarkRed)
+                Color: =White
+                Fill: =If(Self.Icon=Icon.Check, ColorValue(NextColor), ColorValue(CancelColor))
+                Height: =36
+                Icon: |-
+                    =If(
+                        txt_AACallRoutingBHTarget.Text = locUPN.BH Or IsMatch(txt_AACallRoutingBHTarget.Text, "^\+\d{11}"), Icon.Check, Icon.Cancel
+                    )
+                Width: =36
+                X: =txt_AACallRoutingBHTarget.X + txt_AACallRoutingBHTarget.Width + 5
+                Y: =45
+                ZIndex: =5
+
+        crd_AutoAttendantForm_AutoAttendantCallRoutingBHVMSuppression As typedDataCard.toggleEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Callroutingvoicemailpromptsuppre"
+            Default: =If(locDropBoxUpdated.CallRoutingBH = true, false,ThisItem.'Call routing voicemail prompt suppression')
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowChangeRouting_BH) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Auto Attendant management'],DataSourceInfo.DisplayName,"Callroutingvoicemailpromptsuppre")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =125
+            Required: =false
+            Update: =tgl_AACallRoutingBHVMSuppression.Value
+            Visible: |-
+                =If(locCurrentTab="Call Routing" And drp_AACallRoutingBHOptions.Selected.Value = "Redirect: Voicemail", true, false)
+            Width: =287
+            X: =2
+            Y: =15
+            ZIndex: =9
+
+            lbl_AACallRoutingBHVMSuppression As label:
+                AutoHeight: =true
+                Color: =ColorValue(AAColor)
+                FontWeight: =Bold
+                Height: =34
+                Size: =11
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            tgl_AACallRoutingBHVMSuppression As toggleSwitch:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                Default: =Parent.Default
+                DisplayMode: =Parent.DisplayMode
+                Tooltip: =Parent.DisplayName
+                X: =30
+                Y: =lbl_AACallRoutingBHVMSuppression.Y + lbl_AACallRoutingBHVMSuppression.Height + 5
+                ZIndex: =2
+
+            lbl__AACallRoutingBHVMSuppression_Error As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =tgl_AACallRoutingBHVMSuppression.Y + tgl_AACallRoutingBHVMSuppression.Height
+                ZIndex: =3
+
+            lbl_AACallRoutingBHVMSuppression_Star As label:
+                Align: =Align.Center
+                Height: =lbl_AACallRoutingBHVMSuppression.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =lbl_AACallRoutingBHVMSuppression.Y
+                ZIndex: =4
+
+    grp_AA_Holiday_Add As group:
+        Height: =5
+        Width: =5
+        X: =40
+        Y: =40
+        ZIndex: =35
+
+        btn_AA_Holiday_Add As button:
+            Align: =Align.Left
+            BorderThickness: =0
+            Color: =ColorValue(HeaderColor)
+            DisabledBorderColor: =RGBA(0, 0, 0, 1)
+            DisabledFill: =RGBA(0, 0, 0, 0)
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowAddHolidayToAA) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            Fill: =RGBA(0, 0, 0, 0)
+            FontWeight: =Semibold
+            Height: =26
+            HoverColor: =Black
+            HoverFill: =RGBA(0, 0, 0, 0)
+            OnSelect: |-
+                =NewForm(frm_AA_Holiday);
+                Navigate('Auto Attendant Holiday Edit Screen',ScreenTransition.None,{AAHolidayStatus: "new", AAName:AAName});
+            PressedColor: =Black
+            PressedFill: =RGBA(0,0,0,0)
+            RadiusBottomLeft: =0
+            RadiusBottomRight: =0
+            RadiusTopLeft: =0
+            RadiusTopRight: =0
+            Size: =12
+            Text: ="Add"
+            Visible: =locCurrentTab = "Holidays"
+            Width: =50
+            X: =185
+            Y: =182
+            ZIndex: =17
+
+        ico_AA_Holiday_Add As icon.Add:
+            Color: =ColorValue(HeaderColor)
+            DisabledBorderColor: =RGBA(0, 0, 0, 1)
+            DisabledFill: =RGBA(0, 0, 0, 0)
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowAddHolidayToAA) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            Height: =26
+            Icon: =Icon.Add
+            OnSelect: |-
+                =NewForm(frm_AA_Holiday);
+                Navigate('Auto Attendant Holiday Edit Screen',ScreenTransition.None,{AAHolidayStatus: "new", AAName:AAName});
+            Visible: =locCurrentTab = "Holidays"
+            Width: =26
+            X: =159
+            Y: =182
+            ZIndex: =19
+
+    grp_AA_Holiday_Edit As group:
+        Height: =5
+        Width: =5
+        X: =40
+        Y: =40
+        ZIndex: =36
+
+        btn_AA_Holiday_Edit As button:
+            Align: =Align.Left
+            BorderThickness: =0
+            Color: =ColorValue(HeaderColor)
+            DisabledBorderColor: =RGBA(0, 0, 0, 1)
+            DisabledFill: =RGBA(0, 0, 0, 0)
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowAddHolidayToAA) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            Fill: =RGBA(0, 0, 0, 0)
+            FontWeight: =Semibold
+            Height: =26
+            HoverColor: =Black
+            HoverFill: =RGBA(0, 0, 0, 0)
+            OnSelect: |-
+                =Navigate('Auto Attendant Holiday Edit Screen',ScreenTransition.None,{AAHolidayStatus: "update"})
+            PressedColor: =Black
+            PressedFill: =RGBA(0,0,0,0)
+            RadiusBottomLeft: =0
+            RadiusBottomRight: =0
+            RadiusTopLeft: =0
+            RadiusTopRight: =0
+            Size: =12
+            Text: ="Edit"
+            Visible: =locCurrentTab = "Holidays"
+            Width: =84
+            X: =272
+            Y: =182
+            ZIndex: =18
+
+        ico_AA_Holiday_Edit As icon.Add:
+            Color: =ColorValue(HeaderColor)
+            DisabledBorderColor: =RGBA(0, 0, 0, 1)
+            DisabledFill: =RGBA(0, 0, 0, 0)
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowAddHolidayToAA) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            Height: =26
+            Icon: =Icon.Edit
+            OnSelect: |-
+                =Navigate('Auto Attendant Holiday Edit Screen',ScreenTransition.None,{AAHolidayStatus: "update"})
+            Visible: =locCurrentTab = "Holidays"
+            Width: =26
+            X: =246
+            Y: =182
+            ZIndex: =20
+
+    grp_AA_Holiday_Delete As group:
+        Height: =5
+        Width: =5
+        X: =20
+        Y: =20
+        ZIndex: =37
+
+        btn_AA_Holiday_Delete As button:
+            Align: =Align.Left
+            BorderThickness: =0
+            Color: =ColorValue(HeaderColor)
+            DisabledBorderColor: =RGBA(0, 0, 0, 1)
+            DisabledFill: =RGBA(0, 0, 0, 0)
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowAddHolidayToAA) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            Fill: =RGBA(0, 0, 0, 0)
+            FontWeight: =Semibold
+            Height: =26
+            HoverColor: =Black
+            HoverFill: =RGBA(0, 0, 0, 0)
+            OnSelect: |-
+                =Navigate('Auto Attendant Holiday Edit Screen',ScreenTransition.None,{AAHolidayStatus: "delete"})
+            PressedColor: =Black
+            PressedFill: =RGBA(0,0,0,0)
+            RadiusBottomLeft: =0
+            RadiusBottomRight: =0
+            RadiusTopLeft: =0
+            RadiusTopRight: =0
+            Size: =12
+            Text: ="Delete"
+            Visible: =locCurrentTab = "Holidays"
+            Width: =84
+            X: =358
+            Y: =182
+            ZIndex: =22
+
+        ico_AA_Holiday_Delete As icon.Add:
+            Color: =ColorValue(HeaderColor)
+            DisabledBorderColor: =RGBA(0, 0, 0, 1)
+            DisabledFill: =RGBA(0, 0, 0, 0)
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = AAName.Name, AA_AllowAddHolidayToAA) = true,DisplayMode.Edit,DisplayMode.Disabled)
+            Height: =26
+            Icon: =Icon.Trash
+            OnSelect: |-
+                =Navigate('Auto Attendant Holiday Edit Screen',ScreenTransition.None,{AAHolidayStatus: "delete"})
+            Visible: =locCurrentTab = "Holidays"
+            Width: =26
+            X: =332
+            Y: =182
+            ZIndex: =23
+

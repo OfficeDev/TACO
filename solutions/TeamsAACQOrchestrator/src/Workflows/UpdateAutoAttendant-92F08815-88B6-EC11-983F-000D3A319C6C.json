@@ -1,0 +1,2142 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_sharepointonline_1": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "new_sharedsharepointonline_89176"
+        },
+        "api": {
+          "name": "shared_sharepointonline"
+        }
+      },
+      "shared_keyvault": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "new_CONVault"
+        },
+        "api": {
+          "name": "shared_keyvault"
+        }
+      },
+      "shared_office365users_1": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "new_sharedoffice365users_2f2c6"
+        },
+        "api": {
+          "name": "shared_office365users"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        },
+        "VAR - TeamsvoicemanagementSPSite (new_TeamsvoicemanagementSPSite)": {
+          "defaultValue": "AACQMgt",
+          "type": "String",
+          "metadata": {
+            "schemaName": "new_TeamsvoicemanagementSPSite",
+            "description": "SharePoint Site name containing the content for the application"
+          }
+        },
+        "VAR - FunctionApp (new_VARFunctionApp)": {
+          "defaultValue": "TACO-ukwtg",
+          "type": "String",
+          "metadata": {
+            "schemaName": "new_VARFunctionApp",
+            "description": "Name of the function app"
+          }
+        },
+        "VAR - FunctionKey (new_VARFunctionKey)": {
+          "defaultValue": "_adr3AsPuBTbs8ZCSujYTlyn3T7hwJ-swA7ibJuyRBjfAzFufDi2IQ==",
+          "type": "String",
+          "metadata": {
+            "schemaName": "new_VARFunctionKey",
+            "description": "Host key of the function app"
+          }
+        },
+        "VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)": {
+          "defaultValue": "https://m365x14050590.sharepoint.com/sites/AACQMgt",
+          "type": "String",
+          "metadata": {
+            "schemaName": "new_VARSPOSiteAutoAttendantandCallQueueManagement",
+            "description": "SharePoint Site address where the applications Lists are stored"
+          }
+        },
+        "VAR - SPO List - Auto Attendant Management (new_VARSPOListAutoAttendantManagement)": {
+          "defaultValue": "c58a536d-87cd-42dc-adaa-435ed44f60d2",
+          "type": "String",
+          "metadata": {
+            "schemaName": "new_VARSPOListAutoAttendantManagement",
+            "description": "Auto Attendant Management"
+          }
+        },
+        "VAR - SPO List - Voice management audit (new_VARSPOListVoicemanagementaudit)": {
+          "defaultValue": "28e7817f-0a5c-450a-ae02-6b8b2203c6ac",
+          "type": "String",
+          "metadata": {
+            "schemaName": "new_VARSPOListVoicemanagementaudit",
+            "description": "Voice management audit"
+          }
+        },
+        "VAR - Tenant (new_VARTenant)": {
+          "defaultValue": "M365x14050590.onmicrosoft.com",
+          "type": "String",
+          "metadata": {
+            "schemaName": "new_VARTenant",
+            "description": "Tenant name, for example. contoso.onmicrosoft.com"
+          }
+        },
+        "VAR - application id (new_VARapplicationid)": {
+          "defaultValue": "c4b9ee70-6da2-42b4-9fee-cf7b1531d268",
+          "type": "String",
+          "metadata": {
+            "schemaName": "new_VARapplicationid"
+          }
+        }
+      },
+      "triggers": {
+        "When_an_item_is_created_or_modified": {
+          "recurrence": {
+            "interval": 1,
+            "frequency": "Minute"
+          },
+          "splitOn": "@triggerOutputs()?['body/value']",
+          "metadata": {
+            "operationMetadataId": "0c145383-8e63-4a29-b708-a8b4f64ff0ee"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_sharepointonline_1",
+              "operationId": "GetOnUpdatedItems",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+            },
+            "parameters": {
+              "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+              "table": "@parameters('VAR - SPO List - Auto Attendant Management (new_VARSPOListAutoAttendantManagement)')"
+            },
+            "authentication": "@parameters('$authentication')"
+          },
+          "conditions": [
+            {
+              "expression": "@equals(triggerOutputs()?['body/ProvisioningStatus/value'], 'not provisioned')"
+            }
+          ]
+        }
+      },
+      "actions": {
+        "Check_if_item_is_already_provisioned": {
+          "actions": {
+            "Get_changes_for_an_item_or_a_file_(properties_only)": {
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "0e6ca5f8-dab6-4cdb-b48a-025359e24d4e"
+              },
+              "type": "OpenApiConnection",
+              "inputs": {
+                "host": {
+                  "connectionName": "shared_sharepointonline_1",
+                  "operationId": "GetItemChanges",
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                },
+                "parameters": {
+                  "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                  "table": "@parameters('VAR - SPO List - Auto Attendant Management (new_VARSPOListAutoAttendantManagement)')",
+                  "id": "@triggerOutputs()?['body/ID']",
+                  "since": "@triggerOutputs()?['body/{TriggerWindowStartToken}']",
+                  "until": "@triggerOutputs()?['body/{TriggerWindowEndToken}']",
+                  "includeDrafts": false
+                },
+                "authentication": "@parameters('$authentication')"
+              }
+            },
+            "Get_secret": {
+              "runAfter": {
+                "Get_changes_for_an_item_or_a_file_(properties_only)": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "739c8e80-1955-4ca5-a9ab-c8c64585399f"
+              },
+              "type": "OpenApiConnection",
+              "inputs": {
+                "host": {
+                  "connectionName": "shared_keyvault",
+                  "operationId": "GetSecret",
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_keyvault"
+                },
+                "parameters": {
+                  "secretName": "TACO-appSecret"
+                },
+                "authentication": "@parameters('$authentication')"
+              }
+            },
+            "Greeting:_business_hours_changed": {
+              "actions": {
+                "Switch": {
+                  "runAfter": {},
+                  "cases": {
+                    "Greeting:_audio": {
+                      "case": "Play an audio file",
+                      "actions": {
+                        "Run_Set-AutoAttendantGreeting:_audio": {
+                          "runAfter": {},
+                          "type": "Http",
+                          "inputs": {
+                            "method": "POST",
+                            "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Set-AutoAttendantGreeting",
+                            "headers": {
+                              "x-functions-key": "@parameters('VAR - FunctionKey (new_VARFunctionKey)')"
+                            },
+                            "body": {
+                              "Identity": "@triggerOutputs()?['body/{Name}']",
+                              "GreetingAudioBusinessHours": "@triggerOutputs()?['body/Greetingaudio_x003a_businesshour']",
+                              "GreetingTypeBusinessHours": "audio",
+                              "GreetingHours": "business hours",
+                              "SPSite": "@parameters('VAR - TeamsvoicemanagementSPSite (new_TeamsvoicemanagementSPSite)')"
+                            },
+                            "authentication": {
+                              "type": "ActiveDirectoryOAuth",
+                              "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+                              "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+                              "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+                              "secret": "@outputs('Get_secret')?['body/value']"
+                            }
+                          }
+                        },
+                        "Set_action_variable:_Set-AutoAttendantGreeting:_audio": {
+                          "runAfter": {
+                            "Run_Set-AutoAttendantGreeting:_audio": [
+                              "Succeeded"
+                            ]
+                          },
+                          "type": "SetVariable",
+                          "inputs": {
+                            "name": "Action",
+                            "value": "Business hours: Set greeting to play an audio file"
+                          }
+                        },
+                        "Validate_Set-AutoAttendantGreeting:_audio": {
+                          "actions": {
+                            "Set_result_variable:_success_:_Set-AutoAttendantGreeting:_audio": {
+                              "runAfter": {},
+                              "type": "SetVariable",
+                              "inputs": {
+                                "name": "Result",
+                                "value": "Success"
+                              }
+                            }
+                          },
+                          "runAfter": {
+                            "Set_action_variable:_Set-AutoAttendantGreeting:_audio": [
+                              "Succeeded"
+                            ]
+                          },
+                          "else": {
+                            "actions": {
+                              "Set_result_variable:_failed_:_Set-AutoAttendantGreeting:_audio": {
+                                "runAfter": {},
+                                "type": "SetVariable",
+                                "inputs": {
+                                  "name": "Result",
+                                  "value": "Failed"
+                                }
+                              }
+                            }
+                          },
+                          "expression": {
+                            "equals": [
+                              "@outputs('Run_Set-AutoAttendantGreeting:_audio')['statusCode']",
+                              200
+                            ]
+                          },
+                          "type": "If"
+                        },
+                        "Add_audit_log_entry:_Update_auto_attendant_greeting_-_audio__-_bh": {
+                          "runAfter": {
+                            "Validate_Set-AutoAttendantGreeting:_audio": [
+                              "Succeeded"
+                            ]
+                          },
+                          "type": "OpenApiConnection",
+                          "inputs": {
+                            "host": {
+                              "connectionName": "shared_sharepointonline_1",
+                              "operationId": "PostItem",
+                              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                            },
+                            "parameters": {
+                              "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                              "table": "@parameters('VAR - SPO List - Voice management audit (new_VARSPOListVoicemanagementaudit)')",
+                              "item/Title": "@variables('Action')",
+                              "item/Timestamp": "@utcNow()",
+                              "item/Result": "@variables('Result')",
+                              "item/AffectedObject": "@triggerOutputs()?['body/{Name}']",
+                              "item/User": "@triggerOutputs()?['body/Editor/DisplayName']",
+                              "item/Message": "  Auto Attendant greeting: @{triggerOutputs()?['body/Greetingaudio_x003a_businesshour']},\n  Auto Attendant greeting type: audio"
+                            },
+                            "authentication": "@parameters('$authentication')"
+                          }
+                        }
+                      }
+                    },
+                    "Greeting:_text": {
+                      "case": "Add a greeting message",
+                      "actions": {
+                        "Run_Set-AutoAttendantGreeting:_text": {
+                          "runAfter": {},
+                          "type": "Http",
+                          "inputs": {
+                            "method": "POST",
+                            "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Set-AutoAttendantGreeting?code=@{parameters('VAR - FunctionKey (new_VARFunctionKey)')}",
+                            "headers": {
+                              "x-functions-key": "@parameters('VAR - FunctionKey (new_VARFunctionKey)')"
+                            },
+                            "body": {
+                              "Identity": "@triggerOutputs()?['body/{Name}']",
+                              "GreetingTextBusinessHours": "@triggerOutputs()?['body/Greetingtext_x003a_businesshours']",
+                              "GreetingTypeBusinessHours": "text",
+                              "GreetingHours": "business hours"
+                            },
+                            "authentication": {
+                              "type": "ActiveDirectoryOAuth",
+                              "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+                              "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+                              "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+                              "secret": "@outputs('Get_secret')?['body/value']"
+                            }
+                          }
+                        },
+                        "Set_action_variable:_Set-AutoAttendantGreeting:_text": {
+                          "runAfter": {
+                            "Run_Set-AutoAttendantGreeting:_text": [
+                              "Succeeded"
+                            ]
+                          },
+                          "type": "SetVariable",
+                          "inputs": {
+                            "name": "Action",
+                            "value": "Business hours: Add a greeting message"
+                          }
+                        },
+                        "Validate_Set-AutoAttendantGreeting:_text": {
+                          "actions": {
+                            "Set_result_variable:_success_:_Set-AutoAttendantGreeting:_text": {
+                              "runAfter": {},
+                              "type": "SetVariable",
+                              "inputs": {
+                                "name": "Result",
+                                "value": "Success"
+                              }
+                            }
+                          },
+                          "runAfter": {
+                            "Set_action_variable:_Set-AutoAttendantGreeting:_text": [
+                              "Succeeded"
+                            ]
+                          },
+                          "else": {
+                            "actions": {
+                              "Set_result_variable:_failed_:_Set-AutoAttendantGreeting:_text": {
+                                "runAfter": {},
+                                "type": "SetVariable",
+                                "inputs": {
+                                  "name": "Result",
+                                  "value": "Failed"
+                                }
+                              }
+                            }
+                          },
+                          "expression": {
+                            "equals": [
+                              "@outputs('Run_Set-AutoAttendantGreeting:_text')['statusCode']",
+                              200
+                            ]
+                          },
+                          "type": "If"
+                        },
+                        "Add_audit_log_entry:_Update_auto_attendant_greeting_-_text-_bh": {
+                          "runAfter": {
+                            "Validate_Set-AutoAttendantGreeting:_text": [
+                              "Succeeded"
+                            ]
+                          },
+                          "type": "OpenApiConnection",
+                          "inputs": {
+                            "host": {
+                              "connectionName": "shared_sharepointonline_1",
+                              "operationId": "PostItem",
+                              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                            },
+                            "parameters": {
+                              "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                              "table": "@parameters('VAR - SPO List - Voice management audit (new_VARSPOListVoicemanagementaudit)')",
+                              "item/Title": "@variables('Action')",
+                              "item/Timestamp": "@utcNow()",
+                              "item/Result": "@variables('Result')",
+                              "item/AffectedObject": "@triggerOutputs()?['body/{Name}']",
+                              "item/User": "@triggerOutputs()?['body/Editor/DisplayName']",
+                              "item/Message": "Auto Attendant greeting: @{triggerOutputs()?['body/Greetingtext_x003a_businesshours']}\nAuto Attendant greeting type: text"
+                            },
+                            "authentication": "@parameters('$authentication')"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "default": {
+                    "actions": {
+                      "Run_Set-AutoAttendantGreeting:_no_greeting": {
+                        "runAfter": {},
+                        "type": "Http",
+                        "inputs": {
+                          "method": "POST",
+                          "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Set-AutoAttendantGreeting?code=@{parameters('VAR - FunctionKey (new_VARFunctionKey)')}",
+                          "body": {
+                            "Identity": "@triggerOutputs()?['body/{Name}']",
+                            "GreetingTypeBusinessHours": "@triggerOutputs()?['body/Greetingoptions/Value']",
+                            "GreetingHours": "business hours"
+                          }
+                        }
+                      },
+                      "Set_action_variable:_Set-AutoAttendantGreeting:_no_greeting": {
+                        "runAfter": {
+                          "Run_Set-AutoAttendantGreeting:_no_greeting": [
+                            "Succeeded"
+                          ]
+                        },
+                        "type": "SetVariable",
+                        "inputs": {
+                          "name": "Action",
+                          "value": "Business hours: No greeting"
+                        }
+                      },
+                      "Validate_Set-AutoAttendantGreeting:_no_greeting": {
+                        "actions": {
+                          "Set_result_variable:_success_:_Set-AutoAttendantGreeting:_no_greeting": {
+                            "runAfter": {},
+                            "type": "SetVariable",
+                            "inputs": {
+                              "name": "Result",
+                              "value": "Success"
+                            }
+                          }
+                        },
+                        "runAfter": {
+                          "Set_action_variable:_Set-AutoAttendantGreeting:_no_greeting": [
+                            "Succeeded"
+                          ]
+                        },
+                        "else": {
+                          "actions": {
+                            "Set_result_variable:_failed_:_Set-AutoAttendantGreeting:_no_greeting": {
+                              "runAfter": {},
+                              "type": "SetVariable",
+                              "inputs": {
+                                "name": "Result",
+                                "value": "Failed"
+                              }
+                            }
+                          }
+                        },
+                        "expression": {
+                          "equals": [
+                            "@outputs('Run_Set-AutoAttendantGreeting:_no_greeting')['statusCode']",
+                            200
+                          ]
+                        },
+                        "type": "If"
+                      },
+                      "Add_audit_log_entry:_Update_auto_attendant_greeting_-_no_greeting-_bh": {
+                        "runAfter": {
+                          "Validate_Set-AutoAttendantGreeting:_no_greeting": [
+                            "Succeeded"
+                          ]
+                        },
+                        "type": "OpenApiConnection",
+                        "inputs": {
+                          "host": {
+                            "connectionName": "shared_sharepointonline_1",
+                            "operationId": "PostItem",
+                            "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                          },
+                          "parameters": {
+                            "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                            "table": "@parameters('VAR - SPO List - Voice management audit (new_VARSPOListVoicemanagementaudit)')",
+                            "item/Title": "@variables('Action')",
+                            "item/Timestamp": "@utcNow()",
+                            "item/Result": "@variables('Result')",
+                            "item/AffectedObject": "@triggerOutputs()?['body/{Name}']",
+                            "item/User": "@triggerOutputs()?['body/Editor/DisplayName']",
+                            "item/Message": "Auto Attendant greeting type: @{triggerOutputs()?['body/Greetingoptions/Value']}"
+                          },
+                          "authentication": "@parameters('$authentication')"
+                        }
+                      }
+                    }
+                  },
+                  "expression": "@triggerOutputs()?['body/Greetingoptions/Value']",
+                  "metadata": {
+                    "operationMetadataId": "0e594610-ca3f-4ad8-bcf8-af17b3da358e"
+                  },
+                  "type": "Switch"
+                }
+              },
+              "runAfter": {
+                "Get_secret": [
+                  "Succeeded"
+                ]
+              },
+              "expression": {
+                "or": [
+                  {
+                    "equals": [
+                      "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/Greetingoptions']",
+                      "@true"
+                    ]
+                  },
+                  {
+                    "equals": [
+                      "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/Greetingaudio_x003a_businesshour']",
+                      "@true"
+                    ]
+                  },
+                  {
+                    "equals": [
+                      "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/Greetingtext_x003a_businesshours']",
+                      "@true"
+                    ]
+                  }
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "f8867e63-4642-411f-9481-cd57625ce6f0"
+              },
+              "type": "If"
+            },
+            "Greeting:_after_business_hours_changed": {
+              "actions": {
+                "Greeting_options:_after_business_hours": {
+                  "runAfter": {},
+                  "cases": {
+                    "Greeting:_audio": {
+                      "case": "Play an audio file",
+                      "actions": {
+                        "Run_Set-AutoAttendantGreeting_after_business:_audio": {
+                          "runAfter": {},
+                          "type": "Http",
+                          "inputs": {
+                            "method": "POST",
+                            "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Set-AutoAttendantGreeting",
+                            "headers": {
+                              "x-functions-key": "@parameters('VAR - FunctionKey (new_VARFunctionKey)')"
+                            },
+                            "body": {
+                              "Identity": "@triggerOutputs()?['body/{Name}']",
+                              "GreetingAudioAfterBusinessHours": "@triggerOutputs()?['body/Greetingaudio_x003a_outofbusines']",
+                              "GreetingTypeAfterBusinessHours": "audio",
+                              "GreetingHours": "after business hours",
+                              "SPSite": "@parameters('VAR - TeamsvoicemanagementSPSite (new_TeamsvoicemanagementSPSite)')"
+                            },
+                            "authentication": {
+                              "type": "ActiveDirectoryOAuth",
+                              "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+                              "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+                              "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+                              "secret": "@outputs('Get_secret')?['body/value']"
+                            }
+                          }
+                        },
+                        "Set_action_variable:_Set-AutoAttendantGreeting_after_business:_audio": {
+                          "runAfter": {
+                            "Run_Set-AutoAttendantGreeting_after_business:_audio": [
+                              "Succeeded"
+                            ]
+                          },
+                          "type": "SetVariable",
+                          "inputs": {
+                            "name": "Action",
+                            "value": "After business hours: Set greeting to play an audio file"
+                          }
+                        },
+                        "Validate_Set-AutoAttendantGreeting_after_business:_audio": {
+                          "actions": {
+                            "Set_result_variable:_success_:_Set-AutoAttendantGreeting_after_business:_audio": {
+                              "runAfter": {},
+                              "type": "SetVariable",
+                              "inputs": {
+                                "name": "Result",
+                                "value": "Success"
+                              }
+                            }
+                          },
+                          "runAfter": {
+                            "Set_action_variable:_Set-AutoAttendantGreeting_after_business:_audio": [
+                              "Succeeded"
+                            ]
+                          },
+                          "else": {
+                            "actions": {
+                              "Set_result_variable:_failed_:_Set-AutoAttendantGreeting_after_business:_audio": {
+                                "runAfter": {},
+                                "type": "SetVariable",
+                                "inputs": {
+                                  "name": "Result",
+                                  "value": "Failed"
+                                }
+                              }
+                            }
+                          },
+                          "expression": {
+                            "equals": [
+                              "@outputs('Run_Set-AutoAttendantGreeting_after_business:_audio')['statusCode']",
+                              200
+                            ]
+                          },
+                          "type": "If"
+                        },
+                        "Add_audit_log_entry:_Update_auto_attendant_greeting_-_audio__-_ah": {
+                          "runAfter": {
+                            "Validate_Set-AutoAttendantGreeting_after_business:_audio": [
+                              "Succeeded"
+                            ]
+                          },
+                          "type": "OpenApiConnection",
+                          "inputs": {
+                            "host": {
+                              "connectionName": "shared_sharepointonline_1",
+                              "operationId": "PostItem",
+                              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                            },
+                            "parameters": {
+                              "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                              "table": "@parameters('VAR - SPO List - Voice management audit (new_VARSPOListVoicemanagementaudit)')",
+                              "item/Title": "@variables('Action')",
+                              "item/Timestamp": "@utcNow()",
+                              "item/Result": "@variables('Result')",
+                              "item/AffectedObject": "@outputs('Add_audit_log_entry:_Update_auto_attendant_greeting_-_audio__-_bh')?['body/{Name}']",
+                              "item/User": "@triggerOutputs()?['body/Editor/DisplayName']",
+                              "item/Message": "  Auto Attendant greeting: @{triggerOutputs()?['body/Greetingaudio_x003a_outofbusines']},\n  Auto Attendant greeting type: audio"
+                            },
+                            "authentication": "@parameters('$authentication')"
+                          }
+                        }
+                      }
+                    },
+                    "Greeting:_text": {
+                      "case": "Add a greeting message",
+                      "actions": {
+                        "Run_Set-AutoAttendantGreeting_after_business:_text": {
+                          "runAfter": {},
+                          "type": "Http",
+                          "inputs": {
+                            "method": "POST",
+                            "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Set-AutoAttendantGreeting",
+                            "headers": {
+                              "x-functions-key": "@parameters('VAR - FunctionKey (new_VARFunctionKey)')"
+                            },
+                            "body": {
+                              "Identity": "@triggerOutputs()?['body/{Name}']",
+                              "GreetingTextAfterBusinessHours": "@triggerOutputs()?['body/Greetingtext_x003a_outofbusiness']",
+                              "GreetingTypeAfterBusinessHours": "text",
+                              "GreetingHours": "after business hours"
+                            },
+                            "authentication": {
+                              "type": "ActiveDirectoryOAuth",
+                              "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+                              "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+                              "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+                              "secret": "@outputs('Get_secret')?['body/value']"
+                            }
+                          }
+                        },
+                        "Set_action_variable:_Set-AutoAttendantGreeting_after_business:_text": {
+                          "runAfter": {
+                            "Run_Set-AutoAttendantGreeting_after_business:_text": [
+                              "Succeeded"
+                            ]
+                          },
+                          "type": "SetVariable",
+                          "inputs": {
+                            "name": "Action",
+                            "value": "After business hours: Add a greeting message"
+                          }
+                        },
+                        "Validate_Set-AutoAttendantGreeting_after_business:_text": {
+                          "actions": {
+                            "Set_result_variable:_success_:_Set-AutoAttendantGreeting_after_business:_text": {
+                              "runAfter": {},
+                              "type": "SetVariable",
+                              "inputs": {
+                                "name": "Result",
+                                "value": "Success"
+                              }
+                            }
+                          },
+                          "runAfter": {
+                            "Set_action_variable:_Set-AutoAttendantGreeting_after_business:_text": [
+                              "Succeeded"
+                            ]
+                          },
+                          "else": {
+                            "actions": {
+                              "Set_result_variable:_failed_:_Set-AutoAttendantGreeting_after_business:_text": {
+                                "runAfter": {},
+                                "type": "SetVariable",
+                                "inputs": {
+                                  "name": "Result",
+                                  "value": "Failed"
+                                }
+                              }
+                            }
+                          },
+                          "expression": {
+                            "equals": [
+                              "@outputs('Run_Set-AutoAttendantGreeting_after_business:_text')['statusCode']",
+                              200
+                            ]
+                          },
+                          "type": "If"
+                        },
+                        "Add_audit_log_entry:_Update_auto_attendant_greeting_-_text-_ah": {
+                          "runAfter": {
+                            "Validate_Set-AutoAttendantGreeting_after_business:_text": [
+                              "Succeeded"
+                            ]
+                          },
+                          "type": "OpenApiConnection",
+                          "inputs": {
+                            "host": {
+                              "connectionName": "shared_sharepointonline_1",
+                              "operationId": "PostItem",
+                              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                            },
+                            "parameters": {
+                              "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                              "table": "@parameters('VAR - SPO List - Voice management audit (new_VARSPOListVoicemanagementaudit)')",
+                              "item/Title": "@variables('Action')",
+                              "item/Timestamp": "@utcNow()",
+                              "item/Result": "@variables('Result')",
+                              "item/AffectedObject": "@triggerOutputs()?['body/{Name}']",
+                              "item/User": "@triggerOutputs()?['body/Editor/DisplayName']",
+                              "item/Message": "  Auto Attendant greeting: @{triggerOutputs()?['body/Greetingtext_x003a_outofbusiness']},\n  Auto Attendant greeting type: text"
+                            },
+                            "authentication": "@parameters('$authentication')"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "default": {
+                    "actions": {
+                      "Run_Set-AutoAttendantGreeting_after_business:_no_greeting": {
+                        "runAfter": {},
+                        "type": "Http",
+                        "inputs": {
+                          "method": "POST",
+                          "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Set-AutoAttendantGreeting?code=@{parameters('VAR - FunctionKey (new_VARFunctionKey)')}",
+                          "body": {
+                            "Identity": "@triggerOutputs()?['body/{Name}']",
+                            "GreetingTypeAfterBusinessHours": "@triggerOutputs()?['body/Greetingoptions_x003a_afterbusin/Value']",
+                            "GreetingHours": "after business hours"
+                          }
+                        }
+                      },
+                      "Set_action_variable:_Set-AutoAttendantGreeting_after_business:_no_greeting": {
+                        "runAfter": {
+                          "Run_Set-AutoAttendantGreeting_after_business:_no_greeting": [
+                            "Succeeded"
+                          ]
+                        },
+                        "type": "SetVariable",
+                        "inputs": {
+                          "name": "Action",
+                          "value": "After business hours: No greeting"
+                        }
+                      },
+                      "Validate_Set-AutoAttendantGreeting_after_business:_no_greeting": {
+                        "actions": {
+                          "Set_result_variable:_success_:_Set-AutoAttendantGreeting:_no_greeting_2": {
+                            "runAfter": {},
+                            "type": "SetVariable",
+                            "inputs": {
+                              "name": "Result",
+                              "value": "Success"
+                            }
+                          }
+                        },
+                        "runAfter": {
+                          "Set_action_variable:_Set-AutoAttendantGreeting_after_business:_no_greeting": [
+                            "Succeeded"
+                          ]
+                        },
+                        "else": {
+                          "actions": {
+                            "Set_result_variable:_failed_:_Set-AutoAttendantGreeting:_no_greeting_2": {
+                              "runAfter": {},
+                              "type": "SetVariable",
+                              "inputs": {
+                                "name": "Result",
+                                "value": "Failed"
+                              }
+                            }
+                          }
+                        },
+                        "expression": {
+                          "equals": [
+                            "@outputs('Run_Set-AutoAttendantGreeting_after_business:_no_greeting')['statusCode']",
+                            200
+                          ]
+                        },
+                        "type": "If"
+                      },
+                      "Add_audit_log_entry:_Update_auto_attendant_greeting_-_no_greeting__-_ah": {
+                        "runAfter": {
+                          "Validate_Set-AutoAttendantGreeting_after_business:_no_greeting": [
+                            "Succeeded"
+                          ]
+                        },
+                        "type": "OpenApiConnection",
+                        "inputs": {
+                          "host": {
+                            "connectionName": "shared_sharepointonline_1",
+                            "operationId": "PostItem",
+                            "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                          },
+                          "parameters": {
+                            "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                            "table": "@parameters('VAR - SPO List - Voice management audit (new_VARSPOListVoicemanagementaudit)')",
+                            "item/Title": "@variables('Action')",
+                            "item/Timestamp": "@utcNow()",
+                            "item/Result": "@variables('Result')",
+                            "item/AffectedObject": "@triggerOutputs()?['body/{Name}']",
+                            "item/User": "@triggerOutputs()?['body/Editor/DisplayName']",
+                            "item/Message": "Auto Attendant greeting type: @{triggerOutputs()?['body/Greetingoptions/Value']}"
+                          },
+                          "authentication": "@parameters('$authentication')"
+                        }
+                      }
+                    }
+                  },
+                  "expression": "@triggerOutputs()?['body/Greetingoptions_x003a_afterbusin/Value']",
+                  "metadata": {
+                    "operationMetadataId": "8e7779bd-6a43-4c2a-ac6d-793a8d5e7be0"
+                  },
+                  "type": "Switch"
+                }
+              },
+              "runAfter": {
+                "Greeting:_business_hours_changed": [
+                  "Succeeded"
+                ]
+              },
+              "expression": {
+                "or": [
+                  {
+                    "equals": [
+                      "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/Greetingoptions_x003a_afterbusin']",
+                      "@true"
+                    ]
+                  },
+                  {
+                    "equals": [
+                      "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/Greetingaudio_x003a_outofbusines']",
+                      "@true"
+                    ]
+                  },
+                  {
+                    "equals": [
+                      "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/Greetingtext_x003a_outofbusiness']",
+                      "@true"
+                    ]
+                  }
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "cccab454-c824-46ca-9118-6b4948e23841"
+              },
+              "type": "If"
+            },
+            "Call_routing:_business_hours_changed": {
+              "actions": {
+                "Check_which_call_routing_option:_business_hours_has_changed": {
+                  "runAfter": {},
+                  "cases": {
+                    "Disconnect": {
+                      "case": "Disconnect",
+                      "actions": {
+                        "Run_Set-AutoAttendantCallRouting_bh:_disconnect": {
+                          "runAfter": {},
+                          "type": "Http",
+                          "inputs": {
+                            "method": "POST",
+                            "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Set-AutoAttendantCallRouting",
+                            "headers": {
+                              "x-functions-key": "@parameters('VAR - FunctionKey (new_VARFunctionKey)')"
+                            },
+                            "body": {
+                              "Identity": "@triggerOutputs()?['body/{Name}']",
+                              "RedirectTargetTypeBH": "@triggerOutputs()?['body/Callroutingoptions/Value']",
+                              "RoutingHours": "business hours"
+                            },
+                            "authentication": {
+                              "type": "ActiveDirectoryOAuth",
+                              "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+                              "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+                              "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+                              "secret": "@outputs('Get_secret')?['body/value']"
+                            }
+                          }
+                        },
+                        "Set_action_variable_Set-AutoAttendantCallRouting_bh:_disconnect": {
+                          "runAfter": {
+                            "Run_Set-AutoAttendantCallRouting_bh:_disconnect": [
+                              "Succeeded"
+                            ]
+                          },
+                          "type": "SetVariable",
+                          "inputs": {
+                            "name": "Action",
+                            "value": "Updated business hours routing options"
+                          }
+                        },
+                        "Validate_Set-AutoAttendantCallRouting_bh:_disconnect": {
+                          "actions": {
+                            "Set_result_variable_-_success_-_Set-AutoAttendantCallRouting_bh:_disconnect": {
+                              "runAfter": {},
+                              "type": "SetVariable",
+                              "inputs": {
+                                "name": "Result",
+                                "value": "Success"
+                              }
+                            }
+                          },
+                          "runAfter": {
+                            "Set_action_variable_Set-AutoAttendantCallRouting_bh:_disconnect": [
+                              "Succeeded"
+                            ]
+                          },
+                          "else": {
+                            "actions": {
+                              "Set_result_variable_-_failed-_Set-AutoAttendantCallRouting_bh:_disconnect": {
+                                "runAfter": {},
+                                "type": "SetVariable",
+                                "inputs": {
+                                  "name": "Result",
+                                  "value": "Failed"
+                                }
+                              }
+                            }
+                          },
+                          "expression": {
+                            "equals": [
+                              "@outputs('Run_Set-AutoAttendantCallRouting_bh:_disconnect')['statusCode']",
+                              200
+                            ]
+                          },
+                          "type": "If"
+                        },
+                        "Add_audit_log_entry:_Update_auto_attendant_routing_-_disconnect__-_bh": {
+                          "runAfter": {
+                            "Validate_Set-AutoAttendantCallRouting_bh:_disconnect": [
+                              "Succeeded"
+                            ]
+                          },
+                          "type": "OpenApiConnection",
+                          "inputs": {
+                            "host": {
+                              "connectionName": "shared_sharepointonline_1",
+                              "operationId": "PostItem",
+                              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                            },
+                            "parameters": {
+                              "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                              "table": "@parameters('VAR - SPO List - Voice management audit (new_VARSPOListVoicemanagementaudit)')",
+                              "item/Title": "@variables('Action')",
+                              "item/Timestamp": "@utcNow()",
+                              "item/Result": "@variables('Result')",
+                              "item/AffectedObject": "@triggerOutputs()?['body/{Name}']",
+                              "item/User": "@triggerOutputs()?['body/Editor/DisplayName']",
+                              "item/Message": "Auto Attendant Redirect target: @{triggerOutputs()?['body/Callroutingoptions/Value']}"
+                            },
+                            "authentication": "@parameters('$authentication')"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "default": {
+                    "actions": {
+                      "Set_action_variable_Set-AutoAttendantCallRouting_business_hours:_other": {
+                        "runAfter": {
+                          "Check_call_routing_target": [
+                            "Succeeded"
+                          ]
+                        },
+                        "type": "SetVariable",
+                        "inputs": {
+                          "name": "Result",
+                          "value": "Updated business hours routing options"
+                        }
+                      },
+                      "Validate_Set-AutoAttendantCallRouting_business_hours:_other": {
+                        "actions": {
+                          "Set_variable_3": {
+                            "runAfter": {},
+                            "type": "SetVariable",
+                            "inputs": {
+                              "name": "Result",
+                              "value": "Success"
+                            }
+                          }
+                        },
+                        "runAfter": {
+                          "Set_action_variable_Set-AutoAttendantCallRouting_business_hours:_other": [
+                            "Succeeded"
+                          ]
+                        },
+                        "else": {
+                          "actions": {
+                            "Set_variable_4": {
+                              "runAfter": {},
+                              "type": "SetVariable",
+                              "inputs": {
+                                "name": "Result",
+                                "value": "Failed"
+                              }
+                            }
+                          }
+                        },
+                        "expression": {
+                          "equals": [
+                            "@variables('HTTPStatus')",
+                            200
+                          ]
+                        },
+                        "type": "If"
+                      },
+                      "Add_audit_log_entry:_Update_auto_attendant_routing_-_other-_bh": {
+                        "runAfter": {
+                          "Validate_Set-AutoAttendantCallRouting_business_hours:_other": [
+                            "Succeeded"
+                          ]
+                        },
+                        "type": "OpenApiConnection",
+                        "inputs": {
+                          "host": {
+                            "connectionName": "shared_sharepointonline_1",
+                            "operationId": "PostItem",
+                            "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                          },
+                          "parameters": {
+                            "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                            "table": "@parameters('VAR - SPO List - Voice management audit (new_VARSPOListVoicemanagementaudit)')",
+                            "item/Title": "@variables('Action')",
+                            "item/Timestamp": "@utcNow()",
+                            "item/Result": "@variables('Result')",
+                            "item/AffectedObject": "@outputs('Add_audit_log_entry:_Update_auto_attendant_greeting_-_no_greeting-_bh')?['body/{Name}']",
+                            "item/User": "@triggerOutputs()?['body/Editor/DisplayName']",
+                            "item/Message": "Auto Attendant Redirect target type: @{triggerOutputs()?['body/Callroutingoptions/Value']}\nAuto Attendant Redirect target: @{triggerOutputs()?['body/Callroutingtarget']}\nAuto Attendant Redirect target voicemail message supression:@{triggerOutputs()?['body/Callroutingvoicemailpromptsuppre']}"
+                          },
+                          "authentication": "@parameters('$authentication')"
+                        }
+                      },
+                      "Check_call_routing_target": {
+                        "actions": {
+                          "Search_for_users_(V2)": {
+                            "runAfter": {},
+                            "type": "OpenApiConnection",
+                            "inputs": {
+                              "host": {
+                                "connectionName": "shared_office365users_1",
+                                "operationId": "SearchUserV2",
+                                "apiId": "/providers/Microsoft.PowerApps/apis/shared_office365users"
+                              },
+                              "parameters": {
+                                "searchTerm": "@triggerOutputs()?['body/Callroutingtarget']",
+                                "top": 1
+                              },
+                              "authentication": "@parameters('$authentication')"
+                            }
+                          },
+                          "Apply_to_each": {
+                            "foreach": "@outputs('Search_for_users_(V2)')?['body/value']",
+                            "actions": {
+                              "Run_Set-AutoAttendantCallRouting_bh:_other:_person": {
+                                "runAfter": {},
+                                "type": "Http",
+                                "inputs": {
+                                  "method": "POST",
+                                  "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Set-AutoAttendantCallRouting",
+                                  "headers": {
+                                    "x-functions-key": "@parameters('VAR - FunctionKey (new_VARFunctionKey)')"
+                                  },
+                                  "body": {
+                                    "Identity": "@triggerOutputs()?['body/{Name}']",
+                                    "RedirectTargetTypeBH": "@triggerOutputs()?['body/Callroutingoptions/Value']",
+                                    "RedirectTargetBH": "@items('Apply_to_each')?['UserPrincipalName']",
+                                    "RedirectTargetVoicemailPromptSuppressionBH": "@triggerOutputs()?['body/Callroutingvoicemailpromptsuppre']",
+                                    "RoutingHours": "business hours"
+                                  },
+                                  "authentication": {
+                                    "type": "ActiveDirectoryOAuth",
+                                    "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+                                    "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                    "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                    "secret": "@outputs('Get_secret')?['body/value']"
+                                  }
+                                }
+                              },
+                              "Set_variable": {
+                                "runAfter": {
+                                  "Run_Set-AutoAttendantCallRouting_bh:_other:_person": [
+                                    "Succeeded"
+                                  ]
+                                },
+                                "type": "SetVariable",
+                                "inputs": {
+                                  "name": "HTTPStatus",
+                                  "value": "@outputs('Run_Set-AutoAttendantCallRouting_bh:_other:_person')['statusCode']"
+                                }
+                              }
+                            },
+                            "runAfter": {
+                              "Search_for_users_(V2)": [
+                                "Succeeded"
+                              ]
+                            },
+                            "type": "Foreach"
+                          }
+                        },
+                        "runAfter": {},
+                        "else": {
+                          "actions": {
+                            "Run_Set-AutoAttendantCallRouting_bh:_other:_group_of_phonenumber": {
+                              "runAfter": {},
+                              "type": "Http",
+                              "inputs": {
+                                "method": "POST",
+                                "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Set-AutoAttendantCallRouting",
+                                "headers": {
+                                  "x-functions-key": "@parameters('VAR - FunctionKey (new_VARFunctionKey)')"
+                                },
+                                "body": {
+                                  "Identity": "@triggerOutputs()?['body/{Name}']",
+                                  "RedirectTargetTypeBH": "@triggerOutputs()?['body/Callroutingoptions/Value']",
+                                  "RedirectTargetBH": "@triggerOutputs()?['body/Callroutingtarget']",
+                                  "RedirectTargetVoicemailPromptSuppressionBH": "@triggerOutputs()?['body/Callroutingvoicemailpromptsuppre']",
+                                  "RoutingHours": "business hours"
+                                },
+                                "authentication": {
+                                  "type": "ActiveDirectoryOAuth",
+                                  "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+                                  "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                  "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                  "secret": "@outputs('Get_secret')?['body/value']"
+                                }
+                              }
+                            },
+                            "Set_variable_2": {
+                              "runAfter": {
+                                "Run_Set-AutoAttendantCallRouting_bh:_other:_group_of_phonenumber": [
+                                  "Succeeded"
+                                ]
+                              },
+                              "type": "SetVariable",
+                              "inputs": {
+                                "name": "HTTPStatus",
+                                "value": "@outputs('Run_Set-AutoAttendantCallRouting_bh:_other:_group_of_phonenumber')['statusCode']"
+                              }
+                            }
+                          }
+                        },
+                        "expression": {
+                          "or": [
+                            {
+                              "equals": [
+                                "@triggerOutputs()?['body/Callroutingoptions/Value']",
+                                "Redirect: Person in organization"
+                              ]
+                            },
+                            {
+                              "equals": [
+                                "@triggerOutputs()?['body/Callroutingoptions/Value']",
+                                "Redirect: Voice app"
+                              ]
+                            }
+                          ]
+                        },
+                        "type": "If"
+                      }
+                    }
+                  },
+                  "expression": "@triggerOutputs()?['body/Callroutingoptions/Value']",
+                  "metadata": {
+                    "operationMetadataId": "a8074853-793b-4d7f-9019-c09b8a67c6a7"
+                  },
+                  "type": "Switch"
+                }
+              },
+              "runAfter": {
+                "Greeting:_after_business_hours_changed": [
+                  "Succeeded"
+                ]
+              },
+              "expression": {
+                "or": [
+                  {
+                    "equals": [
+                      "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/Callroutingoptions']",
+                      "@true"
+                    ]
+                  },
+                  {
+                    "equals": [
+                      "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/Callroutingtarget']",
+                      "@true"
+                    ]
+                  },
+                  {
+                    "equals": [
+                      "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/Callroutingvoicemailpromptsuppre']",
+                      "@true"
+                    ]
+                  }
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "5c5b547d-c908-4cf7-a2d7-247386654aa9"
+              },
+              "type": "If"
+            },
+            "Call_routing:_after_business_hours_changed": {
+              "actions": {
+                "Check_which_call_routing_option:_after_business_hours_has_changed": {
+                  "runAfter": {},
+                  "cases": {
+                    "Disconnect": {
+                      "case": "Disconnect",
+                      "actions": {
+                        "Run_Set-AutoAttendantCallRouting_ah:_disconnect": {
+                          "runAfter": {},
+                          "type": "Http",
+                          "inputs": {
+                            "method": "POST",
+                            "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Set-AutoAttendantCallRouting",
+                            "headers": {
+                              "x-functions-key": "@parameters('VAR - FunctionKey (new_VARFunctionKey)')"
+                            },
+                            "body": {
+                              "Identity": "@triggerOutputs()?['body/{Name}']",
+                              "RedirectTargetTypeAH": "@triggerOutputs()?['body/Callroutingoptions_x003a_afterbu/Value']",
+                              "RoutingHours": "after business hours"
+                            },
+                            "authentication": {
+                              "type": "ActiveDirectoryOAuth",
+                              "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+                              "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+                              "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+                              "secret": "@outputs('Get_secret')?['body/value']"
+                            }
+                          }
+                        },
+                        "Set_action_variable_Set-AutoAttendantCallRouting_ah:_disconnect": {
+                          "runAfter": {
+                            "Run_Set-AutoAttendantCallRouting_ah:_disconnect": [
+                              "Succeeded"
+                            ]
+                          },
+                          "type": "SetVariable",
+                          "inputs": {
+                            "name": "Action",
+                            "value": "Updated after business hours routing options"
+                          }
+                        },
+                        "Validate_Set-AutoAttendantCallRouting_ah:_disconnect": {
+                          "actions": {
+                            "Set_results_variable:_success_-_Set-AutoAttendantCallRouting_ah:_disconnect": {
+                              "runAfter": {},
+                              "type": "SetVariable",
+                              "inputs": {
+                                "name": "Result",
+                                "value": "Success"
+                              }
+                            }
+                          },
+                          "runAfter": {
+                            "Set_action_variable_Set-AutoAttendantCallRouting_ah:_disconnect": [
+                              "Succeeded"
+                            ]
+                          },
+                          "else": {
+                            "actions": {
+                              "Set_results_variable:_failed-_Set-AutoAttendantCallRouting_ah:_disconnect": {
+                                "runAfter": {},
+                                "type": "SetVariable",
+                                "inputs": {
+                                  "name": "Result",
+                                  "value": "Failed"
+                                }
+                              }
+                            }
+                          },
+                          "expression": {
+                            "equals": [
+                              "@outputs('Run_Set-AutoAttendantCallRouting_ah:_disconnect')['statusCode']",
+                              200
+                            ]
+                          },
+                          "type": "If"
+                        },
+                        "Add_audit_log_entry:_Update_auto_attendant_routing_-_disconnect__-_ah": {
+                          "runAfter": {
+                            "Validate_Set-AutoAttendantCallRouting_ah:_disconnect": [
+                              "Succeeded"
+                            ]
+                          },
+                          "type": "OpenApiConnection",
+                          "inputs": {
+                            "host": {
+                              "connectionName": "shared_sharepointonline_1",
+                              "operationId": "PostItem",
+                              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                            },
+                            "parameters": {
+                              "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                              "table": "@parameters('VAR - SPO List - Voice management audit (new_VARSPOListVoicemanagementaudit)')",
+                              "item/Title": "@variables('Action')",
+                              "item/Timestamp": "@utcNow()",
+                              "item/Result": "@variables('Result')",
+                              "item/AffectedObject": "@triggerOutputs()?['body/{Name}']",
+                              "item/User": "@triggerOutputs()?['body/Editor/DisplayName']",
+                              "item/Message": "Auto Attendant redirect target: @{triggerOutputs()?['body/Callroutingoptions_x003a_afterbu/Value']}"
+                            },
+                            "authentication": "@parameters('$authentication')"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "default": {
+                    "actions": {
+                      "Set_action_variable_Set-AutoAttendantCallRouting_ah:_other": {
+                        "runAfter": {},
+                        "type": "SetVariable",
+                        "inputs": {
+                          "name": "Result",
+                          "value": "Updated business hours routing options"
+                        }
+                      },
+                      "Add_audit_log_entry:_Update_auto_attendant_routing_-_other_-_ah": {
+                        "runAfter": {
+                          "Condition_2": [
+                            "Succeeded"
+                          ]
+                        },
+                        "type": "OpenApiConnection",
+                        "inputs": {
+                          "host": {
+                            "connectionName": "shared_sharepointonline_1",
+                            "operationId": "PostItem",
+                            "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                          },
+                          "parameters": {
+                            "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                            "table": "@parameters('VAR - SPO List - Voice management audit (new_VARSPOListVoicemanagementaudit)')",
+                            "item/Title": "@variables('Action')",
+                            "item/Timestamp": "@utcNow()",
+                            "item/Result": "@variables('Result')",
+                            "item/AffectedObject": "@triggerOutputs()?['body/{Name}']",
+                            "item/User": "@triggerOutputs()?['body/Editor/DisplayName']",
+                            "item/Message": "Auto Attendant redirect target type: @{triggerOutputs()?['body/Callroutingoptions_x003a_afterbu/Value']}\nAuto Attendant redirect target: @{triggerOutputs()?['body/Callroutingtarget_x003a_afterbus']}\nAuto Attendant Redirect target voicemail message supression:@{triggerOutputs()?['body/Callroutingvoicemailpromptsuppre0']}"
+                          },
+                          "authentication": "@parameters('$authentication')"
+                        }
+                      },
+                      "Condition_2": {
+                        "actions": {
+                          "Search_for_users_(V2)_2": {
+                            "runAfter": {},
+                            "type": "OpenApiConnection",
+                            "inputs": {
+                              "host": {
+                                "connectionName": "shared_office365users_1",
+                                "operationId": "SearchUserV2",
+                                "apiId": "/providers/Microsoft.PowerApps/apis/shared_office365users"
+                              },
+                              "parameters": {
+                                "searchTerm": "@triggerOutputs()?['body/Callroutingtarget_x003a_afterbus']",
+                                "top": 1
+                              },
+                              "authentication": "@parameters('$authentication')"
+                            }
+                          },
+                          "Apply_to_each_2": {
+                            "foreach": "@outputs('Search_for_users_(V2)_2')?['body/value']",
+                            "actions": {
+                              "Run_Set-AutoAttendantCallRouting_ah:_other:_person": {
+                                "runAfter": {},
+                                "type": "Http",
+                                "inputs": {
+                                  "method": "POST",
+                                  "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Set-AutoAttendantCallRouting",
+                                  "headers": {
+                                    "x-functions-key": "@parameters('VAR - FunctionKey (new_VARFunctionKey)')"
+                                  },
+                                  "body": {
+                                    "Identity": "@triggerOutputs()?['body/{Name}']",
+                                    "RedirectTargetTypeAH": "@triggerOutputs()?['body/Callroutingoptions_x003a_afterbu/Value']",
+                                    "RedirectTargetAH": "@items('Apply_to_each_2')?['UserPrincipalName']",
+                                    "RedirectTargetVoicemailPromptSuppressionAH": "@triggerOutputs()?['body/Callroutingvoicemailpromptsuppre0']",
+                                    "RoutingHours": "after business hours"
+                                  },
+                                  "authentication": {
+                                    "type": "ActiveDirectoryOAuth",
+                                    "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+                                    "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                    "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                    "secret": "@outputs('Get_secret')?['body/value']"
+                                  }
+                                }
+                              },
+                              "Validate_Set-AutoAttendantCallRouting_aftere_business_hours:_other:_person": {
+                                "actions": {
+                                  "Set_results_variable:_success_-_Set-AutoAttendantCallRouting_ah:_other:_person": {
+                                    "runAfter": {},
+                                    "type": "SetVariable",
+                                    "inputs": {
+                                      "name": "Result",
+                                      "value": "Success"
+                                    }
+                                  }
+                                },
+                                "runAfter": {
+                                  "Run_Set-AutoAttendantCallRouting_ah:_other:_person": [
+                                    "Succeeded"
+                                  ]
+                                },
+                                "else": {
+                                  "actions": {
+                                    "Set_results_variable:_failed-_Set-AutoAttendantCallRouting_ah:_other:_person": {
+                                      "runAfter": {},
+                                      "type": "SetVariable",
+                                      "inputs": {
+                                        "name": "Result",
+                                        "value": "Success"
+                                      }
+                                    }
+                                  }
+                                },
+                                "expression": {
+                                  "equals": [
+                                    "@outputs('Run_Set-AutoAttendantCallRouting_ah:_other:_person')['statusCode']",
+                                    200
+                                  ]
+                                },
+                                "type": "If"
+                              }
+                            },
+                            "runAfter": {
+                              "Search_for_users_(V2)_2": [
+                                "Succeeded"
+                              ]
+                            },
+                            "type": "Foreach"
+                          }
+                        },
+                        "runAfter": {
+                          "Set_action_variable_Set-AutoAttendantCallRouting_ah:_other": [
+                            "Succeeded"
+                          ]
+                        },
+                        "else": {
+                          "actions": {
+                            "Run_Set-AutoAttendantCallRouting_ah:_other:_group_or_phone": {
+                              "runAfter": {},
+                              "type": "Http",
+                              "inputs": {
+                                "method": "POST",
+                                "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Set-AutoAttendantCallRouting",
+                                "headers": {
+                                  "x-functions-key": "@parameters('VAR - FunctionKey (new_VARFunctionKey)')"
+                                },
+                                "body": {
+                                  "Identity": "@triggerOutputs()?['body/{Name}']",
+                                  "RedirectTargetTypeAH": "@triggerOutputs()?['body/Callroutingoptions_x003a_afterbu/Value']",
+                                  "RedirectTargetAH": "@triggerOutputs()?['body/Callroutingtarget_x003a_afterbus']",
+                                  "RedirectTargetVoicemailPromptSuppressionAH": "@triggerOutputs()?['body/Callroutingvoicemailpromptsuppre0']",
+                                  "RoutingHours": "after business hours"
+                                },
+                                "authentication": {
+                                  "type": "ActiveDirectoryOAuth",
+                                  "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+                                  "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                  "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                  "secret": "@outputs('Get_secret')?['body/value']"
+                                }
+                              }
+                            },
+                            "Validate_Set-AutoAttendantCallRouting_after_business_hours:_other": {
+                              "actions": {
+                                "Set_results_variable:_success_-_Set-AutoAttendantCallRouting_ah:_other": {
+                                  "runAfter": {},
+                                  "type": "SetVariable",
+                                  "inputs": {
+                                    "name": "Result",
+                                    "value": "Success"
+                                  }
+                                }
+                              },
+                              "runAfter": {
+                                "Run_Set-AutoAttendantCallRouting_ah:_other:_group_or_phone": [
+                                  "Succeeded"
+                                ]
+                              },
+                              "else": {
+                                "actions": {
+                                  "Set_results_variable:_failed_-_Set-AutoAttendantCallRouting_ah:_other": {
+                                    "runAfter": {},
+                                    "type": "SetVariable",
+                                    "inputs": {
+                                      "name": "Result",
+                                      "value": "Failed"
+                                    }
+                                  }
+                                }
+                              },
+                              "expression": {
+                                "equals": [
+                                  "@outputs('Run_Set-AutoAttendantCallRouting_ah:_other:_group_or_phone')['statusCode']",
+                                  200
+                                ]
+                              },
+                              "type": "If"
+                            }
+                          }
+                        },
+                        "expression": {
+                          "and": [
+                            {
+                              "equals": [
+                                "@triggerOutputs()?['body/Callroutingoptions_x003a_afterbu/Value']",
+                                "Redirect: Person in organization"
+                              ]
+                            },
+                            {
+                              "equals": [
+                                "@triggerOutputs()?['body/Callroutingoptions/Value']",
+                                "Redirect: Voice app"
+                              ]
+                            }
+                          ]
+                        },
+                        "type": "If"
+                      }
+                    }
+                  },
+                  "expression": "@triggerOutputs()?['body/Callroutingoptions_x003a_afterbu/Value']",
+                  "metadata": {
+                    "operationMetadataId": "a8074853-793b-4d7f-9019-c09b8a67c6a7"
+                  },
+                  "type": "Switch"
+                }
+              },
+              "runAfter": {
+                "Call_routing:_business_hours_changed": [
+                  "Succeeded"
+                ]
+              },
+              "expression": {
+                "or": [
+                  {
+                    "equals": [
+                      "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/Callroutingoptions_x003a_afterbu']",
+                      "@true"
+                    ]
+                  },
+                  {
+                    "equals": [
+                      "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/Callroutingtarget_x003a_afterbus']",
+                      "@true"
+                    ]
+                  },
+                  {
+                    "equals": [
+                      "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/Callroutingvoicemailpromptsuppre0']",
+                      "@true"
+                    ]
+                  }
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "5c5b547d-c908-4cf7-a2d7-247386654aa9"
+              },
+              "type": "If"
+            },
+            "Business_hours_changed": {
+              "actions": {
+                "Run_Set-CsAutoAttendantBusinessHours": {
+                  "runAfter": {},
+                  "metadata": {
+                    "operationMetadataId": "be5c61f7-ebc2-4300-b96d-5ff90c43459e"
+                  },
+                  "type": "Http",
+                  "inputs": {
+                    "method": "POST",
+                    "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Set-AutoAttendantBusinessHours",
+                    "headers": {
+                      "x-functions-key": "@parameters('VAR - FunctionKey (new_VARFunctionKey)')"
+                    },
+                    "body": {
+                      "Identity": "@triggerOutputs()?['body/{Name}']",
+                      "days": {
+                        "Monday": {
+                          "StartTime1": "@triggerOutputs()?['body/MondayStartTime1/Value']",
+                          "EndTime1": "@triggerOutputs()?['body/MondayEndTime1/Value']",
+                          "StartTime2": "@triggerOutputs()?['body/MondayStartTime2/Value']",
+                          "EndTime2": "@triggerOutputs()?['body/MondayEndTime2/Value']"
+                        },
+                        "Tuesday": {
+                          "StartTime1": "@triggerOutputs()?['body/TuesdayStartTime1/Value']",
+                          "EndTime1": "@triggerOutputs()?['body/TuesdayEndTime1/Value']",
+                          "StartTime2": "@triggerOutputs()?['body/TuesdayStartTime2/Value']",
+                          "EndTime2": "@triggerOutputs()?['body/TuesdayEndTime2/Value']"
+                        },
+                        "Wednesday": {
+                          "StartTime1": "@triggerOutputs()?['body/WednesdayStartTime1/Value']",
+                          "EndTime1": "@triggerOutputs()?['body/WednesdayEndTime1/Value']",
+                          "StartTime2": "@triggerOutputs()?['body/WednesdayStartTime2/Value']",
+                          "EndTime2": "@triggerOutputs()?['body/WednesdayEndTime2/Value']"
+                        },
+                        "Thursday": {
+                          "StartTime1": "@triggerOutputs()?['body/ThursdayStartTime1/Value']",
+                          "EndTime1": "@triggerOutputs()?['body/ThursdayEndTime1/Value']",
+                          "StartTime2": "@triggerOutputs()?['body/ThursdayStartTime2/Value']",
+                          "EndTime2": "@triggerOutputs()?['body/ThursdayEndTime2/Value']"
+                        },
+                        "Friday": {
+                          "StartTime1": "@triggerOutputs()?['body/FridayStartTime1/Value']",
+                          "EndTime1": "@triggerOutputs()?['body/FridayEndTime1/Value']",
+                          "StartTime2": "@triggerOutputs()?['body/FridayStartTime2/Value']",
+                          "EndTime2": "@triggerOutputs()?['body/FridayEndTime2/Value']"
+                        },
+                        "Saturday": {
+                          "StartTime1": "@triggerOutputs()?['body/SaturdayStartTime1/Value']",
+                          "EndTime1": "@triggerOutputs()?['body/SaturdayEndTime1/Value']",
+                          "StartTime2": "@triggerOutputs()?['body/SaturdayStartTime2/Value']",
+                          "EndTime2": "@triggerOutputs()?['body/SaturdayEndTime2/Value']"
+                        },
+                        "Sunday": {
+                          "StartTime1": "@triggerOutputs()?['body/SundayStartTime1/Value']",
+                          "EndTime1": "@triggerOutputs()?['body/SundayEndTime1/Value']",
+                          "StartTime2": "@triggerOutputs()?['body/SundayStartTime2/Value']",
+                          "EndTime2": "@triggerOutputs()?['body/SundayEndTime2/Value']"
+                        }
+                      }
+                    },
+                    "authentication": {
+                      "type": "ActiveDirectoryOAuth",
+                      "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+                      "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+                      "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+                      "secret": "@outputs('Get_secret')?['body/value']"
+                    }
+                  }
+                },
+                "Set_action_variable_Set-AutoAttendantBusinessHours": {
+                  "runAfter": {
+                    "Run_Set-CsAutoAttendantBusinessHours": [
+                      "Succeeded"
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "62e1328a-5aa2-408a-826e-ce9b25abf94f"
+                  },
+                  "type": "SetVariable",
+                  "inputs": {
+                    "name": "Action",
+                    "value": "Updating business hours"
+                  }
+                },
+                "Validate_Set-AutoAttendantBusinessHours": {
+                  "actions": {
+                    "Set_result_variable_-_success_-_Set-AutoAttendantBusinessHours": {
+                      "runAfter": {},
+                      "metadata": {
+                        "operationMetadataId": "c60c0ae2-1466-4cd0-bbbd-4f2ca39ea28d"
+                      },
+                      "type": "SetVariable",
+                      "inputs": {
+                        "name": "Result",
+                        "value": "Success"
+                      }
+                    }
+                  },
+                  "runAfter": {
+                    "Set_action_variable_Set-AutoAttendantBusinessHours": [
+                      "Succeeded"
+                    ]
+                  },
+                  "else": {
+                    "actions": {
+                      "Set_result_variable_-_failed-_Set-AutoAttendantBusinessHours": {
+                        "runAfter": {},
+                        "metadata": {
+                          "operationMetadataId": "d387df69-22e3-481e-9d59-1a76d7cac79e"
+                        },
+                        "type": "SetVariable",
+                        "inputs": {
+                          "name": "Result",
+                          "value": "Failed"
+                        }
+                      }
+                    }
+                  },
+                  "expression": {
+                    "equals": [
+                      "@outputs('Run_Set-CsAutoAttendantBusinessHours')['statusCode']",
+                      200
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "09b9a8fa-eb46-4bc4-99d4-12e61c712fad"
+                  },
+                  "type": "If"
+                },
+                "Create_audit_log_entry:_Set-AutoAttendantBusinessHours": {
+                  "runAfter": {
+                    "Validate_Set-AutoAttendantBusinessHours": [
+                      "Succeeded"
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "5712bcb1-387a-4734-a806-d2a0f9015e8c"
+                  },
+                  "type": "OpenApiConnection",
+                  "inputs": {
+                    "host": {
+                      "connectionName": "shared_sharepointonline_1",
+                      "operationId": "PostItem",
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                    },
+                    "parameters": {
+                      "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                      "table": "@parameters('VAR - SPO List - Voice management audit (new_VARSPOListVoicemanagementaudit)')",
+                      "item/Title": "@variables('Action')",
+                      "item/Timestamp": "@utcNow()",
+                      "item/Result": "@variables('Result')",
+                      "item/AffectedObject": "@triggerOutputs()?['body/{Name}']",
+                      "item/User": "@triggerOutputs()?['body/Editor/DisplayName']",
+                      "item/Message": "Monday:\n      Time range 1:\n               Start time: @{triggerOutputs()?['body/MondayStartTime1/Value']}\n               End time: @{triggerOutputs()?['body/MondayEndTime1/Value']}\n     Time range 2:\n               Start time: @{triggerOutputs()?['body/MondayStartTime2/Value']}\n               EndTime: @{triggerOutputs()?['body/MondayEndTime2/Value']}\nTuesday\n    Time range 1:\n             Start time: @{triggerOutputs()?['body/TuesdayStartTime1/Value']}\n             End time: @{triggerOutputs()?['body/TuesdayEndTime1/Value']}\n    Time range 2:\n             Start time: @{triggerOutputs()?['body/TuesdayStartTime2/Value']}\n             End time: @{triggerOutputs()?['body/TuesdayEndTime2/Value']}\nWednesday\n    Time range 1:\n             Start time: @{triggerOutputs()?['body/WednesdayStartTime1/Value']}\n             End time: @{triggerOutputs()?['body/WednesdayEndTime1/Value']}\n    Time range 2\n             Start time: @{triggerOutputs()?['body/WednesdayStartTime2/Value']}\n             End time:  @{triggerOutputs()?['body/WednesdayEndTime2/Value']}\nThursday\n    Time range 1:\n            Start time: @{triggerOutputs()?['body/ThursdayStartTime1/Value']}\n            End time: @{triggerOutputs()?['body/ThursdayEndTime1/Value']}\n   Time range 2:    \n           Start time: @{triggerOutputs()?['body/ThursdayStartTime2/Value']}\n           End time: @{triggerOutputs()?['body/ThursdayEndTime2/Value']}\nFriday\n   Time range 1:\n            Start time: @{triggerOutputs()?['body/FridayStartTime1/Value']}\n            End time: @{triggerOutputs()?['body/FridayEndTime1/Value']}\n   Time range 2:\n            Start time: @{triggerOutputs()?['body/FridayStartTime2/Value']}\n            End time: @{triggerOutputs()?['body/FridayEndTime2/Value']}\nSaturday:\n   Time range 1:\n           Start time: @{triggerOutputs()?['body/SaturdayStartTime1/Value']}\n           End time: @{triggerOutputs()?['body/SaturdayEndTime1/Value']}\n   Time range 2:\n            Start time: @{triggerOutputs()?['body/SaturdayStartTime2/Value']}\n            End time: @{triggerOutputs()?['body/SaturdayEndTime2/Value']}\nSunday\n    Time range 1:\n             Start time: @{triggerOutputs()?['body/SundayStartTime1/Value']}\n             End time: @{triggerOutputs()?['body/SundayEndTime1/Value']}\n   Time range 2:\n            Start time: @{triggerOutputs()?['body/SundayStartTime2/Value']}\n            End time: @{triggerOutputs()?['body/SundayEndTime2/Value']}"
+                    },
+                    "authentication": "@parameters('$authentication')"
+                  }
+                }
+              },
+              "runAfter": {
+                "Call_routing:_after_business_hours_changed": [
+                  "Succeeded"
+                ]
+              },
+              "expression": {
+                "or": [
+                  {
+                    "or": [
+                      {
+                        "equals": [
+                          "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/MondayStartTime1']",
+                          "@true"
+                        ]
+                      },
+                      {
+                        "equals": [
+                          "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/MondayEndTime1']",
+                          "@true"
+                        ]
+                      },
+                      {
+                        "equals": [
+                          "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/MondayStartTime2']",
+                          "@true"
+                        ]
+                      },
+                      {
+                        "equals": [
+                          "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/MondayEndTime2']",
+                          "@true"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "or": [
+                      {
+                        "equals": [
+                          "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/TuesdayStartTime1']",
+                          "@true"
+                        ]
+                      },
+                      {
+                        "equals": [
+                          "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/TuesdayEndTime1']",
+                          "@true"
+                        ]
+                      },
+                      {
+                        "equals": [
+                          "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/TuesdayStartTime2']",
+                          "@true"
+                        ]
+                      },
+                      {
+                        "equals": [
+                          "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/TuesdayEndTime2']",
+                          "@true"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "or": [
+                      {
+                        "equals": [
+                          "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/WednesdayStartTime1']",
+                          "@true"
+                        ]
+                      },
+                      {
+                        "equals": [
+                          "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/WednesdayEndTime1']",
+                          "@true"
+                        ]
+                      },
+                      {
+                        "equals": [
+                          "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/WednesdayStartTime2']",
+                          "@true"
+                        ]
+                      },
+                      {
+                        "equals": [
+                          "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/WednesdayEndTime2']",
+                          "@true"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "or": [
+                      {
+                        "equals": [
+                          "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/ThursdayStartTime1']",
+                          "@true"
+                        ]
+                      },
+                      {
+                        "equals": [
+                          "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/ThursdayEndTime1']",
+                          "@true"
+                        ]
+                      },
+                      {
+                        "equals": [
+                          "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/ThursdayStartTime2']",
+                          "@true"
+                        ]
+                      },
+                      {
+                        "equals": [
+                          "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/ThursdayEndTime2']",
+                          "@true"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "or": [
+                      {
+                        "equals": [
+                          "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/FridayStartTime1']",
+                          "@true"
+                        ]
+                      },
+                      {
+                        "equals": [
+                          "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/FridayEndTime1']",
+                          "@true"
+                        ]
+                      },
+                      {
+                        "equals": [
+                          "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/FridayStartTime2']",
+                          "@true"
+                        ]
+                      },
+                      {
+                        "equals": [
+                          "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/FridayEndTime2']",
+                          "@true"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "or": [
+                      {
+                        "equals": [
+                          "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/SaturdayStartTime1']",
+                          "@true"
+                        ]
+                      },
+                      {
+                        "equals": [
+                          "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/SaturdayEndTime1']",
+                          "@true"
+                        ]
+                      },
+                      {
+                        "equals": [
+                          "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/SaturdayStartTime2']",
+                          "@true"
+                        ]
+                      },
+                      {
+                        "equals": [
+                          "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/SaturdayEndTime2']",
+                          "@true"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "or": [
+                      {
+                        "equals": [
+                          "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/SundayStartTime1']",
+                          "@true"
+                        ]
+                      },
+                      {
+                        "equals": [
+                          "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/SundayEndTime1']",
+                          "@true"
+                        ]
+                      },
+                      {
+                        "equals": [
+                          "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/SundayStartTime2']",
+                          "@true"
+                        ]
+                      },
+                      {
+                        "equals": [
+                          "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/SundayEndTime2']",
+                          "@true"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "7be2478a-aff9-4c43-9052-361ba396a253"
+              },
+              "type": "If"
+            },
+            "Condition": {
+              "actions": {
+                "Update_item": {
+                  "runAfter": {},
+                  "metadata": {
+                    "operationMetadataId": "a5c07c92-89c7-4d12-96ef-24c16759e831"
+                  },
+                  "type": "OpenApiConnection",
+                  "inputs": {
+                    "host": {
+                      "connectionName": "shared_sharepointonline_1",
+                      "operationId": "PatchItem",
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                    },
+                    "parameters": {
+                      "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                      "table": "@parameters('VAR - SPO List - Auto Attendant Management (new_VARSPOListAutoAttendantManagement)')",
+                      "id": "@triggerOutputs()?['body/ID']",
+                      "item/Title": "@triggerOutputs()?['body/Title']",
+                      "item/Greetingoptions/Value": "@triggerOutputs()?['body/Greetingoptions/Value']",
+                      "item/Greetingaudio_x003a_businesshour": "@triggerOutputs()?['body/Greetingaudio_x003a_businesshour']",
+                      "item/Greetingtext_x003a_businesshours": "@triggerOutputs()?['body/Greetingtext_x003a_businesshours']",
+                      "item/Greetingoptions_x003a_afterbusin/Value": "@triggerOutputs()?['body/Greetingoptions_x003a_afterbusin/Value']",
+                      "item/Greetingaudio_x003a_outofbusines": "@triggerOutputs()?['body/Greetingaudio_x003a_outofbusines']",
+                      "item/Greetingtext_x003a_outofbusiness": "@triggerOutputs()?['body/Greetingtext_x003a_outofbusiness']",
+                      "item/Callroutingoptions/Value": "@triggerOutputs()?['body/Callroutingoptions/Value']",
+                      "item/Callroutingtarget": "@triggerOutputs()?['body/Callroutingtarget']",
+                      "item/Callroutingvoicemailpromptsuppre": "@triggerOutputs()?['body/Callroutingvoicemailpromptsuppre']",
+                      "item/MondayStartTime1/Value": "@triggerOutputs()?['body/MondayStartTime1/Value']",
+                      "item/MondayEndTime1/Value": "@triggerOutputs()?['body/MondayEndTime1/Value']",
+                      "item/MondayStartTime2/Value": "@triggerOutputs()?['body/MondayStartTime2/Value']",
+                      "item/MondayEndTime2/Value": "@triggerOutputs()?['body/MondayEndTime2/Value']",
+                      "item/MondayExtraTimeRange": "@triggerOutputs()?['body/MondayExtraTimeRange']",
+                      "item/TuesdayStartTime1/Value": "@triggerOutputs()?['body/TuesdayStartTime1/Value']",
+                      "item/TuesdayEndTime1/Value": "@triggerOutputs()?['body/TuesdayEndTime1/Value']",
+                      "item/TuesdayStartTime2/Value": "@triggerOutputs()?['body/TuesdayStartTime2/Value']",
+                      "item/TuesdayEndTime2/Value": "@triggerOutputs()?['body/TuesdayEndTime2/Value']",
+                      "item/TuesdayExtraTimeRange": "@triggerOutputs()?['body/TuesdayExtraTimeRange']",
+                      "item/WednesdayStartTime1/Value": "@triggerOutputs()?['body/WednesdayStartTime1/Value']",
+                      "item/WednesdayEndTime1/Value": "@triggerOutputs()?['body/WednesdayEndTime1/Value']",
+                      "item/WednesdayStartTime2/Value": "@triggerOutputs()?['body/WednesdayStartTime2/Value']",
+                      "item/WednesdayEndTime2/Value": "@triggerOutputs()?['body/WednesdayEndTime2/Value']",
+                      "item/WednesdayExtraTimeRange": "@triggerOutputs()?['body/WednesdayExtraTimeRange']",
+                      "item/ThursdayStartTime1/Value": "@triggerOutputs()?['body/ThursdayStartTime1/Value']",
+                      "item/ThursdayEndTime1/Value": "@triggerOutputs()?['body/ThursdayEndTime1/Value']",
+                      "item/ThursdayStartTime2/Value": "@triggerOutputs()?['body/ThursdayStartTime2/Value']",
+                      "item/ThursdayEndTime2/Value": "@triggerOutputs()?['body/ThursdayEndTime2/Value']",
+                      "item/ThursdayExtraTimeRange": "@triggerOutputs()?['body/ThursdayExtraTimeRange']",
+                      "item/FridayStartTime1/Value": "@triggerOutputs()?['body/FridayStartTime1/Value']",
+                      "item/FridayEndTime1/Value": "@triggerOutputs()?['body/FridayEndTime1/Value']",
+                      "item/FridayStartTime2/Value": "@triggerOutputs()?['body/FridayStartTime2/Value']",
+                      "item/FridayEndTime2/Value": "@triggerOutputs()?['body/FridayEndTime2/Value']",
+                      "item/FridayExtraTimeRange": "@triggerOutputs()?['body/FridayExtraTimeRange']",
+                      "item/SaturdayStartTime1/Value": "@triggerOutputs()?['body/SaturdayStartTime1/Value']",
+                      "item/SaturdayEndTime1/Value": "@triggerOutputs()?['body/SaturdayEndTime1/Value']",
+                      "item/SaturdayStartTime2/Value": "@triggerOutputs()?['body/SaturdayStartTime2/Value']",
+                      "item/SaturdayEndTime2/Value": "@triggerOutputs()?['body/SaturdayEndTime2/Value']",
+                      "item/SaturdayExtraTimeRange": "@triggerOutputs()?['body/SaturdayExtraTimeRange']",
+                      "item/SundayStartTime1/Value": "@triggerOutputs()?['body/SundayStartTime1/Value']",
+                      "item/SundayEndTime1/Value": "@triggerOutputs()?['body/SundayEndTime1/Value']",
+                      "item/SundayStartTime2/Value": "@triggerOutputs()?['body/SundayStartTime2/Value']",
+                      "item/SundayEndTime2/Value": "@triggerOutputs()?['body/SundayEndTime2/Value']",
+                      "item/SundayExtraTimeRange": "@triggerOutputs()?['body/SundayExtraTimeRange']",
+                      "item/Callroutingoptions_x003a_afterbu/Value": "@triggerOutputs()?['body/Callroutingoptions_x003a_afterbu/Value']",
+                      "item/Callroutingtarget_x003a_afterbus": "@triggerOutputs()?['body/Callroutingtarget_x003a_afterbus']",
+                      "item/Callroutingvoicemailpromptsuppre0": "@triggerOutputs()?['body/Callroutingvoicemailpromptsuppre0']",
+                      "item/ProvisioningStatus/Value": "provisioned"
+                    },
+                    "authentication": "@parameters('$authentication')"
+                  }
+                }
+              },
+              "runAfter": {
+                "Business_hours_changed": [
+                  "Succeeded"
+                ]
+              },
+              "expression": {
+                "equals": [
+                  "@variables('Result')",
+                  "Success"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "d2ac1b4c-3e35-40ad-a98d-3182d59de1ec"
+              },
+              "type": "If"
+            }
+          },
+          "runAfter": {
+            "Initialize_variable_HTTPStatus": [
+              "Succeeded"
+            ]
+          },
+          "expression": {
+            "equals": [
+              "@triggerOutputs()?['body/ProvisioningStatus/Value']",
+              "not provisioned"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "fd9334e5-2408-4919-9bcb-7dd7bf24fca5"
+          },
+          "type": "If"
+        },
+        "Initialize_variable_action": {
+          "runAfter": {},
+          "metadata": {
+            "operationMetadataId": "9f4dfbee-66f0-4443-b8e1-fb4bd54c90e7"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "Action",
+                "type": "string",
+                "value": "none"
+              }
+            ]
+          }
+        },
+        "Initialize_variable_result": {
+          "runAfter": {
+            "Initialize_variable_action": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "bd564672-c778-4626-951a-7ad72c3c35db"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "Result",
+                "type": "string",
+                "value": "failed"
+              }
+            ]
+          }
+        },
+        "Initialize_variable_identity": {
+          "runAfter": {
+            "Initialize_variable_result": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "bf3b7711-9e86-4e63-a697-d2f93a60cdf7"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "Identity",
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "Initialize_variable_HTTPStatus": {
+          "runAfter": {
+            "Initialize_variable_identity": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "1b83b80e-5e48-43df-8c1e-809da16cfa02"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "HTTPStatus",
+                "type": "integer"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}

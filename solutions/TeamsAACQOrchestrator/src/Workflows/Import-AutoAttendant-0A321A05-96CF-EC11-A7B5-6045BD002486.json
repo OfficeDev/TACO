@@ -1,0 +1,508 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_keyvault": {
+        "runtimeSource": "invoker",
+        "connection": {
+          "connectionReferenceLogicalName": "new_CONVault"
+        },
+        "api": {
+          "name": "shared_keyvault"
+        }
+      },
+      "shared_sharepointonline": {
+        "runtimeSource": "invoker",
+        "connection": {
+          "connectionReferenceLogicalName": "new_sharedsharepointonline_89176"
+        },
+        "api": {
+          "name": "shared_sharepointonline"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        },
+        "VAR - Tenant (new_VARTenant)": {
+          "defaultValue": "M365x14050590.OnMicrosoft.com",
+          "type": "String",
+          "metadata": {
+            "schemaName": "new_VARTenant",
+            "description": "Tenant name, for example. contoso.onmicrosoft.com"
+          }
+        },
+        "VAR - application id (new_VARapplicationid)": {
+          "defaultValue": "c4b9ee70-6da2-42b4-9fee-cf7b1531d268",
+          "type": "String",
+          "metadata": {
+            "schemaName": "new_VARapplicationid"
+          }
+        },
+        "VAR - FunctionKey (new_VARFunctionKey)": {
+          "defaultValue": "462tk2llK8lgL0sFAGiIY3qMb5aAehPGpIujhc3Kjx51AzFuh4-uwQ==",
+          "type": "String",
+          "metadata": {
+            "schemaName": "new_VARFunctionKey",
+            "description": "Host key of the function app"
+          }
+        },
+        "VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)": {
+          "defaultValue": "https://m365x14050590.sharepoint.com/sites/AACQMgt",
+          "type": "String",
+          "metadata": {
+            "schemaName": "new_VARSPOSiteAutoAttendantandCallQueueManagement",
+            "description": "SharePoint Site address where the applications Lists are stored"
+          }
+        },
+        "VAR - SPO List - Auto Attendant Management (new_VARSPOListAutoAttendantManagement)": {
+          "defaultValue": "c58a536d-87cd-42dc-adaa-435ed44f60d2",
+          "type": "String",
+          "metadata": {
+            "schemaName": "new_VARSPOListAutoAttendantManagement",
+            "description": "Auto Attendant Management"
+          }
+        }
+      },
+      "triggers": {
+        "manual": {
+          "metadata": {
+            "operationMetadataId": "ac8d4f6a-ef06-46c4-83bb-29b2dc956aec"
+          },
+          "type": "Request",
+          "kind": "PowerApp",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "HTTP_Body": {
+                  "type": "any",
+                  "description": "Enter request content. This parameter is used as part of \"5A7C37C5-45BF-4CB5-93C9-EB26E3D73B74\"",
+                  "x-ms-powerflows-param-ispartial": true
+                }
+              },
+              "required": [
+                "HTTP_Body"
+              ]
+            }
+          }
+        }
+      },
+      "actions": {
+        "Get_secret": {
+          "runAfter": {},
+          "metadata": {
+            "operationMetadataId": "d2eef44d-b854-421b-8892-95d5263f6a36"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_keyvault",
+              "operationId": "GetSecret",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_keyvault"
+            },
+            "parameters": {
+              "secretName": "TACO-appSecret"
+            },
+            "authentication": {
+              "type": "Raw",
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+            }
+          }
+        },
+        "HTTP": {
+          "runAfter": {
+            "Get_secret": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "ab01394b-d82a-4a76-87ad-979496995323"
+          },
+          "type": "Http",
+          "inputs": {
+            "method": "POST",
+            "uri": "https://aacqadministration.azurewebsites.net/api/Export-AutoAttendant",
+            "headers": {
+              "x-functions-key": "@parameters('VAR - FunctionKey (new_VARFunctionKey)')"
+            },
+            "body": {
+              "Identity": "@triggerBody()['HTTP_Body']"
+            },
+            "authentication": {
+              "type": "ActiveDirectoryOAuth",
+              "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+              "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+              "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+              "secret": "@outputs('Get_secret')?['body/value']"
+            }
+          }
+        },
+        "Condition": {
+          "actions": {
+            "Parse_JSON": {
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "b56ae583-c89c-454d-a89c-770cc86f6884"
+              },
+              "type": "ParseJson",
+              "inputs": {
+                "content": "@body('HTTP')",
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Name": {
+                      "type": "string"
+                    },
+                    "BHGreetingType": {
+                      "type": "string"
+                    },
+                    "BHGreetingAudio": {},
+                    "BHGreetingText": {},
+                    "BHAction": {
+                      "type": "string"
+                    },
+                    "BHTarget": {},
+                    "BHEnableSharedVoicemailSystemPromptSuppression": {
+                      "type": "boolean"
+                    },
+                    "AHGreetingType": {
+                      "type": "string"
+                    },
+                    "AHGreetingAudio": {},
+                    "AHGreetingText": {},
+                    "AHAction": {
+                      "type": "string"
+                    },
+                    "AHTarget": {},
+                    "AHEnableSharedVoicemailSystemPromptSuppression": {
+                      "type": "boolean"
+                    },
+                    "MondayExtraRange": {},
+                    "MondayStartTime1": {},
+                    "MondayEndTime1": {},
+                    "MondayStartTime2": {},
+                    "MondayEndTime2": {},
+                    "TuesdayExtraRange": {},
+                    "TuesdayStartTime1": {},
+                    "TuesdayEndTime1": {},
+                    "TuesdayStartTime2": {},
+                    "TuesdayEndTime2": {},
+                    "WednesdayExtraRange": {},
+                    "WednesdayStartTime1": {},
+                    "WednesdayEndTime1": {},
+                    "WednesdayStartTime2": {},
+                    "WednesdayEndTime2": {},
+                    "ThursdayExtraRange": {},
+                    "ThursdayStartTime1": {},
+                    "ThursdayEndTime1": {},
+                    "ThursdayStartTime2": {},
+                    "ThursdayEndTime2": {},
+                    "FridayExtraRange": {},
+                    "FridayStartTime1": {},
+                    "FridayEndTime1": {},
+                    "FridayStartTime2": {},
+                    "FridayEndTime2": {},
+                    "SaturdayExtraRange": {},
+                    "SaturdayStartTime1": {},
+                    "SaturdayEndTime1": {},
+                    "SaturdayStartTime2": {},
+                    "SaturdayEndTime2": {},
+                    "SundayExtraRange": {},
+                    "SundayStartTime1": {},
+                    "SundayEndTime1": {},
+                    "SundayStartTime2": {},
+                    "SundayEndTime2": {}
+                  }
+                }
+              }
+            },
+            "Get_items": {
+              "runAfter": {
+                "Parse_JSON": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "c1ff2817-e339-4b51-8042-a7cc40e5e7b6"
+              },
+              "type": "OpenApiConnection",
+              "inputs": {
+                "host": {
+                  "connectionName": "shared_sharepointonline",
+                  "operationId": "GetItems",
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                },
+                "parameters": {
+                  "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                  "table": "@parameters('VAR - SPO List - Auto Attendant Management (new_VARSPOListAutoAttendantManagement)')",
+                  "$filter": "Title eq '@{body('Parse_JSON')?['Name']}'"
+                },
+                "authentication": {
+                  "type": "Raw",
+                  "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+                }
+              }
+            },
+            "AA_entry_exists_updating_current_entry": {
+              "actions": {
+                "Apply_to_each": {
+                  "foreach": "@outputs('Get_items')?['body/value']",
+                  "actions": {
+                    "Update_item": {
+                      "runAfter": {},
+                      "metadata": {
+                        "operationMetadataId": "bd2b5851-9337-43dc-9290-9cea0433caa3"
+                      },
+                      "type": "OpenApiConnection",
+                      "inputs": {
+                        "host": {
+                          "connectionName": "shared_sharepointonline",
+                          "operationId": "PatchItem",
+                          "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                        },
+                        "parameters": {
+                          "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                          "table": "@parameters('VAR - SPO List - Auto Attendant Management (new_VARSPOListAutoAttendantManagement)')",
+                          "id": "@items('Apply_to_each')?['ID']",
+                          "item/Title": "@body('Parse_JSON')?['Name']",
+                          "item/Greetingoptions/Value": "@body('Parse_JSON')?['BHGreetingType']",
+                          "item/Greetingaudio_x003a_businesshour": "@body('Parse_JSON')?['BHGreetingAudio']",
+                          "item/Greetingtext_x003a_businesshours": "@body('Parse_JSON')?['BHGreetingText']",
+                          "item/Greetingoptions_x003a_afterbusin/Value": "@body('Parse_JSON')?['AHGreetingType']",
+                          "item/Greetingaudio_x003a_outofbusines": "@body('Parse_JSON')?['AHGreetingAudio']",
+                          "item/Greetingtext_x003a_outofbusiness": "@body('Parse_JSON')?['AHGreetingText']",
+                          "item/Callroutingoptions/Value": "@body('Parse_JSON')?['BHAction']",
+                          "item/Callroutingtarget": "@body('Parse_JSON')?['BHTarget']",
+                          "item/Callroutingvoicemailpromptsuppre": "@body('Parse_JSON')?['BHEnableSharedVoicemailSystemPromptSuppression']",
+                          "item/MondayStartTime1/Value": "@body('Parse_JSON')?['MondayStartTime1']",
+                          "item/MondayEndTime1/Value": "@body('Parse_JSON')?['MondayEndTime2']",
+                          "item/MondayStartTime2/Value": "@body('Parse_JSON')?['MondayStartTime2']",
+                          "item/MondayEndTime2/Value": "@body('Parse_JSON')?['MondayEndTime2']",
+                          "item/MondayExtraTimeRange": "@body('Parse_JSON')?['MondayExtraRange']",
+                          "item/TuesdayStartTime1/Value": "@body('Parse_JSON')?['TuesdayStartTime1']",
+                          "item/TuesdayEndTime1/Value": "@body('Parse_JSON')?['TuesdayEndTime1']",
+                          "item/TuesdayStartTime2/Value": "@body('Parse_JSON')?['TuesdayStartTime2']",
+                          "item/TuesdayEndTime2/Value": "@body('Parse_JSON')?['TuesdayEndTime2']",
+                          "item/TuesdayExtraTimeRange": "@body('Parse_JSON')?['TuesdayExtraRange']",
+                          "item/WednesdayStartTime1/Value": "@body('Parse_JSON')?['WednesdayStartTime1']",
+                          "item/WednesdayEndTime1/Value": "@body('Parse_JSON')?['WednesdayEndTime2']",
+                          "item/WednesdayStartTime2/Value": "@body('Parse_JSON')?['WednesdayStartTime2']",
+                          "item/WednesdayEndTime2/Value": "@body('Parse_JSON')?['WednesdayEndTime2']",
+                          "item/WednesdayExtraTimeRange": "@body('Parse_JSON')?['WednesdayExtraRange']",
+                          "item/ThursdayStartTime1/Value": "@body('Parse_JSON')?['ThursdayStartTime1']",
+                          "item/ThursdayEndTime1/Value": "@body('Parse_JSON')?['ThursdayEndTime1']",
+                          "item/ThursdayStartTime2/Value": "@body('Parse_JSON')?['ThursdayStartTime2']",
+                          "item/ThursdayEndTime2/Value": "@body('Parse_JSON')?['ThursdayEndTime2']",
+                          "item/ThursdayExtraTimeRange": "@body('Parse_JSON')?['ThursdayExtraRange']",
+                          "item/FridayStartTime1/Value": "@body('Parse_JSON')?['FridayStartTime1']",
+                          "item/FridayEndTime1/Value": "@body('Parse_JSON')?['FridayEndTime1']",
+                          "item/FridayStartTime2/Value": "@body('Parse_JSON')?['FridayStartTime2']",
+                          "item/FridayEndTime2/Value": "@body('Parse_JSON')?['FridayEndTime2']",
+                          "item/FridayExtraTimeRange": "@body('Parse_JSON')?['FridayExtraRange']",
+                          "item/SaturdayStartTime1/Value": "@body('Parse_JSON')?['SaturdayStartTime1']",
+                          "item/SaturdayEndTime1/Value": "@body('Parse_JSON')?['SaturdayEndTime1']",
+                          "item/SaturdayStartTime2/Value": "@body('Parse_JSON')?['SaturdayStartTime2']",
+                          "item/SaturdayEndTime2/Value": "@body('Parse_JSON')?['SaturdayEndTime2']",
+                          "item/SaturdayExtraTimeRange": "@body('Parse_JSON')?['SaturdayExtraRange']",
+                          "item/SundayStartTime1/Value": "@body('Parse_JSON')?['SundayStartTime1']",
+                          "item/SundayEndTime1/Value": "@body('Parse_JSON')?['SundayEndTime1']",
+                          "item/SundayStartTime2/Value": "@body('Parse_JSON')?['SundayStartTime2']",
+                          "item/SundayEndTime2/Value": "@body('Parse_JSON')?['SundayEndTime2']",
+                          "item/SundayExtraTimeRange": "@body('Parse_JSON')?['SundayExtraRange']",
+                          "item/Callroutingoptions_x003a_afterbu/Value": "@body('Parse_JSON')?['AHAction']",
+                          "item/Callroutingtarget_x003a_afterbus": "@body('Parse_JSON')?['AHTarget']",
+                          "item/Callroutingvoicemailpromptsuppre0": "@body('Parse_JSON')?['AHEnableSharedVoicemailSystemPromptSuppression']",
+                          "item/ProvisioningStatus/Value": "provisioned"
+                        },
+                        "authentication": {
+                          "type": "Raw",
+                          "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+                        }
+                      }
+                    }
+                  },
+                  "runAfter": {},
+                  "metadata": {
+                    "operationMetadataId": "48d27eb2-5c14-4221-b9d5-0438e74dc1a9"
+                  },
+                  "type": "Foreach"
+                }
+              },
+              "runAfter": {
+                "Compose": [
+                  "Succeeded"
+                ]
+              },
+              "expression": {
+                "equals": [
+                  "@outputs('Compose')",
+                  1
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "938f8814-c224-46a5-9a77-7a44328a87ac"
+              },
+              "type": "If"
+            },
+            "Compose": {
+              "runAfter": {
+                "Get_items": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "5705f7ee-bd9d-4227-97f1-012973b80d84"
+              },
+              "type": "Compose",
+              "inputs": "@length(body('Get_items')?['value'])"
+            },
+            "AA_entry_does_not_exist_create_new_entry": {
+              "actions": {
+                "Create_item_3": {
+                  "runAfter": {},
+                  "metadata": {
+                    "operationMetadataId": "b3d7e2a9-8d9d-4b01-bc23-5638f3612d7c"
+                  },
+                  "type": "OpenApiConnection",
+                  "inputs": {
+                    "host": {
+                      "connectionName": "shared_sharepointonline",
+                      "operationId": "PostItem",
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                    },
+                    "parameters": {
+                      "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                      "table": "@parameters('VAR - SPO List - Auto Attendant Management (new_VARSPOListAutoAttendantManagement)')",
+                      "item/Title": "@body('Parse_JSON')?['Name']",
+                      "item/Greetingoptions/Value": "@body('Parse_JSON')?['BHGreetingType']",
+                      "item/Greetingaudio_x003a_businesshour": "@body('Parse_JSON')?['BHGreetingAudio']",
+                      "item/Greetingtext_x003a_businesshours": "@body('Parse_JSON')?['BHGreetingText']",
+                      "item/Greetingoptions_x003a_afterbusin/Value": "@body('Parse_JSON')?['AHGreetingType']",
+                      "item/Greetingaudio_x003a_outofbusines": "@body('Parse_JSON')?['BHGreetingAudio']",
+                      "item/Greetingtext_x003a_outofbusiness": "@body('Parse_JSON')?['AHGreetingText']",
+                      "item/Callroutingoptions/Value": "@body('Parse_JSON')?['BHAction']",
+                      "item/Callroutingtarget": "@body('Parse_JSON')?['BHTarget']",
+                      "item/Callroutingvoicemailpromptsuppre": "@body('Parse_JSON')?['BHEnableSharedVoicemailSystemPromptSuppression']",
+                      "item/MondayStartTime1/Value": "@body('Parse_JSON')?['MondayStartTime1']",
+                      "item/MondayEndTime1/Value": "@body('Parse_JSON')?['MondayEndTime1']",
+                      "item/MondayStartTime2/Value": "@body('Parse_JSON')?['MondayStartTime2']",
+                      "item/MondayEndTime2/Value": "@body('Parse_JSON')?['MondayEndTime2']",
+                      "item/MondayExtraTimeRange": "@body('Parse_JSON')?['MondayExtraRange']",
+                      "item/TuesdayStartTime1/Value": "@body('Parse_JSON')?['TuesdayStartTime1']",
+                      "item/TuesdayEndTime1/Value": "@body('Parse_JSON')?['TuesdayEndTime1']",
+                      "item/TuesdayStartTime2/Value": "@body('Parse_JSON')?['TuesdayStartTime2']",
+                      "item/TuesdayEndTime2/Value": "@body('Parse_JSON')?['TuesdayEndTime2']",
+                      "item/TuesdayExtraTimeRange": "@body('Parse_JSON')?['TuesdayExtraRange']",
+                      "item/WednesdayStartTime1/Value": "@body('Parse_JSON')?['WednesdayStartTime1']",
+                      "item/WednesdayEndTime1/Value": "@body('Parse_JSON')?['WednesdayEndTime1']",
+                      "item/WednesdayStartTime2/Value": "@body('Parse_JSON')?['WednesdayStartTime2']",
+                      "item/WednesdayEndTime2/Value": "@body('Parse_JSON')?['WednesdayEndTime2']",
+                      "item/WednesdayExtraTimeRange": "@body('Parse_JSON')?['WednesdayExtraRange']",
+                      "item/ThursdayStartTime1/Value": "@body('Parse_JSON')?['ThursdayStartTime1']",
+                      "item/ThursdayEndTime1/Value": "@body('Parse_JSON')?['ThursdayEndTime1']",
+                      "item/ThursdayStartTime2/Value": "@body('Parse_JSON')?['ThursdayStartTime2']",
+                      "item/ThursdayEndTime2/Value": "@body('Parse_JSON')?['ThursdayEndTime2']",
+                      "item/ThursdayExtraTimeRange": "@body('Parse_JSON')?['ThursdayExtraRange']",
+                      "item/FridayStartTime1/Value": "@body('Parse_JSON')?['FridayStartTime1']",
+                      "item/FridayEndTime1/Value": "@body('Parse_JSON')?['FridayEndTime2']",
+                      "item/FridayStartTime2/Value": "@body('Parse_JSON')?['FridayStartTime2']",
+                      "item/FridayEndTime2/Value": "@body('Parse_JSON')?['FridayEndTime2']",
+                      "item/FridayExtraTimeRange": "@body('Parse_JSON')?['FridayExtraRange']",
+                      "item/SaturdayStartTime1/Value": "@body('Parse_JSON')?['SaturdayStartTime1']",
+                      "item/SaturdayEndTime1/Value": "@body('Parse_JSON')?['SaturdayEndTime1']",
+                      "item/SaturdayStartTime2/Value": "@body('Parse_JSON')?['SaturdayStartTime2']",
+                      "item/SaturdayEndTime2/Value": "@body('Parse_JSON')?['SaturdayEndTime2']",
+                      "item/SaturdayExtraTimeRange": "@body('Parse_JSON')?['SaturdayExtraRange']",
+                      "item/SundayStartTime1/Value": "@body('Parse_JSON')?['SundayStartTime1']",
+                      "item/SundayEndTime1/Value": "@body('Parse_JSON')?['SundayEndTime1']",
+                      "item/SundayStartTime2/Value": "@body('Parse_JSON')?['SundayStartTime2']",
+                      "item/SundayEndTime2/Value": "@body('Parse_JSON')?['SundayEndTime2']",
+                      "item/SundayExtraTimeRange": "@body('Parse_JSON')?['SundayExtraRange']",
+                      "item/Callroutingoptions_x003a_afterbu/Value": "@body('Parse_JSON')?['AHAction']",
+                      "item/Callroutingtarget_x003a_afterbus": "@body('Parse_JSON')?['AHTarget']",
+                      "item/Callroutingvoicemailpromptsuppre0": "@body('Parse_JSON')?['AHEnableSharedVoicemailSystemPromptSuppression']",
+                      "item/ProvisioningStatus/Value": "provisioned"
+                    },
+                    "authentication": {
+                      "type": "Raw",
+                      "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+                    }
+                  }
+                }
+              },
+              "runAfter": {
+                "AA_entry_exists_updating_current_entry": [
+                  "Succeeded"
+                ]
+              },
+              "expression": {
+                "equals": [
+                  "@outputs('Compose')",
+                  0
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "9c792270-8b73-41c2-a00b-fe5c7acf32fb"
+              },
+              "type": "If"
+            }
+          },
+          "runAfter": {
+            "HTTP": [
+              "Succeeded"
+            ]
+          },
+          "expression": {
+            "equals": [
+              "@outputs('HTTP')['statusCode']",
+              200
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "d6685eda-9010-4952-8420-3e20337b0e7f"
+          },
+          "type": "If"
+        },
+        "Respond_to_a_PowerApp_or_flow": {
+          "runAfter": {
+            "Condition": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "02c21acb-943c-4217-a11f-9828f19e48a9"
+          },
+          "type": "Response",
+          "kind": "PowerApp",
+          "inputs": {
+            "statusCode": 200,
+            "body": {
+              "completed": "@{true}"
+            },
+            "schema": {
+              "type": "object",
+              "properties": {
+                "completed": {
+                  "title": "Completed",
+                  "x-ms-dynamically-added": true,
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}
