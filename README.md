@@ -6,7 +6,7 @@
 
 A delegated Admin application for Auto Attendant and Call Queue management
 
-<img src="./Media/taco-logo.png" height="140">
+<img src="./Media/home-screen.png" height="300">
 
 
 
@@ -28,15 +28,7 @@ As of today, this application supports the following scenarios:
  * Change call overflow handling
  * Change call timeout handling
 
-The architecture of this solution can be adapted to support other scenarios that require delegated admin management of Teams phone system or any other feature accessible via PowerShell cmdlet or even MS Graph API. 
-
-Here is the application running in Microsoft Teams
-
-<!-- <p align="center">
-    <img src="./Media/AAandCQManagement.jpg" alt="Microsoft Teams AA/CQ Orchestrator screenshot" width="600"/>
-</p> -->
-
-![Microsoft Teams AA/CQ Orchestrator screenshot](./Media/AAandCQManagement.jpg)
+The architecture of this solution can be adapted to support other scenarios that require delegated admin management of Teams phone system or any other feature accessible via PowerShell cmdlet or even MS Graph API.
 
 If you want to start using the solution yourself review the Wiki for the deployment and configuration steps.
 

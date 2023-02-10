@@ -1,0 +1,61 @@
+name: commit-solution
+on:
+  workflow_dispatch:
+    inputs:
+      message:
+        description: 'Commit message'
+        required: true 
+        default: '.'
+        type: string
+
+      branch:
+        description: 'Branch to commit to'
+        default: 'Dev'
+        type: string
+        required: true 
+
+      environment:
+        description: 'Environment to extract solution from'
+        type: environment
+        required: true 
+
+      solution_name:
+        description: 'solution to extract and commit'
+        required: true
+        default: 'TeamsAACQOrchestrator' 
+        type: choice
+        options:
+        - TeamsAACQOrchestrator
+        - taco_publisher
+
+      solution-type:
+        description: 'Export Both or only Unmanaged'
+        required: true 
+        default: 'Both' 
+        type: choice
+        options:
+        - Both
+        - Unmanaged
+
+
+jobs:
+  commit:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    # if:  ${{ inputs.message }} 
+    steps:
+      - uses: actions/checkout@v3
+        # us GH Personal Access Token to allow other actions to trigger on any changes to the repo
+        with:
+          token: ${{ secrets.MY_GITHUB_TOKEN }}
+          ref: ${{ inputs.branch }}
+
+      - uses: ./.github/actions/export-unpack-commit
+        with:
+          solution-name: ${{ inputs.solution_name }}
+          message: ${{ inputs.message }}
+          environment-url:  "${{ secrets.CSD_ENVIRONMENT_URL }}"
+          tenant-id: "${{ secrets.APP_TENANT_ID }}"
+          app-id: "${{ secrets.APP_ID }}"
+          client-secret: "${{ secrets.APP_SECRET }}"
+          solution-type: ${{ inputs.solution-type }}
