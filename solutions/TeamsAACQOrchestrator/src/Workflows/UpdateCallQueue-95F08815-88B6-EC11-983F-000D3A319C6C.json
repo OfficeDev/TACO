@@ -1,0 +1,2508 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_sharepointonline_1": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "new_sharedsharepointonline_89176"
+        },
+        "api": {
+          "name": "shared_sharepointonline"
+        }
+      },
+      "shared_keyvault": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "new_CONVault"
+        },
+        "api": {
+          "name": "shared_keyvault"
+        }
+      },
+      "shared_office365users_1": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "new_sharedoffice365users_2f2c6"
+        },
+        "api": {
+          "name": "shared_office365users"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        },
+        "VAR - TeamsvoicemanagementSPSite (new_TeamsvoicemanagementSPSite)": {
+          "defaultValue": "AACQMgt",
+          "type": "String",
+          "metadata": {
+            "schemaName": "new_TeamsvoicemanagementSPSite",
+            "description": "SharePoint Site name containing the content for the application"
+          }
+        },
+        "VAR - FunctionApp (new_VARFunctionApp)": {
+          "defaultValue": "TACO-ukwtg",
+          "type": "String",
+          "metadata": {
+            "schemaName": "new_VARFunctionApp",
+            "description": "Name of the function app"
+          }
+        },
+        "VAR - FunctionKey (new_VARFunctionKey)": {
+          "defaultValue": "_adr3AsPuBTbs8ZCSujYTlyn3T7hwJ-swA7ibJuyRBjfAzFufDi2IQ==",
+          "type": "String",
+          "metadata": {
+            "schemaName": "new_VARFunctionKey",
+            "description": "Host key of the function app"
+          }
+        },
+        "VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)": {
+          "defaultValue": "https://m365x14050590.sharepoint.com/sites/AACQMgt",
+          "type": "String",
+          "metadata": {
+            "schemaName": "new_VARSPOSiteAutoAttendantandCallQueueManagement",
+            "description": "SharePoint Site address where the applications Lists are stored"
+          }
+        },
+        "VAR - SPO List - Call Queue Management (new_VARSPOListCallQueueManagement)": {
+          "defaultValue": "2a46921d-22cc-414e-95e9-3a4d1d7a2955",
+          "type": "String",
+          "metadata": {
+            "schemaName": "new_VARSPOListCallQueueManagement",
+            "description": "Call Queue Management"
+          }
+        },
+        "VAR - SPO List - Voice management audit (new_VARSPOListVoicemanagementaudit)": {
+          "defaultValue": "28e7817f-0a5c-450a-ae02-6b8b2203c6ac",
+          "type": "String",
+          "metadata": {
+            "schemaName": "new_VARSPOListVoicemanagementaudit",
+            "description": "Voice management audit"
+          }
+        },
+        "VAR - Tenant (new_VARTenant)": {
+          "defaultValue": "M365x14050590.onmicrosoft.com",
+          "type": "String",
+          "metadata": {
+            "schemaName": "new_VARTenant",
+            "description": "Tenant name, for example. contoso.onmicrosoft.com"
+          }
+        },
+        "VAR - application id (new_VARapplicationid)": {
+          "defaultValue": "c4b9ee70-6da2-42b4-9fee-cf7b1531d268",
+          "type": "String",
+          "metadata": {
+            "schemaName": "new_VARapplicationid"
+          }
+        }
+      },
+      "triggers": {
+        "When_an_item_is_created_or_modified": {
+          "recurrence": {
+            "interval": 1,
+            "frequency": "Minute"
+          },
+          "splitOn": "@triggerOutputs()?['body/value']",
+          "metadata": {
+            "operationMetadataId": "337db563-60f3-47d5-ab8a-6d0b9169fcd4"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_sharepointonline_1",
+              "operationId": "GetOnUpdatedItems",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+            },
+            "parameters": {
+              "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+              "table": "@parameters('VAR - SPO List - Call Queue Management (new_VARSPOListCallQueueManagement)')"
+            },
+            "authentication": "@parameters('$authentication')"
+          },
+          "conditions": [
+            {
+              "expression": "@equals(triggerOutputs()?['body/Provisioningstatus/Value'], 'not provisioned')"
+            }
+          ]
+        }
+      },
+      "actions": {
+        "Check_if_item_was_already_provisioned": {
+          "actions": {
+            "Get_changes_for_an_item_or_a_file_(properties_only)": {
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "89ef66b4-6ada-4725-b942-958cc0894f55"
+              },
+              "type": "OpenApiConnection",
+              "inputs": {
+                "host": {
+                  "connectionName": "shared_sharepointonline_1",
+                  "operationId": "GetItemChanges",
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                },
+                "parameters": {
+                  "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                  "table": "@parameters('VAR - SPO List - Call Queue Management (new_VARSPOListCallQueueManagement)')",
+                  "id": "@triggerOutputs()?['body/ID']",
+                  "since": "@triggerOutputs()?['body/{TriggerWindowStartToken}']",
+                  "until": "@triggerOutputs()?['body/{TriggerWindowEndToken}']",
+                  "includeDrafts": false
+                },
+                "authentication": "@parameters('$authentication')"
+              }
+            },
+            "Get_secret": {
+              "runAfter": {
+                "Get_changes_for_an_item_or_a_file_(properties_only)": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "ac5aad23-0100-4406-b838-eda4fa10d671"
+              },
+              "type": "OpenApiConnection",
+              "inputs": {
+                "host": {
+                  "connectionName": "shared_keyvault",
+                  "operationId": "GetSecret",
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_keyvault"
+                },
+                "parameters": {
+                  "secretName": "TACO-appSecret"
+                },
+                "authentication": "@parameters('$authentication')"
+              }
+            },
+            "Check_if_greeting_changed": {
+              "actions": {
+                "Update_Greeting": {
+                  "runAfter": {},
+                  "cases": {
+                    "Greeting:_default": {
+                      "case": "Default",
+                      "actions": {
+                        "Run_Set-CallQueueGreeting:_default": {
+                          "runAfter": {},
+                          "type": "Http",
+                          "inputs": {
+                            "method": "POST",
+                            "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Set-CallQueueGreeting",
+                            "headers": {
+                              "x-functions-key": "@parameters('VAR - FunctionKey (new_VARFunctionKey)')"
+                            },
+                            "body": {
+                              "GreetingType": "@triggerOutputs()?['body/Greetingtype/Value']",
+                              "Identity": "@triggerOutputs()?['body/Title']"
+                            },
+                            "authentication": {
+                              "type": "ActiveDirectoryOAuth",
+                              "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+                              "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+                              "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+                              "secret": "@outputs('Get_secret')?['body/value']"
+                            }
+                          }
+                        },
+                        "Set_action_variable:_Set-CallQueueGreeting:_default": {
+                          "runAfter": {
+                            "Run_Set-CallQueueGreeting:_default": [
+                              "Succeeded"
+                            ]
+                          },
+                          "type": "SetVariable",
+                          "inputs": {
+                            "name": "Action",
+                            "value": "Set greeting type to default"
+                          }
+                        },
+                        "Validate_Set-CallQueueGreeting:_default": {
+                          "actions": {
+                            "_set_result_parameter:_success:_Set-CallQueueGreeting:_default": {
+                              "runAfter": {},
+                              "type": "SetVariable",
+                              "inputs": {
+                                "name": "Result",
+                                "value": "Success"
+                              }
+                            }
+                          },
+                          "runAfter": {
+                            "Set_action_variable:_Set-CallQueueGreeting:_default": [
+                              "Succeeded"
+                            ]
+                          },
+                          "else": {
+                            "actions": {
+                              "_set_result_parameter:_failed:_Set-CallQueueGreeting:_default": {
+                                "runAfter": {},
+                                "type": "SetVariable",
+                                "inputs": {
+                                  "name": "Result",
+                                  "value": "Failed"
+                                }
+                              }
+                            }
+                          },
+                          "expression": {
+                            "equals": [
+                              "@outputs('Run_Set-CallQueueGreeting:_default')['statusCode']",
+                              200
+                            ]
+                          },
+                          "type": "If"
+                        },
+                        "Create_audit_log_entry:_Set-CallQueueGreeting:_default": {
+                          "runAfter": {
+                            "Validate_Set-CallQueueGreeting:_default": [
+                              "Succeeded"
+                            ]
+                          },
+                          "type": "OpenApiConnection",
+                          "inputs": {
+                            "host": {
+                              "connectionName": "shared_sharepointonline_1",
+                              "operationId": "PostItem",
+                              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                            },
+                            "parameters": {
+                              "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                              "table": "@parameters('VAR - SPO List - Voice management audit (new_VARSPOListVoicemanagementaudit)')",
+                              "item/Title": "@variables('Action')",
+                              "item/Timestamp": "@UtcNow()",
+                              "item/Result": "@variables('Result')",
+                              "item/AffectedObject": "@triggerOutputs()?['body/Title']",
+                              "item/User": "@triggerOutputs()?['body/Editor/DisplayName']",
+                              "item/Message": "GreetingType: @{triggerOutputs()?['body/Greetingtype/Value']}"
+                            },
+                            "authentication": "@parameters('$authentication')"
+                          }
+                        }
+                      }
+                    },
+                    "Greeting:_custom": {
+                      "case": "Custom",
+                      "actions": {
+                        "Run_Set-CallQueueGreeting:_custom": {
+                          "runAfter": {},
+                          "type": "Http",
+                          "inputs": {
+                            "method": "POST",
+                            "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Set-CallQueueGreeting",
+                            "headers": {
+                              "x-functions-key": "@parameters('VAR - FunctionKey (new_VARFunctionKey)')"
+                            },
+                            "body": {
+                              "Greeting": "@triggerOutputs()?['body/Alerttime']",
+                              "GreetingType": "@triggerOutputs()?['body/Greetingtype/Value']",
+                              "Identity": "@triggerOutputs()?['body/Title']",
+                              "SPSite": "@parameters('VAR - TeamsvoicemanagementSPSite (new_TeamsvoicemanagementSPSite)')"
+                            },
+                            "authentication": {
+                              "type": "ActiveDirectoryOAuth",
+                              "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+                              "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+                              "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+                              "secret": "@outputs('Get_secret')?['body/value']"
+                            }
+                          }
+                        },
+                        "Set_action_variable:_Set-CallQueueGreeting:_custom": {
+                          "runAfter": {
+                            "Run_Set-CallQueueGreeting:_custom": [
+                              "Succeeded"
+                            ]
+                          },
+                          "type": "SetVariable",
+                          "inputs": {
+                            "name": "Action",
+                            "value": "Set greeting to custom"
+                          }
+                        },
+                        "Validate_Set-CallQueueGreeting:_custom": {
+                          "actions": {
+                            "Set_result_parameter:_success:_Set-CallQueueGreeting:_custom": {
+                              "runAfter": {},
+                              "type": "SetVariable",
+                              "inputs": {
+                                "name": "Result",
+                                "value": "Success"
+                              }
+                            }
+                          },
+                          "runAfter": {
+                            "Set_action_variable:_Set-CallQueueGreeting:_custom": [
+                              "Succeeded"
+                            ]
+                          },
+                          "else": {
+                            "actions": {
+                              "Set_result_parameter:_failed:_Set-CallQueueGreeting:_custom": {
+                                "runAfter": {},
+                                "type": "SetVariable",
+                                "inputs": {
+                                  "name": "Result",
+                                  "value": "Failed"
+                                }
+                              }
+                            }
+                          },
+                          "expression": {
+                            "equals": [
+                              "@outputs('Run_Set-CallQueueGreeting:_custom')['statusCode']",
+                              200
+                            ]
+                          },
+                          "type": "If"
+                        },
+                        "Create_audit_log_entry:_Set-CallQueueGreeting:_custom": {
+                          "runAfter": {
+                            "Validate_Set-CallQueueGreeting:_custom": [
+                              "Succeeded"
+                            ]
+                          },
+                          "type": "OpenApiConnection",
+                          "inputs": {
+                            "host": {
+                              "connectionName": "shared_sharepointonline_1",
+                              "operationId": "PostItem",
+                              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                            },
+                            "parameters": {
+                              "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                              "table": "@parameters('VAR - SPO List - Voice management audit (new_VARSPOListVoicemanagementaudit)')",
+                              "item/Title": "@variables('Action')",
+                              "item/Timestamp": "@utcNow()",
+                              "item/Result": "@variables('Result')",
+                              "item/AffectedObject": "@triggerOutputs()?['body/Title']",
+                              "item/User": "@triggerOutputs()?['body/Editor/DisplayName']",
+                              "item/Message": "GreetingType: @{triggerOutputs()?['body/Greetingtype/Value']}\nGreeting: @{triggerOutputs()?['body/Alerttime']}"
+                            },
+                            "authentication": "@parameters('$authentication')"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "default": {
+                    "actions": {}
+                  },
+                  "expression": "@triggerOutputs()?['body/Greetingtype/Value']",
+                  "metadata": {
+                    "operationMetadataId": "5db1d301-1a66-4308-9c89-1fac5496d30f"
+                  },
+                  "type": "Switch"
+                }
+              },
+              "runAfter": {
+                "Get_secret": [
+                  "Succeeded"
+                ]
+              },
+              "expression": {
+                "or": [
+                  {
+                    "equals": [
+                      "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/Greetingtype']",
+                      "@true"
+                    ]
+                  },
+                  {
+                    "equals": [
+                      "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/Alerttime']",
+                      "@true"
+                    ]
+                  }
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "7425b28c-be2c-4ec4-bb2d-4b00fd2ad3a3"
+              },
+              "type": "If"
+            },
+            "Check_if_music_on_hold_changed": {
+              "actions": {
+                "Update_MoH": {
+                  "runAfter": {},
+                  "cases": {
+                    "Default": {
+                      "case": "Default",
+                      "actions": {
+                        "Run_Set-CallQueueMusicOnHold:_default": {
+                          "runAfter": {},
+                          "type": "Http",
+                          "inputs": {
+                            "method": "POST",
+                            "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Set-CallQueueMusicOnHold",
+                            "headers": {
+                              "x-functions-key": "@parameters('VAR - FunctionKey (new_VARFunctionKey)')"
+                            },
+                            "body": {
+                              "MoHType": "@triggerOutputs()?['body/MusiconHoldType/Value']",
+                              "Identity": "@triggerOutputs()?['body/Title']"
+                            },
+                            "authentication": {
+                              "type": "ActiveDirectoryOAuth",
+                              "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+                              "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+                              "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+                              "secret": "@outputs('Get_secret')?['body/value']"
+                            }
+                          }
+                        },
+                        "Set_action_parameter:_Set-CallQueueMusicOnHold:_default": {
+                          "runAfter": {
+                            "Run_Set-CallQueueMusicOnHold:_default": [
+                              "Succeeded"
+                            ]
+                          },
+                          "type": "SetVariable",
+                          "inputs": {
+                            "name": "Action",
+                            "value": "Set music on hold type to default"
+                          }
+                        },
+                        "Validate:_Set_action_parameter:_Set-CallQueueMusicOnHold:_default": {
+                          "actions": {
+                            "Set_result_variable:_success_:Set-CallQueueMusicOnHold:_default": {
+                              "runAfter": {},
+                              "type": "SetVariable",
+                              "inputs": {
+                                "name": "Result",
+                                "value": "Success"
+                              }
+                            }
+                          },
+                          "runAfter": {
+                            "Set_action_parameter:_Set-CallQueueMusicOnHold:_default": [
+                              "Succeeded"
+                            ]
+                          },
+                          "else": {
+                            "actions": {
+                              "Set_result_variable:_failed:_Set-CallQueueMusicOnHold:_default": {
+                                "runAfter": {},
+                                "type": "SetVariable",
+                                "inputs": {
+                                  "name": "Result",
+                                  "value": "Failed"
+                                }
+                              }
+                            }
+                          },
+                          "expression": {
+                            "equals": [
+                              "@outputs('Run_Set-CallQueueMusicOnHold:_default')['statusCode']",
+                              200
+                            ]
+                          },
+                          "type": "If"
+                        },
+                        "Create_audit_log_entry:_Set-CallQueueMusicOnHold:_default": {
+                          "runAfter": {
+                            "Validate:_Set_action_parameter:_Set-CallQueueMusicOnHold:_default": [
+                              "Succeeded"
+                            ]
+                          },
+                          "type": "OpenApiConnection",
+                          "inputs": {
+                            "host": {
+                              "connectionName": "shared_sharepointonline_1",
+                              "operationId": "PostItem",
+                              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                            },
+                            "parameters": {
+                              "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                              "table": "@parameters('VAR - SPO List - Voice management audit (new_VARSPOListVoicemanagementaudit)')",
+                              "item/Title": "@variables('Action')",
+                              "item/Timestamp": "@UtcNow()",
+                              "item/Result": "@variables('Result')",
+                              "item/AffectedObject": "@triggerOutputs()?['body/Title']",
+                              "item/User": "@triggerOutputs()?['body/Editor/DisplayName']",
+                              "item/Message": "GreetingType: @{triggerOutputs()?['body/MusiconHoldType/Value']}"
+                            },
+                            "authentication": "@parameters('$authentication')"
+                          }
+                        }
+                      }
+                    },
+                    "Custom": {
+                      "case": "Custom",
+                      "actions": {
+                        "Run_Set-CallQueueMusicOnHold:_custom": {
+                          "runAfter": {},
+                          "type": "Http",
+                          "inputs": {
+                            "method": "POST",
+                            "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Set-CallQueueMusicOnHold",
+                            "headers": {
+                              "x-functions-key": "@parameters('VAR - FunctionKey (new_VARFunctionKey)')"
+                            },
+                            "body": {
+                              "MoH": "@triggerOutputs()?['body/MusiconHold']",
+                              "MoHType": "@triggerOutputs()?['body/MusiconHoldType/Value']",
+                              "Identity": "@triggerOutputs()?['body/Title']",
+                              "SPSite": "@parameters('VAR - TeamsvoicemanagementSPSite (new_TeamsvoicemanagementSPSite)')"
+                            },
+                            "authentication": {
+                              "type": "ActiveDirectoryOAuth",
+                              "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+                              "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+                              "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+                              "secret": "@outputs('Get_secret')?['body/value']"
+                            }
+                          }
+                        },
+                        "Set_action_parameter:_Set-CallQueueMusicOnHold:_custom": {
+                          "runAfter": {
+                            "Run_Set-CallQueueMusicOnHold:_custom": [
+                              "Succeeded"
+                            ]
+                          },
+                          "type": "SetVariable",
+                          "inputs": {
+                            "name": "Action",
+                            "value": "Set music on hold to custom"
+                          }
+                        },
+                        "Validate:_Set_action_parameter:_Set-CallQueueMusicOnHold:_custom": {
+                          "actions": {
+                            "Set_result_variable:_success_:_Set-CallQueueMusicOnHold:_custom": {
+                              "runAfter": {},
+                              "type": "SetVariable",
+                              "inputs": {
+                                "name": "Result",
+                                "value": "Success"
+                              }
+                            }
+                          },
+                          "runAfter": {
+                            "Set_action_parameter:_Set-CallQueueMusicOnHold:_custom": [
+                              "Succeeded"
+                            ]
+                          },
+                          "else": {
+                            "actions": {
+                              "Set_result_variable:_failed:_Set-CallQueueMusicOnHold:_custom": {
+                                "runAfter": {},
+                                "type": "SetVariable",
+                                "inputs": {
+                                  "name": "Result",
+                                  "value": "Failed"
+                                }
+                              }
+                            }
+                          },
+                          "expression": {
+                            "equals": [
+                              "@outputs('Run_Set-CallQueueMusicOnHold:_custom')['statusCode']",
+                              200
+                            ]
+                          },
+                          "type": "If"
+                        },
+                        "Create_audit_log_entry:_Set-CallQueueMusicOnHold:_custom": {
+                          "runAfter": {
+                            "Validate:_Set_action_parameter:_Set-CallQueueMusicOnHold:_custom": [
+                              "Succeeded"
+                            ]
+                          },
+                          "type": "OpenApiConnection",
+                          "inputs": {
+                            "host": {
+                              "connectionName": "shared_sharepointonline_1",
+                              "operationId": "PostItem",
+                              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                            },
+                            "parameters": {
+                              "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                              "table": "@parameters('VAR - SPO List - Voice management audit (new_VARSPOListVoicemanagementaudit)')",
+                              "item/Title": "@variables('Action')",
+                              "item/Timestamp": "@utcNow()",
+                              "item/Result": "@variables('Result')",
+                              "item/AffectedObject": "@triggerOutputs()?['body/Title']",
+                              "item/User": "@triggerOutputs()?['body/Editor/DisplayName']",
+                              "item/Message": "GreetingType: @{triggerOutputs()?['body/MusiconHoldType/Value']}\nGreeting: @{triggerOutputs()?['body/MusiconHold']}"
+                            },
+                            "authentication": "@parameters('$authentication')"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "default": {
+                    "actions": {}
+                  },
+                  "expression": "@triggerOutputs()?['body/MusiconHoldType/Value']",
+                  "metadata": {
+                    "operationMetadataId": "5b9a80f1-0f18-487f-83ef-a00b3a47f080"
+                  },
+                  "type": "Switch"
+                }
+              },
+              "runAfter": {
+                "Check_if_greeting_changed": [
+                  "Succeeded"
+                ]
+              },
+              "expression": {
+                "or": [
+                  {
+                    "equals": [
+                      "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/MusiconHoldType']",
+                      "@true"
+                    ]
+                  },
+                  {
+                    "equals": [
+                      "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/MusiconHold']",
+                      "@true"
+                    ]
+                  }
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "8b01e1df-6687-4c23-b5c4-830c0d4f5fb5"
+              },
+              "type": "If"
+            },
+            "Check_if_agent_alert_time_changed": {
+              "actions": {
+                "Run_Set-CallQueueAgentAlertTime": {
+                  "runAfter": {},
+                  "metadata": {
+                    "operationMetadataId": "215723d5-0913-44dd-b174-66f00fc31b0a"
+                  },
+                  "type": "Http",
+                  "inputs": {
+                    "method": "POST",
+                    "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Set-CallQueueAgentAlertTime",
+                    "headers": {
+                      "x-functions-key": "@parameters('VAR - FunctionKey (new_VARFunctionKey)')"
+                    },
+                    "body": {
+                      "AgentAlertTime": "@int(triggerOutputs()?['body/Callagentalerttime'])",
+                      "Identity": "@triggerOutputs()?['body/Title']"
+                    },
+                    "authentication": {
+                      "type": "ActiveDirectoryOAuth",
+                      "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+                      "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+                      "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+                      "secret": "@outputs('Get_secret')?['body/value']"
+                    }
+                  }
+                },
+                "Update_Action:_Set-CallQueueAgentAlertTime": {
+                  "runAfter": {
+                    "Run_Set-CallQueueAgentAlertTime": [
+                      "Succeeded"
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "e5517724-947a-4e4c-9ede-1cd2e74bae85"
+                  },
+                  "type": "SetVariable",
+                  "inputs": {
+                    "name": "Action",
+                    "value": "Set agent alert time"
+                  }
+                },
+                "Validate_Set-CallQueueAgentAlertTime": {
+                  "actions": {
+                    "Set_result_variable:_success:_Set-CallQueueAgentAlertTime": {
+                      "runAfter": {},
+                      "metadata": {
+                        "operationMetadataId": "c648ccd7-5aaa-488f-85df-2e834aa2ca6b"
+                      },
+                      "type": "SetVariable",
+                      "inputs": {
+                        "name": "Result",
+                        "value": "Success"
+                      }
+                    }
+                  },
+                  "runAfter": {
+                    "Update_Action:_Set-CallQueueAgentAlertTime": [
+                      "Succeeded"
+                    ]
+                  },
+                  "else": {
+                    "actions": {
+                      "Set_result_variable:_failed:_Set-CallQueueAgentAlertTime": {
+                        "runAfter": {},
+                        "metadata": {
+                          "operationMetadataId": "806b56b1-b31a-441f-aa21-45a3a108db26"
+                        },
+                        "type": "SetVariable",
+                        "inputs": {
+                          "name": "Result",
+                          "value": "Failed"
+                        }
+                      }
+                    }
+                  },
+                  "expression": {
+                    "equals": [
+                      "@outputs('Run_Set-CallQueueAgentAlertTime')['statusCode']",
+                      200
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "149c92f1-5604-4052-a9e7-1aac450cd275"
+                  },
+                  "type": "If"
+                },
+                "Create_audit_log_entry:_Set-CallQueueAgentAlertTime": {
+                  "runAfter": {
+                    "Validate_Set-CallQueueAgentAlertTime": [
+                      "Succeeded"
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "2a797e31-ccca-4227-81a2-29a659c2d818"
+                  },
+                  "type": "OpenApiConnection",
+                  "inputs": {
+                    "host": {
+                      "connectionName": "shared_sharepointonline_1",
+                      "operationId": "PostItem",
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                    },
+                    "parameters": {
+                      "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                      "table": "@parameters('VAR - SPO List - Voice management audit (new_VARSPOListVoicemanagementaudit)')",
+                      "item/Title": "@variables('Action')",
+                      "item/Timestamp": "@UtcNow()",
+                      "item/Result": "@variables('Result')",
+                      "item/AffectedObject": "@triggerOutputs()?['body/Title']",
+                      "item/User": "@triggerOutputs()?['body/Editor/DisplayName']",
+                      "item/Message": "Agent alert time: @{triggerOutputs()?['body/Callagentalerttime']}"
+                    },
+                    "authentication": "@parameters('$authentication')"
+                  }
+                }
+              },
+              "runAfter": {
+                "Check_if_music_on_hold_changed": [
+                  "Succeeded"
+                ]
+              },
+              "expression": {
+                "equals": [
+                  "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/Callagentalerttime']",
+                  "@true"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "91ccc7a8-a671-43ba-8fe6-cd135927b34d"
+              },
+              "type": "If"
+            },
+            "Check_if_time-out_settings_have_been_updated": {
+              "actions": {
+                "Validate_Set-CallQueueTimeoutThreshold_Set-CallQueueTimeoutAction": {
+                  "actions": {
+                    "Result:_Update_call_timeout_success": {
+                      "runAfter": {},
+                      "metadata": {
+                        "operationMetadataId": "ac6f7004-59c9-41d5-92a3-d72ba194e1c4"
+                      },
+                      "type": "SetVariable",
+                      "inputs": {
+                        "name": "result",
+                        "value": "Succes"
+                      }
+                    },
+                    "Set_variable": {
+                      "runAfter": {
+                        "Result:_Update_call_timeout_success": [
+                          "Succeeded"
+                        ]
+                      },
+                      "metadata": {
+                        "operationMetadataId": "70d7077d-a501-4d74-b155-78951f84d69b"
+                      },
+                      "type": "SetVariable",
+                      "inputs": {
+                        "name": "HTTPStatus",
+                        "value": 200
+                      }
+                    }
+                  },
+                  "runAfter": {
+                    "Check_if_timeout_threshold_is_the_only_value_which_has_been_updated": [
+                      "Succeeded"
+                    ]
+                  },
+                  "else": {
+                    "actions": {
+                      "Result:_Update_call_timeout_failed": {
+                        "runAfter": {},
+                        "metadata": {
+                          "operationMetadataId": "ac6f7004-59c9-41d5-92a3-d72ba194e1c4"
+                        },
+                        "type": "SetVariable",
+                        "inputs": {
+                          "name": "result",
+                          "value": "Failed"
+                        }
+                      }
+                    }
+                  },
+                  "expression": {
+                    "equals": [
+                      "@variables('HTTPStatus')",
+                      200
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "49534ecd-ed59-4dc1-a69e-de5b658f0e31"
+                  },
+                  "type": "If"
+                },
+                "Add_audit_log_entry:_Update_call_timeout": {
+                  "runAfter": {
+                    "Validate_Set-CallQueueTimeoutThreshold_Set-CallQueueTimeoutAction": [
+                      "Succeeded"
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "3f02d760-9be9-4a9e-917e-51f8f7ca1a5d"
+                  },
+                  "type": "OpenApiConnection",
+                  "inputs": {
+                    "host": {
+                      "connectionName": "shared_sharepointonline_1",
+                      "operationId": "PostItem",
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                    },
+                    "parameters": {
+                      "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                      "table": "@parameters('VAR - SPO List - Voice management audit (new_VARSPOListVoicemanagementaudit)')",
+                      "item/Title": "@variables('Action')",
+                      "item/Timestamp": "@utcNow()",
+                      "item/Result": "@variables('Result')",
+                      "item/AffectedObject": "@triggerOutputs()?['body/Title']",
+                      "item/User": "@triggerOutputs()?['body/Editor/DisplayName']",
+                      "item/Message": "Call timeout:@{triggerOutputs()?['body/CallTimeoutHandling/Value']}\nCall timeout action: @{triggerOutputs()?['body/CallTimeoutHandling/Value']}\nCall timeout target: @{triggerOutputs()?['body/Target']}"
+                    },
+                    "authentication": "@parameters('$authentication')"
+                  }
+                },
+                "Check_if_timeout_threshold_is_the_only_value_which_has_been_updated": {
+                  "actions": {
+                    "Run_Set-CallQueueTimeoutThreshold": {
+                      "runAfter": {},
+                      "metadata": {
+                        "operationMetadataId": "6ba1f22a-30cd-4e6d-8cf1-ac015384626c"
+                      },
+                      "type": "Http",
+                      "inputs": {
+                        "method": "POST",
+                        "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Set-CallQueueTimeOutThreshold",
+                        "headers": {
+                          "x-functions-key": "@parameters('VAR - FunctionKey (new_VARFunctionKey)')"
+                        },
+                        "body": {
+                          "TimeoutThreshold": "@int(triggerOutputs()?['body/CalltimeoutMaximumwaittime'])",
+                          "Identity": "@triggerOutputs()?['body/Title']"
+                        },
+                        "authentication": {
+                          "type": "ActiveDirectoryOAuth",
+                          "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+                          "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+                          "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+                          "secret": "@outputs('Get_secret')?['body/value']"
+                        }
+                      }
+                    },
+                    "Set_HTTPStatus:_queue_time_out_settings": {
+                      "runAfter": {
+                        "Run_Set-CallQueueTimeoutThreshold": [
+                          "Succeeded"
+                        ]
+                      },
+                      "metadata": {
+                        "operationMetadataId": "94c2e145-e6eb-4946-b4e4-badbb408ab4e"
+                      },
+                      "type": "SetVariable",
+                      "inputs": {
+                        "name": "HTTPStatus",
+                        "value": "@outputs('Run_Set-CallQueueTimeoutThreshold')['statusCode']"
+                      }
+                    },
+                    "Setting_action_variable:_queue_time_out_settings": {
+                      "runAfter": {
+                        "Set_HTTPStatus:_queue_time_out_settings": [
+                          "Succeeded"
+                        ]
+                      },
+                      "metadata": {
+                        "operationMetadataId": "59bbf0b6-1400-4a0e-8f15-afbaa3cd7de7"
+                      },
+                      "type": "SetVariable",
+                      "inputs": {
+                        "name": "Action",
+                        "value": "Updated queue time-out settings: threshold"
+                      }
+                    }
+                  },
+                  "runAfter": {},
+                  "else": {
+                    "actions": {
+                      "Call_timeout:_handling_or_target_and_max_wait_time_changed": {
+                        "actions": {
+                          "Call_timeout_handling_-_max_wait_time_changed": {
+                            "runAfter": {},
+                            "cases": {
+                              "Voicemail_-_max_wait_time_changed": {
+                                "case": "Redirect: Voicemail",
+                                "actions": {
+                                  "Voicemail:_text_or_audio:_max_waiting_time_changed": {
+                                    "runAfter": {},
+                                    "cases": {
+                                      "Voicemail:_text": {
+                                        "case": "text",
+                                        "actions": {
+                                          "Run_Set-CallQueueTimeoutAction:_voicemail_text_max_waittime": {
+                                            "runAfter": {},
+                                            "type": "Http",
+                                            "inputs": {
+                                              "method": "POST",
+                                              "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Set-CallQueueTimeOutAction",
+                                              "headers": {
+                                                "@{parameters('VAR - FunctionKey (new_VARFunctionKey)')}x-functions-key": ""
+                                              },
+                                              "body": {
+                                                "TimeoutThreshold": "@int(triggerOutputs()?['body/CalltimeoutMaximumwaittime'])",
+                                                "TimeoutSharedVoicemailTarget": "@triggerOutputs()?['body/CallTimeoutSharedVoicemailtarget']",
+                                                "TimeoutVoicemailText": "@triggerOutputs()?['body/Calltimeouttext']",
+                                                "TimeoutVoicemailType": "@triggerOutputs()?['body/Calltimeoutsharedvoicemailtype/Value']",
+                                                "TimeOutAction": "@triggerOutputs()?['body/CallTimeoutHandling/Value']",
+                                                "TimeoutTarget": "@triggerOutputs()?['body/Target']",
+                                                "Identity": "@triggerOutputs()?['body/Title']"
+                                              },
+                                              "authentication": {
+                                                "type": "ActiveDirectoryOAuth",
+                                                "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+                                                "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                                "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                                "secret": "@outputs('Get_secret')?['body/value']"
+                                              }
+                                            }
+                                          },
+                                          "Set_HTTP_status_code:_Set-CallQueueTimeOutAction:_voicemail_text_max_waittime": {
+                                            "runAfter": {
+                                              "Run_Set-CallQueueTimeoutAction:_voicemail_text_max_waittime": [
+                                                "Succeeded"
+                                              ]
+                                            },
+                                            "type": "SetVariable",
+                                            "inputs": {
+                                              "name": "HTTPStatus",
+                                              "value": "@outputs('Run_Set-CallQueueTimeoutAction:_voicemail_text_max_waittime')['statusCode']"
+                                            }
+                                          },
+                                          "Set_action:_Set-CallQueueTimeOutAction:_voicemail_text_max_waittime": {
+                                            "runAfter": {
+                                              "Set_HTTP_status_code:_Set-CallQueueTimeOutAction:_voicemail_text_max_waittime": [
+                                                "Succeeded"
+                                              ]
+                                            },
+                                            "type": "SetVariable",
+                                            "inputs": {
+                                              "name": "Action",
+                                              "value": "Updated queue time-out settings: target and threshold"
+                                            }
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "default": {
+                                      "actions": {
+                                        "Run_Set-CallQueueTimeoutAction:_voicemail_audio_max_waittime": {
+                                          "runAfter": {},
+                                          "type": "Http",
+                                          "inputs": {
+                                            "method": "POST",
+                                            "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Set-CallQueueTimeOutAction",
+                                            "headers": {
+                                              "x-functions-key": "@parameters('VAR - FunctionKey (new_VARFunctionKey)')"
+                                            },
+                                            "body": {
+                                              "TimeoutThreshold": "@int(triggerOutputs()?['body/CalltimeoutMaximumwaittime'])",
+                                              "TimeoutSharedVoicemailTarget": "@triggerOutputs()?['body/CallTimeoutSharedVoicemailtarget']",
+                                              "TimeoutVoicemailText": "@triggerOutputs()?['body/Calltimeoutaudio']",
+                                              "TimeoutVoicemailType": "@triggerOutputs()?['body/Calltimeoutsharedvoicemailtype/Value']",
+                                              "TimeOutAction": "@triggerOutputs()?['body/CallTimeoutHandling/Value']",
+                                              "TimeoutTarget": "@triggerOutputs()?['body/Target']",
+                                              "Identity": "@triggerOutputs()?['body/Title']",
+                                              "SPSite": "@parameters('VAR - TeamsvoicemanagementSPSite (new_TeamsvoicemanagementSPSite)')"
+                                            },
+                                            "authentication": {
+                                              "type": "ActiveDirectoryOAuth",
+                                              "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+                                              "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                              "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                              "secret": "@outputs('Get_secret')?['body/value']"
+                                            }
+                                          }
+                                        },
+                                        "Set_HTTP_status_code:_Set-CallQueueTimeoutAction:_voicemail_audio_max_waittime": {
+                                          "runAfter": {
+                                            "Run_Set-CallQueueTimeoutAction:_voicemail_audio_max_waittime": [
+                                              "Succeeded"
+                                            ]
+                                          },
+                                          "type": "SetVariable",
+                                          "inputs": {
+                                            "name": "HTTPStatus",
+                                            "value": "@outputs('Run_Set-CallQueueTimeoutAction:_voicemail_audio_max_waittime')['statusCode']"
+                                          }
+                                        },
+                                        "Set_action:_Set-CallQueueTimeOutAction:_voicemail_audio_max_waittime": {
+                                          "runAfter": {
+                                            "Set_HTTP_status_code:_Set-CallQueueTimeoutAction:_voicemail_audio_max_waittime": [
+                                              "Succeeded"
+                                            ]
+                                          },
+                                          "type": "SetVariable",
+                                          "inputs": {
+                                            "name": "Action",
+                                            "value": "Updated queue time-out settings: target and threshold"
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "expression": "@triggerOutputs()?['body/Calltimeoutsharedvoicemailtype/Value']",
+                                    "type": "Switch"
+                                  }
+                                }
+                              }
+                            },
+                            "default": {
+                              "actions": {
+                                "Set_action:_Set-CallQueueTimeoutAction:_other_max_waittime": {
+                                  "runAfter": {
+                                    "Condition": [
+                                      "Succeeded"
+                                    ]
+                                  },
+                                  "type": "SetVariable",
+                                  "inputs": {
+                                    "name": "Action",
+                                    "value": "Updated queue time-out settings: target and threshold"
+                                  }
+                                },
+                                "Condition": {
+                                  "actions": {
+                                    "Search_for_users_(V2)": {
+                                      "runAfter": {},
+                                      "type": "OpenApiConnection",
+                                      "inputs": {
+                                        "host": {
+                                          "connectionName": "shared_office365users_1",
+                                          "operationId": "SearchUserV2",
+                                          "apiId": "/providers/Microsoft.PowerApps/apis/shared_office365users"
+                                        },
+                                        "parameters": {
+                                          "searchTerm": "@triggerOutputs()?['body/Target']",
+                                          "top": 1
+                                        },
+                                        "authentication": "@parameters('$authentication')"
+                                      }
+                                    },
+                                    "Apply_to_each": {
+                                      "foreach": "@outputs('Search_for_users_(V2)')?['body/value']",
+                                      "actions": {
+                                        "Run_Set-CallQueueTimeoutAction:_other_max_waittime:_person_voice_app": {
+                                          "runAfter": {},
+                                          "type": "Http",
+                                          "inputs": {
+                                            "method": "POST",
+                                            "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Set-CallQueueTimeOutAction",
+                                            "headers": {
+                                              "x-functions-key": "@parameters('VAR - FunctionKey (new_VARFunctionKey)')"
+                                            },
+                                            "body": {
+                                              "TimeoutThreshold": "@int(triggerOutputs()?['body/CalltimeoutMaximumwaittime'])",
+                                              "TimeOutAction": "@triggerOutputs()?['body/CallTimeoutHandling/Value']",
+                                              "TimeoutTarget": "@items('Apply_to_each')?['UserPrincipalName']",
+                                              "Identity": "@triggerOutputs()?['body/Title']"
+                                            },
+                                            "authentication": {
+                                              "type": "ActiveDirectoryOAuth",
+                                              "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+                                              "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                              "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                              "secret": "@outputs('Get_secret')?['body/value']"
+                                            }
+                                          }
+                                        },
+                                        "Run_Set-CallQueueTimeoutAction:_other_max_waittime:_person_voice_app_-_result": {
+                                          "runAfter": {
+                                            "Run_Set-CallQueueTimeoutAction:_other_max_waittime:_person_voice_app": [
+                                              "Succeeded"
+                                            ]
+                                          },
+                                          "type": "SetVariable",
+                                          "inputs": {
+                                            "name": "HTTPStatus",
+                                            "value": "@outputs('Run_Set-CallQueueTimeoutAction:_other_max_waittime:_person_voice_app')['statusCode']"
+                                          }
+                                        }
+                                      },
+                                      "runAfter": {
+                                        "Search_for_users_(V2)": [
+                                          "Succeeded"
+                                        ]
+                                      },
+                                      "type": "Foreach"
+                                    }
+                                  },
+                                  "runAfter": {},
+                                  "else": {
+                                    "actions": {
+                                      "Run_Set-CallQueueTimeoutAction:_other_max_waittime": {
+                                        "runAfter": {},
+                                        "type": "Http",
+                                        "inputs": {
+                                          "method": "POST",
+                                          "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Set-CallQueueTimeOutAction",
+                                          "headers": {
+                                            "x-functions-key": "@parameters('VAR - FunctionKey (new_VARFunctionKey)')"
+                                          },
+                                          "body": {
+                                            "TimeoutThreshold": "@int(triggerOutputs()?['body/CalltimeoutMaximumwaittime'])",
+                                            "TimeOutAction": "@triggerOutputs()?['body/CallTimeoutHandling/Value']",
+                                            "TimeoutTarget": "@triggerOutputs()?['body/Target']",
+                                            "Identity": "@triggerOutputs()?['body/Title']"
+                                          },
+                                          "authentication": {
+                                            "type": "ActiveDirectoryOAuth",
+                                            "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+                                            "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                            "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                            "secret": "@outputs('Get_secret')?['body/value']"
+                                          }
+                                        }
+                                      },
+                                      "Set_HTTP_status_code:_Set-CallQueueTimeoutAction:_other_max_waittime": {
+                                        "runAfter": {
+                                          "Run_Set-CallQueueTimeoutAction:_other_max_waittime": [
+                                            "Succeeded"
+                                          ]
+                                        },
+                                        "type": "SetVariable",
+                                        "inputs": {
+                                          "name": "HTTPStatus",
+                                          "value": "@outputs('Run_Set-CallQueueTimeoutAction:_other_max_waittime')['statusCode']"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "expression": {
+                                    "or": [
+                                      {
+                                        "equals": [
+                                          "@triggerOutputs()?['body/CallTimeoutHandling/Value']",
+                                          "Redirect: Person in organization"
+                                        ]
+                                      },
+                                      {
+                                        "equals": [
+                                          "@triggerOutputs()?['body/CallTimeoutHandling/Value']",
+                                          "Redirect: Voice app"
+                                        ]
+                                      }
+                                    ]
+                                  },
+                                  "type": "If"
+                                }
+                              }
+                            },
+                            "expression": "@triggerOutputs()?['body/CallTimeoutHandling/Value']",
+                            "metadata": {
+                              "operationMetadataId": "510d1a68-354e-4a5c-a077-7e19f5cc552f"
+                            },
+                            "type": "Switch"
+                          }
+                        },
+                        "runAfter": {},
+                        "else": {
+                          "actions": {
+                            "Call_timeout_handling_-_max_wait_time_did_not_change": {
+                              "runAfter": {},
+                              "cases": {
+                                "Voicemail": {
+                                  "case": "Redirect: Voicemail",
+                                  "actions": {
+                                    "Voicemail:_text_or_audio:_max_waiting_time_not_changed": {
+                                      "runAfter": {},
+                                      "cases": {
+                                        "Voicemail:_text": {
+                                          "case": "text",
+                                          "actions": {
+                                            "Run_Set-CallQueueTimeoutAction:_voicemail_text": {
+                                              "runAfter": {},
+                                              "type": "Http",
+                                              "inputs": {
+                                                "method": "POST",
+                                                "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Set-CallQueueTimeOutAction",
+                                                "headers": {
+                                                  "@{parameters('VAR - FunctionKey (new_VARFunctionKey)')}x-functions-key": ""
+                                                },
+                                                "body": {
+                                                  "TimeoutSharedVoicemailTarget": "@triggerOutputs()?['body/CallTimeoutSharedVoicemailtarget']",
+                                                  "TimeoutVoicemailText": "@triggerOutputs()?['body/Calltimeouttext']",
+                                                  "TimeoutVoicemailType": "@triggerOutputs()?['body/Calltimeoutsharedvoicemailtype/Value']",
+                                                  "TimeOutAction": "@triggerOutputs()?['body/CallTimeoutHandling/Value']",
+                                                  "TimeoutTarget": "@triggerOutputs()?['body/Target']",
+                                                  "Identity": "@triggerOutputs()?['body/Title']"
+                                                },
+                                                "authentication": {
+                                                  "type": "ActiveDirectoryOAuth",
+                                                  "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+                                                  "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                                  "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                                  "secret": "@outputs('Get_secret')?['body/value']"
+                                                }
+                                              }
+                                            },
+                                            "Set_HTTP_status_code:_Set-CallQueueTimeoutAction:_voicemail_text": {
+                                              "runAfter": {
+                                                "Run_Set-CallQueueTimeoutAction:_voicemail_text": [
+                                                  "Succeeded"
+                                                ]
+                                              },
+                                              "type": "SetVariable",
+                                              "inputs": {
+                                                "name": "HTTPStatus",
+                                                "value": "@outputs('Run_Set-CallQueueTimeoutAction:_voicemail_text')['statusCode']"
+                                              }
+                                            },
+                                            "Set_action:_Set-CallQueueTimeoutAction:_voicemail_text": {
+                                              "runAfter": {
+                                                "Set_HTTP_status_code:_Set-CallQueueTimeoutAction:_voicemail_text": [
+                                                  "Succeeded"
+                                                ]
+                                              },
+                                              "type": "SetVariable",
+                                              "inputs": {
+                                                "name": "Action",
+                                                "value": "Updated queue time-out settings: target"
+                                              }
+                                            }
+                                          }
+                                        }
+                                      },
+                                      "default": {
+                                        "actions": {
+                                          "Run_Set-CallQueueTimeoutAction:_voicemail_audio": {
+                                            "runAfter": {},
+                                            "type": "Http",
+                                            "inputs": {
+                                              "method": "POST",
+                                              "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Set-CallQueueTimeOutAction",
+                                              "headers": {
+                                                "x-functions-key": ""
+                                              },
+                                              "body": {
+                                                "TimeoutSharedVoicemailTarget": "@triggerOutputs()?['body/CallTimeoutSharedVoicemailtarget']",
+                                                "TimeoutVoicemailText": "@triggerOutputs()?['body/Calltimeoutaudio']",
+                                                "TimeoutVoicemailType": "@triggerOutputs()?['body/Calltimeoutsharedvoicemailtype/Value']",
+                                                "TimeOutAction": "@triggerOutputs()?['body/CallTimeoutHandling/Value']",
+                                                "TimeoutTarget": "@triggerOutputs()?['body/Target']",
+                                                "Identity": "@triggerOutputs()?['body/Title']",
+                                                "SPSite": "@parameters('VAR - TeamsvoicemanagementSPSite (new_TeamsvoicemanagementSPSite)')"
+                                              },
+                                              "authentication": {
+                                                "type": "ActiveDirectoryOAuth",
+                                                "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+                                                "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                                "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                                "secret": "@outputs('Get_secret')?['body/value']"
+                                              }
+                                            }
+                                          },
+                                          "Set_HTTP_status_code:_Set-CallQueueTimeoutAction:_voicemail_audio": {
+                                            "runAfter": {
+                                              "Run_Set-CallQueueTimeoutAction:_voicemail_audio": [
+                                                "Succeeded"
+                                              ]
+                                            },
+                                            "type": "SetVariable",
+                                            "inputs": {
+                                              "name": "HTTPStatus",
+                                              "value": "@outputs('Run_Set-CallQueueTimeoutAction:_voicemail_audio')['statusCode']"
+                                            }
+                                          },
+                                          "Set_action:_Set-CallQueueTimeoutAction:_voicemail_audio": {
+                                            "runAfter": {
+                                              "Set_HTTP_status_code:_Set-CallQueueTimeoutAction:_voicemail_audio": [
+                                                "Succeeded"
+                                              ]
+                                            },
+                                            "type": "SetVariable",
+                                            "inputs": {
+                                              "name": "Action",
+                                              "value": "Updated queue time-out settings: target"
+                                            }
+                                          }
+                                        }
+                                      },
+                                      "expression": "@triggerOutputs()?['body/Calltimeoutsharedvoicemailtype/Value']",
+                                      "type": "Switch"
+                                    }
+                                  }
+                                }
+                              },
+                              "default": {
+                                "actions": {
+                                  "Set_identity:_Set-CallQueueTimeoutAction:_other": {
+                                    "runAfter": {
+                                      "Condition_2": [
+                                        "Succeeded"
+                                      ]
+                                    },
+                                    "type": "SetVariable",
+                                    "inputs": {
+                                      "name": "Action",
+                                      "value": "Updated queue time-out settings: target"
+                                    }
+                                  },
+                                  "Condition_2": {
+                                    "actions": {
+                                      "Search_for_users_(V2)_2": {
+                                        "runAfter": {},
+                                        "type": "OpenApiConnection",
+                                        "inputs": {
+                                          "host": {
+                                            "connectionName": "shared_office365users_1",
+                                            "operationId": "SearchUserV2",
+                                            "apiId": "/providers/Microsoft.PowerApps/apis/shared_office365users"
+                                          },
+                                          "parameters": {
+                                            "searchTerm": "@triggerOutputs()?['body/Target']",
+                                            "top": 1
+                                          },
+                                          "authentication": "@parameters('$authentication')"
+                                        }
+                                      },
+                                      "Apply_to_each_2": {
+                                        "foreach": "@outputs('Search_for_users_(V2)_2')?['body/value']",
+                                        "actions": {
+                                          "Run:_Set-CallQueueTimeoutAction:_other:_user_phone": {
+                                            "runAfter": {},
+                                            "type": "Http",
+                                            "inputs": {
+                                              "method": "POST",
+                                              "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Set-CallQueueTimeOutAction",
+                                              "headers": {
+                                                "x-functions-key": "@parameters('VAR - FunctionKey (new_VARFunctionKey)')"
+                                              },
+                                              "body": {
+                                                "TimeoutMaxWaitTime": "@triggerOutputs()?['body/CalltimeoutMaximumwaittime']",
+                                                "TimeOutAction": "@triggerOutputs()?['body/CallTimeoutHandling/Value']",
+                                                "TimeoutTarget": "@items('Apply_to_each_2')?['UserPrincipalName']",
+                                                "Identity": "@triggerOutputs()?['body/Title']"
+                                              },
+                                              "authentication": {
+                                                "type": "ActiveDirectoryOAuth",
+                                                "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+                                                "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                                "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                                "secret": "@outputs('Get_secret')?['body/value']"
+                                              }
+                                            }
+                                          },
+                                          "Set_HTTP_status_code:_Set-CallQueueTimeoutAction:_other:_userphone": {
+                                            "runAfter": {
+                                              "Run:_Set-CallQueueTimeoutAction:_other:_user_phone": [
+                                                "Succeeded"
+                                              ]
+                                            },
+                                            "type": "SetVariable",
+                                            "inputs": {
+                                              "name": "HTTPStatus",
+                                              "value": "@outputs('Run:_Set-CallQueueTimeoutAction:_other:_user_phone')['statusCode']"
+                                            }
+                                          }
+                                        },
+                                        "runAfter": {
+                                          "Search_for_users_(V2)_2": [
+                                            "Succeeded"
+                                          ]
+                                        },
+                                        "type": "Foreach"
+                                      }
+                                    },
+                                    "runAfter": {},
+                                    "else": {
+                                      "actions": {
+                                        "Run_Set-CallQueueTimeoutAction:_other": {
+                                          "runAfter": {},
+                                          "type": "Http",
+                                          "inputs": {
+                                            "method": "POST",
+                                            "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Set-CallQueueTimeOutAction",
+                                            "headers": {
+                                              "x-functions-key": "@parameters('VAR - FunctionKey (new_VARFunctionKey)')"
+                                            },
+                                            "body": {
+                                              "TimeoutMaxWaitTime": "@triggerOutputs()?['body/CalltimeoutMaximumwaittime']",
+                                              "TimeOutAction": "@triggerOutputs()?['body/CallTimeoutHandling/Value']",
+                                              "TimeoutTarget": "@triggerOutputs()?['body/Target']",
+                                              "Identity": "@triggerOutputs()?['body/Title']"
+                                            },
+                                            "authentication": {
+                                              "type": "ActiveDirectoryOAuth",
+                                              "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+                                              "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                              "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                              "secret": "@outputs('Get_secret')?['body/value']"
+                                            }
+                                          }
+                                        },
+                                        "Set_HTTP_status_code:_Set-CallQueueTimeoutAction:_other": {
+                                          "runAfter": {
+                                            "Run_Set-CallQueueTimeoutAction:_other": [
+                                              "Succeeded"
+                                            ]
+                                          },
+                                          "type": "SetVariable",
+                                          "inputs": {
+                                            "name": "HTTPStatus",
+                                            "value": "@outputs('Run_Set-CallQueueTimeoutAction:_other')['statusCode']"
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "expression": {
+                                      "or": [
+                                        {
+                                          "equals": [
+                                            "@triggerOutputs()?['body/CallTimeoutHandling/Value']",
+                                            "Redirect: Person in organization"
+                                          ]
+                                        },
+                                        {
+                                          "equals": [
+                                            "@triggerOutputs()?['body/CallTimeoutHandling/Value']",
+                                            "Redirect: Voice app"
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    "type": "If"
+                                  }
+                                }
+                              },
+                              "expression": "@triggerOutputs()?['body/CallTimeoutHandling/Value']",
+                              "metadata": {
+                                "operationMetadataId": "93c758c9-e12f-42f0-9946-13c0a015f7d6"
+                              },
+                              "type": "Switch"
+                            }
+                          }
+                        },
+                        "expression": {
+                          "equals": [
+                            "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/CalltimeoutMaximumwaittime']",
+                            "@true"
+                          ]
+                        },
+                        "metadata": {
+                          "operationMetadataId": "0b976542-18c4-4b9a-9c56-848c2a2f7157"
+                        },
+                        "type": "If"
+                      }
+                    }
+                  },
+                  "expression": {
+                    "and": [
+                      {
+                        "equals": [
+                          "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/CalltimeoutMaximumwaittime']",
+                          "@true"
+                        ]
+                      },
+                      {
+                        "equals": [
+                          "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/CallTimeoutHandling']",
+                          "@false"
+                        ]
+                      },
+                      {
+                        "equals": [
+                          "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/Target']",
+                          "@false"
+                        ]
+                      }
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "5515fe52-04f6-4f80-ada0-5b6644690beb"
+                  },
+                  "type": "If"
+                }
+              },
+              "runAfter": {
+                "Check_if_agent_alert_time_changed": [
+                  "Succeeded"
+                ]
+              },
+              "expression": {
+                "or": [
+                  {
+                    "equals": [
+                      "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/CallTimeoutHandling']",
+                      "@true"
+                    ]
+                  },
+                  {
+                    "equals": [
+                      "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/Target']",
+                      "@true"
+                    ]
+                  },
+                  {
+                    "equals": [
+                      "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/CalltimeoutMaximumwaittime']",
+                      "@true"
+                    ]
+                  }
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "a78c4fec-e90c-41ee-95bd-0ed95a447690"
+              },
+              "type": "If"
+            },
+            "Check_if_call_overflow_settings_have_been_updated": {
+              "actions": {
+                "Validate:_Update_call_overflow": {
+                  "actions": {
+                    "Result:_Update_call_overflow_success": {
+                      "runAfter": {},
+                      "metadata": {
+                        "operationMetadataId": "ac6f7004-59c9-41d5-92a3-d72ba194e1c4"
+                      },
+                      "type": "SetVariable",
+                      "inputs": {
+                        "name": "result",
+                        "value": "Success"
+                      }
+                    }
+                  },
+                  "runAfter": {
+                    "Check_if_overflow_threshold_is_the_only_value_which_has_been_updated": [
+                      "Succeeded"
+                    ]
+                  },
+                  "else": {
+                    "actions": {
+                      "Result:_Update_call_overflow_failed": {
+                        "runAfter": {},
+                        "metadata": {
+                          "operationMetadataId": "1fc822f4-b90b-43a1-8012-ed52f7def4a4"
+                        },
+                        "type": "SetVariable",
+                        "inputs": {
+                          "name": "Result",
+                          "value": "Failed"
+                        }
+                      }
+                    }
+                  },
+                  "expression": {
+                    "equals": [
+                      "@variables('HTTPStatus')",
+                      200
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "df6c9109-31f6-47de-be9b-8dc3660b7033"
+                  },
+                  "type": "If"
+                },
+                "Add_audit_log_entry:_Update_call_overflow": {
+                  "runAfter": {
+                    "Validate:_Update_call_overflow": [
+                      "Succeeded"
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "00510777-d3be-4434-9224-09a873922012"
+                  },
+                  "type": "OpenApiConnection",
+                  "inputs": {
+                    "host": {
+                      "connectionName": "shared_sharepointonline_1",
+                      "operationId": "PostItem",
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                    },
+                    "parameters": {
+                      "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                      "table": "@parameters('VAR - SPO List - Voice management audit (new_VARSPOListVoicemanagementaudit)')",
+                      "item/Title": "@variables('Action')",
+                      "item/Timestamp": "@utcNow()",
+                      "item/Result": "@variables('Result')",
+                      "item/AffectedObject": "@triggerOutputs()?['body/Title']",
+                      "item/User": "@triggerOutputs()?['body/Editor/DisplayName']",
+                      "item/Message": "Call overflow threshold: @{triggerOutputs()?['body/Calloverflowthreshold']}\nCall overflow action: @{triggerOutputs()?['body/Calloverflowaction/Value']}\nCall overflow target: @{triggerOutputs()?['body/Maximumcallsinqueue']}"
+                    },
+                    "authentication": "@parameters('$authentication')"
+                  }
+                },
+                "Check_if_overflow_threshold_is_the_only_value_which_has_been_updated": {
+                  "actions": {
+                    "Run_Set-CallQueueOverflowThreshold": {
+                      "runAfter": {},
+                      "metadata": {
+                        "operationMetadataId": "02ce0c99-4c03-49c7-b088-081cbe0e4234"
+                      },
+                      "type": "Http",
+                      "inputs": {
+                        "method": "POST",
+                        "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Set-CallQueueOverflowThreshold",
+                        "headers": {
+                          "x-functions-key": "@parameters('VAR - FunctionKey (new_VARFunctionKey)')"
+                        },
+                        "body": {
+                          "OverflowThreshold": "@int(triggerOutputs()?['body/Calloverflowthreshold'])",
+                          "Identity": "@triggerOutputs()?['body/Title']"
+                        },
+                        "authentication": {
+                          "type": "ActiveDirectoryOAuth",
+                          "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+                          "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+                          "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+                          "secret": "@outputs('Get_secret')?['body/value']"
+                        }
+                      }
+                    },
+                    "Set_HTTP_status:_Set-CallQueueOverflowThreshold": {
+                      "runAfter": {
+                        "Run_Set-CallQueueOverflowThreshold": [
+                          "Succeeded"
+                        ]
+                      },
+                      "metadata": {
+                        "operationMetadataId": "11fc6a6c-de17-41af-aa13-8d8348ddda0a"
+                      },
+                      "type": "SetVariable",
+                      "inputs": {
+                        "name": "HTTPStatus",
+                        "value": "@outputs('Run_Set-CallQueueOverflowThreshold')['statusCode']"
+                      }
+                    },
+                    "Set_action:_Set-CallQueueOverflowThreshold": {
+                      "runAfter": {
+                        "Set_HTTP_status:_Set-CallQueueOverflowThreshold": [
+                          "Succeeded"
+                        ]
+                      },
+                      "metadata": {
+                        "operationMetadataId": "c011a69d-c9c5-48cb-aca0-bd52c138f10b"
+                      },
+                      "type": "SetVariable",
+                      "inputs": {
+                        "name": "Action",
+                        "value": "Updated queue overflow settings: threshold"
+                      }
+                    }
+                  },
+                  "runAfter": {},
+                  "else": {
+                    "actions": {
+                      "Call_overflow:_handling_or_target_and_threshold_changed": {
+                        "actions": {
+                          "Call_overflow_handling_-_threshold_changed": {
+                            "runAfter": {},
+                            "cases": {
+                              "Voicemail": {
+                                "case": "Redirect: Voicemail",
+                                "actions": {
+                                  "Switch": {
+                                    "runAfter": {},
+                                    "cases": {
+                                      "Voicemail:_text": {
+                                        "case": "text",
+                                        "actions": {
+                                          "Run_Set-CsCallQueueOverFlowAction_-_voicemail_-_text_-_threshold": {
+                                            "runAfter": {},
+                                            "type": "Http",
+                                            "inputs": {
+                                              "method": "POST",
+                                              "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Set-CallQueueOverFlowAction",
+                                              "headers": {
+                                                "x-functions-key": "@parameters('VAR - FunctionKey (new_VARFunctionKey)')"
+                                              },
+                                              "body": {
+                                                "OverflowThreshold": "@int(triggerOutputs()?['body/Calloverflowthreshold'])",
+                                                "OverflowVoicemailTTSPrompt": "@triggerOutputs()?['body/Calloverflowtext']",
+                                                "OverflowVoicemailTarget": "@triggerOutputs()?['body/CalloverflowSharedVoicemailtarge']",
+                                                "OverflowAction": "@triggerOutputs()?['body/Calloverflowaction/Value']",
+                                                "OverflowTarget": "@triggerOutputs()?['body/Maximumcallsinqueue']",
+                                                "Identity": "@triggerOutputs()?['body/Title']"
+                                              },
+                                              "authentication": {
+                                                "type": "ActiveDirectoryOAuth",
+                                                "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+                                                "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                                "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                                "secret": "@outputs('Get_secret')?['body/value']"
+                                              }
+                                            }
+                                          },
+                                          "Set_HTTP_status_variable:_voicemail_-_text_-_threshold": {
+                                            "runAfter": {
+                                              "Run_Set-CsCallQueueOverFlowAction_-_voicemail_-_text_-_threshold": [
+                                                "Succeeded"
+                                              ]
+                                            },
+                                            "type": "SetVariable",
+                                            "inputs": {
+                                              "name": "HTTPStatus",
+                                              "value": "@outputs('Run_Set-CsCallQueueOverFlowAction_-_voicemail_-_text_-_threshold')['statusCode']"
+                                            }
+                                          },
+                                          "Set_action:_voicemail_-_text_-_threshold": {
+                                            "runAfter": {
+                                              "Set_HTTP_status_variable:_voicemail_-_text_-_threshold": [
+                                                "Succeeded"
+                                              ]
+                                            },
+                                            "type": "SetVariable",
+                                            "inputs": {
+                                              "name": "Action",
+                                              "value": "Updated queue overflow settings: target and threshold"
+                                            }
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "default": {
+                                      "actions": {
+                                        "Run_Set-CsCallQueueOverFlowAction_-_voicemail_-_audio_-_threshold": {
+                                          "runAfter": {},
+                                          "type": "Http",
+                                          "inputs": {
+                                            "method": "POST",
+                                            "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Set-CallQueueOverFlowAction",
+                                            "headers": {
+                                              "x-functions-key": "@parameters('VAR - FunctionKey (new_VARFunctionKey)')"
+                                            },
+                                            "body": {
+                                              "OverflowThreshold": "@int(triggerOutputs()?['body/Calloverflowthreshold'])",
+                                              "OverflowVoicemailAudioPrompt": "@triggerOutputs()?['body/Calloverflowaudio']",
+                                              "OverflowVoicemailTarget": "@triggerOutputs()?['body/CalloverflowSharedVoicemailtarge']",
+                                              "OverflowAction": "@triggerOutputs()?['body/Calloverflowaction/Value']",
+                                              "OverflowTarget": "@triggerOutputs()?['body/Maximumcallsinqueue']",
+                                              "Identity": "@triggerOutputs()?['body/Title']",
+                                              "SPSite": "@parameters('VAR - TeamsvoicemanagementSPSite (new_TeamsvoicemanagementSPSite)')"
+                                            },
+                                            "authentication": {
+                                              "type": "ActiveDirectoryOAuth",
+                                              "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+                                              "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                              "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                              "secret": "@outputs('Get_secret')?['body/value']"
+                                            }
+                                          }
+                                        },
+                                        "Set_HTTP_status_variable:_voicemail_-_audio_-_threshold": {
+                                          "runAfter": {
+                                            "Run_Set-CsCallQueueOverFlowAction_-_voicemail_-_audio_-_threshold": [
+                                              "Succeeded"
+                                            ]
+                                          },
+                                          "type": "SetVariable",
+                                          "inputs": {
+                                            "name": "HTTPStatus",
+                                            "value": "@outputs('Run_Set-CsCallQueueOverFlowAction_-_voicemail_-_audio_-_threshold')['statusCode']"
+                                          }
+                                        },
+                                        "Set_action:_voicemail_-_audio_-_threshold": {
+                                          "runAfter": {
+                                            "Set_HTTP_status_variable:_voicemail_-_audio_-_threshold": [
+                                              "Succeeded"
+                                            ]
+                                          },
+                                          "type": "SetVariable",
+                                          "inputs": {
+                                            "name": "Action",
+                                            "value": "Updated queue overflow settings: target and threshold"
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "expression": "@triggerOutputs()?['body/Calloverflowsharedvoicemailtype/Value']",
+                                    "type": "Switch"
+                                  }
+                                }
+                              }
+                            },
+                            "default": {
+                              "actions": {
+                                "Set_action:_other_-_threshold": {
+                                  "runAfter": {
+                                    "Check_call_overflow_handling_type": [
+                                      "Succeeded"
+                                    ]
+                                  },
+                                  "type": "SetVariable",
+                                  "inputs": {
+                                    "name": "Result",
+                                    "value": "Updated queue overflow settings: target and threshold"
+                                  }
+                                },
+                                "Check_call_overflow_handling_type": {
+                                  "actions": {
+                                    "Search_for_users_(V2)_3": {
+                                      "runAfter": {},
+                                      "type": "OpenApiConnection",
+                                      "inputs": {
+                                        "host": {
+                                          "connectionName": "shared_office365users_1",
+                                          "operationId": "SearchUserV2",
+                                          "apiId": "/providers/Microsoft.PowerApps/apis/shared_office365users"
+                                        },
+                                        "parameters": {
+                                          "searchTerm": "@triggerOutputs()?['body/Maximumcallsinqueue']",
+                                          "top": 1
+                                        },
+                                        "authentication": "@parameters('$authentication')"
+                                      }
+                                    },
+                                    "Apply_to_each_3": {
+                                      "foreach": "@outputs('Search_for_users_(V2)_3')?['body/value']",
+                                      "actions": {
+                                        "Run_Set-CsCallQueueOverFlowAction_-_other_-_threshold:_person_voice_app": {
+                                          "runAfter": {},
+                                          "type": "Http",
+                                          "inputs": {
+                                            "method": "POST",
+                                            "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Set-CallQueueOverFlowAction",
+                                            "headers": {
+                                              "@{parameters('VAR - FunctionKey (new_VARFunctionKey)')}x-functions-key": ""
+                                            },
+                                            "body": {
+                                              "OverflowAction": "@triggerOutputs()?['body/Calloverflowaction/Value']",
+                                              "OverflowTarget": "@items('Apply_to_each_3')?['UserPrincipalName']",
+                                              "Identity": "@triggerOutputs()?['body/Title']",
+                                              "OverflowThreshold": "@int(triggerOutputs()?['body/Calloverflowthreshold'])"
+                                            },
+                                            "authentication": {
+                                              "type": "ActiveDirectoryOAuth",
+                                              "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+                                              "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                              "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                              "secret": "@outputs('Get_secret')?['body/value']"
+                                            }
+                                          }
+                                        },
+                                        "Set_http_status:_other_-_threshold:_person_voice_app": {
+                                          "runAfter": {
+                                            "Run_Set-CsCallQueueOverFlowAction_-_other_-_threshold:_person_voice_app": [
+                                              "Succeeded"
+                                            ]
+                                          },
+                                          "type": "SetVariable",
+                                          "inputs": {
+                                            "name": "HTTPStatus",
+                                            "value": "@outputs('Run_Set-CsCallQueueOverFlowAction_-_other_-_threshold:_person_voice_app')['statusCode']"
+                                          }
+                                        }
+                                      },
+                                      "runAfter": {
+                                        "Search_for_users_(V2)_3": [
+                                          "Succeeded"
+                                        ]
+                                      },
+                                      "type": "Foreach"
+                                    }
+                                  },
+                                  "runAfter": {},
+                                  "else": {
+                                    "actions": {
+                                      "Run_Set-CsCallQueueOverFlowAction_-_other_-_threshold": {
+                                        "runAfter": {},
+                                        "type": "Http",
+                                        "inputs": {
+                                          "method": "POST",
+                                          "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Set-CallQueueOverFlowAction",
+                                          "headers": {
+                                            "x-functions-key": "@parameters('VAR - FunctionKey (new_VARFunctionKey)')"
+                                          },
+                                          "body": {
+                                            "OverflowAction": "@triggerOutputs()?['body/Calloverflowaction/Value']",
+                                            "OverflowTarget": "@triggerOutputs()?['body/Maximumcallsinqueue']",
+                                            "Identity": "@triggerOutputs()?['body/Title']",
+                                            "OverflowThreshold": "@int(triggerOutputs()?['body/Calloverflowthreshold'])"
+                                          },
+                                          "authentication": {
+                                            "type": "ActiveDirectoryOAuth",
+                                            "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+                                            "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                            "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                            "secret": "@outputs('Get_secret')?['body/value']"
+                                          }
+                                        }
+                                      },
+                                      "Set_http_status:_other_-_threshold": {
+                                        "runAfter": {
+                                          "Run_Set-CsCallQueueOverFlowAction_-_other_-_threshold": [
+                                            "Succeeded"
+                                          ]
+                                        },
+                                        "type": "SetVariable",
+                                        "inputs": {
+                                          "name": "HTTPStatus",
+                                          "value": "@outputs('Run_Set-CsCallQueueOverFlowAction_-_other_-_threshold')['statusCode']"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "expression": {
+                                    "and": [
+                                      {
+                                        "equals": [
+                                          "@triggerOutputs()?['body/Calloverflowaction/Value']",
+                                          "Redirect: Person in organization"
+                                        ]
+                                      },
+                                      {
+                                        "equals": [
+                                          "@triggerOutputs()?['body/Calloverflowaction/Value']",
+                                          "Redirect: Voice app"
+                                        ]
+                                      }
+                                    ]
+                                  },
+                                  "type": "If"
+                                }
+                              }
+                            },
+                            "expression": "@triggerOutputs()?['body/Calloverflowaction/Value']",
+                            "metadata": {
+                              "operationMetadataId": "ac7a05ed-9177-44db-8aa5-7bd10c4185b7"
+                            },
+                            "type": "Switch"
+                          }
+                        },
+                        "runAfter": {},
+                        "else": {
+                          "actions": {
+                            "Call_overflow_handling_or_target_changed": {
+                              "runAfter": {},
+                              "cases": {
+                                "Voicemail": {
+                                  "case": "Redirect: Voicemail",
+                                  "actions": {
+                                    "Switch_2": {
+                                      "runAfter": {},
+                                      "cases": {
+                                        "Voicemail:_text": {
+                                          "case": "text",
+                                          "actions": {
+                                            "Run_Set-CsCallQueueOverFlowAction_-_voicemail_-_text": {
+                                              "runAfter": {},
+                                              "type": "Http",
+                                              "inputs": {
+                                                "method": "POST",
+                                                "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Set-CallQueueOverFlowAction",
+                                                "headers": {
+                                                  "x-functions-key": "@parameters('VAR - FunctionKey (new_VARFunctionKey)')"
+                                                },
+                                                "body": {
+                                                  "OverflowVoicemailTTSPrompt": "@triggerOutputs()?['body/Calloverflowtext']",
+                                                  "OverflowVoicemailTarget": "@triggerOutputs()?['body/CalloverflowSharedVoicemailtarge']",
+                                                  "OverflowAction": "@triggerOutputs()?['body/Calloverflowaction/Value']",
+                                                  "OverflowTarget": "@triggerOutputs()?['body/Maximumcallsinqueue']",
+                                                  "Identity": "@triggerOutputs()?['body/Title']"
+                                                },
+                                                "authentication": {
+                                                  "type": "ActiveDirectoryOAuth",
+                                                  "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+                                                  "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                                  "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                                  "secret": "@outputs('Get_secret')?['body/value']"
+                                                }
+                                              }
+                                            },
+                                            "Set_HTTP_status:_voicemail_-_text": {
+                                              "runAfter": {
+                                                "Run_Set-CsCallQueueOverFlowAction_-_voicemail_-_text": [
+                                                  "Succeeded"
+                                                ]
+                                              },
+                                              "type": "SetVariable",
+                                              "inputs": {
+                                                "name": "HTTPStatus",
+                                                "value": "@outputs('Run_Set-CsCallQueueOverFlowAction_-_voicemail_-_text')['statusCode']"
+                                              }
+                                            },
+                                            "Set_action:_voicemail_-_text": {
+                                              "runAfter": {
+                                                "Set_HTTP_status:_voicemail_-_text": [
+                                                  "Succeeded"
+                                                ]
+                                              },
+                                              "type": "SetVariable",
+                                              "inputs": {
+                                                "name": "Action",
+                                                "value": "Updated queue overflow settings: target"
+                                              }
+                                            }
+                                          }
+                                        }
+                                      },
+                                      "default": {
+                                        "actions": {
+                                          "Run_Set-CsCallQueueOverFlowAction_-_voicemail_-_audio": {
+                                            "runAfter": {},
+                                            "type": "Http",
+                                            "inputs": {
+                                              "method": "POST",
+                                              "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Set-CallQueueOverFlowAction",
+                                              "headers": {
+                                                "x-functions-key": "@parameters('VAR - FunctionKey (new_VARFunctionKey)')"
+                                              },
+                                              "body": {
+                                                "OverflowVoicemailAudioPrompt": "@triggerOutputs()?['body/Calloverflowaudio']",
+                                                "OverflowVoicemailTarget": "@triggerOutputs()?['body/CalloverflowSharedVoicemailtarge']",
+                                                "OverflowAction": "@triggerOutputs()?['body/Calloverflowaction/Value']",
+                                                "OverflowTarget": "@triggerOutputs()?['body/Maximumcallsinqueue']",
+                                                "Identity": "@triggerOutputs()?['body/Title']",
+                                                "SPSite": "@parameters('VAR - TeamsvoicemanagementSPSite (new_TeamsvoicemanagementSPSite)')"
+                                              },
+                                              "authentication": {
+                                                "type": "ActiveDirectoryOAuth",
+                                                "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+                                                "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                                "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                                "secret": "@outputs('Get_secret')?['body/value']"
+                                              }
+                                            }
+                                          },
+                                          "Set_HTTP_status:_voicemail_-_audio": {
+                                            "runAfter": {
+                                              "Run_Set-CsCallQueueOverFlowAction_-_voicemail_-_audio": [
+                                                "Succeeded"
+                                              ]
+                                            },
+                                            "type": "SetVariable",
+                                            "inputs": {
+                                              "name": "HTTPStatus",
+                                              "value": "@outputs('Run_Set-CsCallQueueOverFlowAction_-_voicemail_-_audio')['statusCode']"
+                                            }
+                                          },
+                                          "Set_action:_voicemail_-_audio": {
+                                            "runAfter": {
+                                              "Set_HTTP_status:_voicemail_-_audio": [
+                                                "Succeeded"
+                                              ]
+                                            },
+                                            "type": "SetVariable",
+                                            "inputs": {
+                                              "name": "Action",
+                                              "value": "Updated queue overflow settings: target"
+                                            }
+                                          }
+                                        }
+                                      },
+                                      "expression": "@triggerOutputs()?['body/Calloverflowsharedvoicemailtype/Value']",
+                                      "type": "Switch"
+                                    }
+                                  }
+                                }
+                              },
+                              "default": {
+                                "actions": {
+                                  "Set_action:_voicemail_-_other": {
+                                    "runAfter": {
+                                      "Condition_3": [
+                                        "Succeeded"
+                                      ]
+                                    },
+                                    "type": "SetVariable",
+                                    "inputs": {
+                                      "name": "Action",
+                                      "value": "Updated queue overflow settings: target"
+                                    }
+                                  },
+                                  "Condition_3": {
+                                    "actions": {
+                                      "Search_for_users_(V2)_4": {
+                                        "runAfter": {},
+                                        "type": "OpenApiConnection",
+                                        "inputs": {
+                                          "host": {
+                                            "connectionName": "shared_office365users_1",
+                                            "operationId": "SearchUserV2",
+                                            "apiId": "/providers/Microsoft.PowerApps/apis/shared_office365users"
+                                          },
+                                          "parameters": {
+                                            "searchTerm": "@triggerOutputs()?['body/Maximumcallsinqueue']",
+                                            "top": 1
+                                          },
+                                          "authentication": "@parameters('$authentication')"
+                                        }
+                                      },
+                                      "Apply_to_each_4": {
+                                        "foreach": "@outputs('Search_for_users_(V2)_4')?['body/value']",
+                                        "actions": {
+                                          "Run_Set-CsCallQueueOverFlowAction_-_other:_user_voice_app": {
+                                            "runAfter": {},
+                                            "type": "Http",
+                                            "inputs": {
+                                              "method": "POST",
+                                              "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Set-CallQueueOverFlowAction",
+                                              "headers": {
+                                                "x-functions-key": "@parameters('VAR - FunctionKey (new_VARFunctionKey)')"
+                                              },
+                                              "body": {
+                                                "OverflowAction": "@triggerOutputs()?['body/Calloverflowaction/Value']",
+                                                "OverflowTarget": "@items('Apply_to_each_4')?['UserPrincipalName']",
+                                                "Identity": "@triggerOutputs()?['body/Title']"
+                                              },
+                                              "authentication": {
+                                                "type": "ActiveDirectoryOAuth",
+                                                "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+                                                "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                                "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                                "secret": "@outputs('Get_secret')?['body/value']"
+                                              }
+                                            }
+                                          },
+                                          "Set_HTTP_status:_voicemail_-_other:_user_voice_app": {
+                                            "runAfter": {
+                                              "Run_Set-CsCallQueueOverFlowAction_-_other:_user_voice_app": [
+                                                "Succeeded"
+                                              ]
+                                            },
+                                            "type": "SetVariable",
+                                            "inputs": {
+                                              "name": "HTTPStatus",
+                                              "value": "@outputs('Run_Set-CsCallQueueOverFlowAction_-_other:_user_voice_app')['statusCode']"
+                                            }
+                                          }
+                                        },
+                                        "runAfter": {
+                                          "Search_for_users_(V2)_4": [
+                                            "Succeeded"
+                                          ]
+                                        },
+                                        "type": "Foreach"
+                                      }
+                                    },
+                                    "runAfter": {},
+                                    "else": {
+                                      "actions": {
+                                        "Run_Set-CsCallQueueOverFlowAction_-_other": {
+                                          "runAfter": {},
+                                          "type": "Http",
+                                          "inputs": {
+                                            "method": "POST",
+                                            "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Set-CallQueueOverFlowAction",
+                                            "headers": {
+                                              "x-functions-key": "@parameters('VAR - FunctionKey (new_VARFunctionKey)')"
+                                            },
+                                            "body": {
+                                              "OverflowAction": "@triggerOutputs()?['body/Calloverflowaction/Value']",
+                                              "OverflowTarget": "@triggerOutputs()?['body/Maximumcallsinqueue']",
+                                              "Identity": "@triggerOutputs()?['body/Title']"
+                                            },
+                                            "authentication": {
+                                              "type": "ActiveDirectoryOAuth",
+                                              "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+                                              "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                              "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                              "secret": "@outputs('Get_secret')?['body/value']"
+                                            }
+                                          }
+                                        },
+                                        "Set_HTTP_status:_voicemail_-_other": {
+                                          "runAfter": {
+                                            "Run_Set-CsCallQueueOverFlowAction_-_other": [
+                                              "Succeeded"
+                                            ]
+                                          },
+                                          "type": "SetVariable",
+                                          "inputs": {
+                                            "name": "HTTPStatus",
+                                            "value": "@outputs('Run_Set-CsCallQueueOverFlowAction_-_other')['statusCode']"
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "expression": {
+                                      "or": [
+                                        {
+                                          "equals": [
+                                            "@triggerOutputs()?['body/Calloverflowaction/Value']",
+                                            "Redirect: Person in organization"
+                                          ]
+                                        },
+                                        {
+                                          "equals": [
+                                            "@triggerOutputs()?['body/Calloverflowaction/Value']",
+                                            "Redirect: Voice app"
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    "type": "If"
+                                  }
+                                }
+                              },
+                              "expression": "@triggerOutputs()?['body/Calloverflowaction/Value']",
+                              "metadata": {
+                                "operationMetadataId": "edd278ef-cb75-4f25-b9de-18d506685c56"
+                              },
+                              "type": "Switch"
+                            }
+                          }
+                        },
+                        "expression": {
+                          "equals": [
+                            "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/Calloverflowthreshold']",
+                            "@true"
+                          ]
+                        },
+                        "metadata": {
+                          "operationMetadataId": "bdf370ec-e173-496d-84c7-c2adc163601d"
+                        },
+                        "type": "If"
+                      }
+                    }
+                  },
+                  "expression": {
+                    "and": [
+                      {
+                        "equals": [
+                          "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/Calloverflowaction']",
+                          "@false"
+                        ]
+                      },
+                      {
+                        "equals": [
+                          "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/Maximumcallsinqueue']",
+                          "@false"
+                        ]
+                      },
+                      {
+                        "equals": [
+                          "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/Calloverflowthreshold']",
+                          "@true"
+                        ]
+                      }
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "83ba82d5-a803-47fc-8014-9eb8308c6511"
+                  },
+                  "type": "If"
+                }
+              },
+              "runAfter": {
+                "Check_if_time-out_settings_have_been_updated": [
+                  "Succeeded"
+                ]
+              },
+              "expression": {
+                "or": [
+                  {
+                    "equals": [
+                      "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/Calloverflowaction']",
+                      "@true"
+                    ]
+                  },
+                  {
+                    "equals": [
+                      "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/Calloverflowthreshold']",
+                      "@true"
+                    ]
+                  },
+                  {
+                    "equals": [
+                      "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/Maximumcallsinqueue']",
+                      "@true"
+                    ]
+                  }
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "0348ff4c-712b-4774-b179-6ea9a1c734af"
+              },
+              "type": "If"
+            },
+            "Condition_4": {
+              "actions": {
+                "Update_item": {
+                  "runAfter": {},
+                  "metadata": {
+                    "operationMetadataId": "53ea08b9-babe-4646-9604-2bf113020111"
+                  },
+                  "type": "OpenApiConnection",
+                  "inputs": {
+                    "host": {
+                      "connectionName": "shared_sharepointonline_1",
+                      "operationId": "PatchItem",
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                    },
+                    "parameters": {
+                      "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                      "table": "@parameters('VAR - SPO List - Call Queue Management (new_VARSPOListCallQueueManagement)')",
+                      "id": "@triggerOutputs()?['body/ID']",
+                      "item/Title": "@triggerOutputs()?['body/Title']",
+                      "item/Greetingtype/Value": "@triggerOutputs()?['body/Greetingtype/Value']",
+                      "item/Alerttime": "@triggerOutputs()?['body/Alerttime']",
+                      "item/MusiconHoldType/Value": "@triggerOutputs()?['body/MusiconHoldType/Value']",
+                      "item/MusiconHold": "@triggerOutputs()?['body/MusiconHold']",
+                      "item/Callagentalerttime": "@triggerOutputs()?['body/Callagentalerttime']",
+                      "item/Calloverflowthreshold": "@triggerOutputs()?['body/Calloverflowthreshold']",
+                      "item/Calloverflowaction/Value": "@triggerOutputs()?['body/Calloverflowaction/Value']",
+                      "item/Maximumcallsinqueue": "@triggerOutputs()?['body/Maximumcallsinqueue']",
+                      "item/CalloverflowSharedVoicemailtarge": "@triggerOutputs()?['body/CalloverflowSharedVoicemailtarge']",
+                      "item/Calloverflowsharedvoicemailtype/Value": "@triggerOutputs()?['body/CalloverflowSharedVoicemailtarge']",
+                      "item/Calloverflowaudio": "@triggerOutputs()?['body/Calloverflowaudio']",
+                      "item/Calloverflowtext": "@triggerOutputs()?['body/Calloverflowtext']",
+                      "item/CallTimeoutHandling/Value": "@triggerOutputs()?['body/CallTimeoutHandling/Value']",
+                      "item/Target": "@triggerOutputs()?['body/Target']",
+                      "item/CallTimeoutSharedVoicemailtarget": "@triggerOutputs()?['body/CallTimeoutSharedVoicemailtarget']",
+                      "item/Calltimeoutsharedvoicemailtype/Value": "@triggerOutputs()?['body/Calltimeoutsharedvoicemailtype/Value']",
+                      "item/Calltimeoutaudio": "@triggerOutputs()?['body/Calltimeoutaudio']",
+                      "item/Calltimeouttext": "@triggerOutputs()?['body/Calltimeouttext']",
+                      "item/CalltimeoutMaximumwaittime": "@triggerOutputs()?['body/CalltimeoutMaximumwaittime']",
+                      "item/Provisioningstatus/Value": "provisioned"
+                    },
+                    "authentication": "@parameters('$authentication')"
+                  }
+                }
+              },
+              "runAfter": {
+                "Check_if_call_overflow_settings_have_been_updated": [
+                  "Succeeded"
+                ]
+              },
+              "expression": {
+                "equals": [
+                  "@variables('Result')",
+                  "Success"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "be496830-ba51-4456-8713-0105c5f349c4"
+              },
+              "type": "If"
+            }
+          },
+          "runAfter": {
+            "Initialize_variable_HTTPStatus": [
+              "Succeeded"
+            ]
+          },
+          "expression": {
+            "equals": [
+              "@triggerOutputs()?['body/Provisioningstatus/Value']",
+              "not provisioned"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "0e872e95-0320-40df-8928-31417c02529a"
+          },
+          "type": "If"
+        },
+        "Initialize_variable_action": {
+          "runAfter": {},
+          "metadata": {
+            "operationMetadataId": "6897a463-e3bc-4910-a980-0cfa6e574959"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "Action",
+                "type": "string",
+                "value": "none"
+              }
+            ]
+          }
+        },
+        "Initizalize_variable_result": {
+          "runAfter": {
+            "Initialize_variable_action": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "6c67085b-025b-4d60-8be9-2b19da54348d"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "Result",
+                "type": "string",
+                "value": "failed"
+              }
+            ]
+          }
+        },
+        "Initialize_variable_identity": {
+          "runAfter": {
+            "Initizalize_variable_result": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "fd625bdd-a9e4-4a8f-af35-e351a9ee87de"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "Identity",
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "Initialize_variable_HTTPStatus": {
+          "runAfter": {
+            "Initialize_variable_identity": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "c629b0ed-b568-4889-a41a-d61c58c3fd8e"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "HTTPStatus",
+                "type": "integer"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}

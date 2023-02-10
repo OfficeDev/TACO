@@ -1,0 +1,2247 @@
+"'Call Queue Edit Screen' As screen":
+    Fill: =RGBA(243, 242, 241, 1)
+    Height: =Max(App.Height, App.DesignHeight)
+    OnHidden: =ResetForm(frm_CallQueue);
+    OnVisible: |-
+        =UpdateContext({
+            locShowValidation: {
+                AgentAlertTime: false,
+                OverflowThreshold: false,        
+                OverflowTarget: false,
+                OverflowVoicemailTarget: false,
+                TimeoutThreshold: false,
+                TimeoutTarget: false,
+                TimeoutVoicemailTarget: false
+            }
+        });
+        UpdateContext({
+            locDropBoxUpdated:
+                {
+                    GreetingType: false,
+                    MoHType: false,
+                    CallOverflowAction: false,
+                    CallTimeoutAction: false
+                }
+        });
+        
+        UpdateContext({
+            locThresholdsUpdated:
+                {
+                    AgentAlertTime: false
+                }
+        });
+        
+        UpdateContext({
+            locUPN:
+                {
+                    CallOverflow: "",
+                    TimeOut: ""
+                }
+        });
+        
+        UpdateContext({locUPN:
+            Patch(locUPN, {CallOverflow: First(Office365Users.SearchUser({searchTerm:txt_CallOverflowTarget.Text})).DisplayName})
+        });
+        
+        UpdateContext({locUPN:
+            Patch(locUPN, {CallTimeOut: First(Office365Users.SearchUser({searchTerm:txt_CallTimeoutTarget.Text})).DisplayName})
+        });
+        
+        If(CurrentTab = "Greeting and Music" Or locCurrentTab = Blank(), Set(locCurrentTab, "Greeting and Music"));
+    Width: =Max(App.Width, App.DesignWidth)
+
+    rec_AutAttendantForm_BottomButtons_bar_4 As rectangle:
+        Fill: =RGBA(255, 255, 255, 1)
+        Height: =92
+        Width: =1306
+        X: =60
+        Y: =676
+        ZIndex: =1
+
+    rec_AutoAttendantName_bar_2 As rectangle:
+        Fill: =RGBA(202, 202, 202, 1)
+        Height: =80
+        Width: =Parent.Width - cmp_left_menu_1.Width
+        X: =cmp_left_menu_1.X + cmp_left_menu_1.Width
+        Y: =cmp_header_1.Y + cmp_header.Height
+        ZIndex: =2
+
+    cmp_header As header_bar:
+        ZIndex: =3
+
+    cmp_left_menu As left_menu_bar:
+        Default: ="Call Queues Screen"
+        Height: =703
+        Y: =65
+        ZIndex: =4
+
+    btn_CallQueueMenu_GreetingMusic As button:
+        Align: =Center
+        BorderThickness: =0
+        Color: =RGBA(0, 0, 0, 1)
+        Fill: =RGBA(0, 0, 0, 0)
+        FontWeight: =If(locCurrentTab = "Greeting and Music", FontWeight.Bold,FontWeight.Normal)
+        Height: =32
+        HoverColor: =Black
+        HoverFill: =RGBA(0, 0, 0, 0)
+        OnSelect: =Set(locCurrentTab, Self.Text)
+        PressedColor: =Black
+        PressedFill: =RGBA(0,0,0,0)
+        RadiusBottomLeft: =0
+        RadiusBottomRight: =0
+        RadiusTopLeft: =0
+        RadiusTopRight: =0
+        Size: =10
+        Text: ="Greeting and Music"
+        X: =123
+        Y: =110
+        ZIndex: =6
+
+    btn_CallQueueMenu_CallOverflow As button:
+        Align: =Center
+        BorderThickness: =0
+        Color: =RGBA(0, 0, 0, 1)
+        Fill: =RGBA(0, 0, 0, 0)
+        FontWeight: =If(locCurrentTab = "Call Overflow Handling", FontWeight.Bold,FontWeight.Normal)
+        Height: =32
+        HoverColor: =Black
+        HoverFill: =RGBA(0, 0, 0, 0)
+        OnSelect: =Set(locCurrentTab, Self.Text)
+        PressedColor: =Black
+        PressedFill: =RGBA(0,0,0,0)
+        RadiusBottomLeft: =0
+        RadiusBottomRight: =0
+        RadiusTopLeft: =0
+        RadiusTopRight: =0
+        Size: =10
+        Text: ="Call Overflow Handling"
+        Width: =180
+        X: =btn_CallQueueMenu_AgentAlerting.X+btn_CallQueueMenu_AgentAlerting.Width
+        Y: =110
+        ZIndex: =7
+
+    btn_CallQueueMenu_CallTimeout As button:
+        Align: =Center
+        BorderThickness: =0
+        Color: =RGBA(0, 0, 0, 1)
+        Fill: =RGBA(0, 0, 0, 0)
+        FontWeight: =If(locCurrentTab = "Call Timeout Handling", FontWeight.Bold,FontWeight.Normal)
+        Height: =32
+        HoverColor: =Black
+        HoverFill: =RGBA(0, 0, 0, 0)
+        OnSelect: =Set(locCurrentTab, Self.Text)
+        PressedColor: =Black
+        PressedFill: =RGBA(0,0,0,0)
+        RadiusBottomLeft: =0
+        RadiusBottomRight: =0
+        RadiusTopLeft: =0
+        RadiusTopRight: =0
+        Size: =10
+        Text: ="Call Timeout Handling"
+        Width: =185
+        X: =btn_CallQueueMenu_CallOverflow.X+btn_CallQueueMenu_CallOverflow.Width
+        Y: =110
+        ZIndex: =8
+
+    frm_CallQueue As form:
+        AcceptsFocus: =false
+        DataSource: ='Call Queue management'
+        Height: =467
+        Item: =gal_CallQueues.Selected
+        NumberOfColumns: =1
+        OnFailure: |-
+            =Notify(
+                "Failed: form was not saved due to an error",
+                NotificationType.Error
+            );
+        OnSuccess: |-
+            =Notify(
+                "Success: form was successfully saved",
+                NotificationType.Success
+            );
+        Width: =950
+        X: =107
+        Y: =212
+        ZIndex: =9
+
+        "'Provisioning status_DataCard1' As typedDataCard.comboBoxEditCard":
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Provisioningstatus"
+            Default: =ThisItem.'Provisioning status'
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: =DataSourceInfo([@'Call Queue management'],DataSourceInfo.DisplayName,"Provisioningstatus")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =DataCardValue66.Selected
+            Visible: =false
+            Width: =950
+            X: =0
+            Y: =20
+            ZIndex: =1
+
+            DataCardKey31 As label:
+                AutoHeight: =true
+                Height: =34
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            DataCardValue66 As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                DefaultSelectedItems: =If(frm_CallQueue.Unsaved,LookUp(Choices('Call Queue management'.'Provisioning status'),Value="not provisioned"),Parent.Default)
+                DisplayFields: =["Value"]
+                DisplayMode: =Parent.DisplayMode
+                IsSearchable: =false
+                Items: =Choices([@'Call Queue management'].'Provisioning status')
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["Value"]
+                SearchItems: =[]
+                SelectMultiple: =false
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardKey31.Y + DataCardKey31.Height + 5
+                ZIndex: =2
+
+            ErrorMessage66 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue66.Y + DataCardValue66.Height
+                ZIndex: =3
+
+            StarVisible66 As label:
+                Align: =Align.Center
+                Height: =DataCardKey31.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey31.Y
+                ZIndex: =4
+
+        crd_CallQueueForm_CallQueueTitle As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Title"
+            Default: =ThisItem.Name
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: =DataSourceInfo([@'Call Queue management'],DataSourceInfo.DisplayName,"Title")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            MaxLength: =DataSourceInfo([@'Call Queue management'], DataSourceInfo.MaxLength, "Title")
+            Required: =true
+            Update: =txt_CallQueueTitle_Name.Text
+            Visible: =false
+            Width: =950
+            X: =0
+            Y: =0
+            ZIndex: =9
+
+            lbl_CallQueueTitle_Name As label:
+                AutoHeight: =true
+                Height: =34
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            txt_CallQueueTitle_Name As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                MaxLength: =Parent.MaxLength
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =lbl_CallQueueTitle_Name.Y + lbl_CallQueueTitle_Name.Height + 5
+                ZIndex: =2
+
+            lbl_CallQueueTitle_ErrorMessage As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =txt_CallQueueTitle_Name.Y + txt_CallQueueTitle_Name.Height
+                ZIndex: =3
+
+            lbl_CallQueueTitle_Star As label:
+                Align: =Align.Center
+                Height: =lbl_CallQueueTitle_Name.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =lbl_CallQueueTitle_Name.Y
+                ZIndex: =4
+
+        crd_CallQueueForm_CallQueueGreetingType As typedDataCard.comboBoxEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Greetingtype"
+            Default: =ThisItem.'Greeting type'
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = txt_CallQueueTitle_Name.Text, CQ_AllowChangeGreeting) = true,Parent.DisplayMode,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Call Queue management'],DataSourceInfo.DisplayName,"Greetingtype")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =drp_CallQueueGreetingType.Selected
+            Visible: =locCurrentTab="Greeting and music"
+            Width: =950
+            X: =0
+            Y: =1
+            ZIndex: =9
+
+            lbl_CallQueueGreetingType As label:
+                AutoHeight: =true
+                Height: =34
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            drp_CallQueueGreetingType As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                DefaultSelectedItems: =Parent.Default
+                DisplayFields: =["Value"]
+                DisplayMode: =Parent.DisplayMode
+                IsSearchable: =false
+                Items: =Choices([@'Call Queue management'].'Greeting type')
+                OnChange: |-
+                    =UpdateContext({locDropBoxUpdated: 
+                        Patch(locDropBoxUpdated, {GreetingType: true})
+                    });
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["Value"]
+                SearchItems: =[]
+                SelectMultiple: =false
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 700
+                X: =30
+                Y: =lbl_CallQueueGreetingType.Y + lbl_CallQueueGreetingType.Height + 5
+                ZIndex: =2
+
+            lbl_CallQueueGreetingType_ErrorMessage As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =drp_CallQueueGreetingType.Y + drp_CallQueueGreetingType.Height
+                ZIndex: =3
+
+            lbl_CallQueueGreetingType_Star As label:
+                Align: =Align.Center
+                Height: =lbl_CallQueueGreetingType.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =lbl_CallQueueGreetingType.Y
+                ZIndex: =4
+
+        crd_CallQueueForm_CallQueueGreeting As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Alerttime"
+            Default: =If(([@GreetingAudioPromptFile] = "" Or [@GreetingAudioPromptFile] = Blank()) And drp_CallQueueGreetingType.Selected.Value = "Custom" And locDropBoxUpdated.GreetingType = false,ThisItem.Greeting,[@GreetingAudioPromptFile])
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = txt_CallQueueTitle_Name.Text, CQ_AllowChangeGreeting) = true,Parent.DisplayMode,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Call Queue management'],DataSourceInfo.DisplayName,"Alerttime")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            MaxLength: =DataSourceInfo([@'Call Queue management'], DataSourceInfo.MaxLength, "Alerttime")
+            Required: =false
+            Update: =txt_CallQueueGreeting_FileName.Text
+            Visible: =locCurrentTab="Greeting and Music" And drp_CallQueueGreetingType.Selected.Value = "Custom"
+            Width: =950
+            X: =0
+            Y: =2
+            ZIndex: =9
+
+            lbl_CallQueueGreeting_FileName As label:
+                AutoHeight: =true
+                Height: =34
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            txt_CallQueueGreeting_FileName As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                MaxLength: =Parent.MaxLength
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Tooltip: =Parent.DisplayName
+                Width: |
+                    =Parent.Width - 700
+                X: =30
+                Y: =lbl_CallQueueGreeting_FileName.Y + lbl_CallQueueGreeting_FileName.Height + 5
+                ZIndex: =2
+
+            lbl_CallQueueGreeting_ErrorMessage As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =txt_CallQueueGreeting_FileName.Y + txt_CallQueueGreeting_FileName.Height
+                ZIndex: =3
+
+            lbl_CallQueueGreeting_Star As label:
+                Align: =Align.Center
+                Height: =lbl_CallQueueGreeting_FileName.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =lbl_CallQueueGreeting_FileName.Y
+                ZIndex: =4
+
+            btn_CallQueueGreeting_Edit As icon.Add:
+                Height: =40
+                Icon: =Icon.Edit
+                OnSelect: |-
+                    =UpdateContext({
+                        locShowPopupForm: true,
+                        locPromptType: "greeting"
+                    });
+                Width: =40
+                X: =txt_CallQueueGreeting_FileName.X + txt_CallQueueGreeting_FileName.Width + 5
+                Y: =txt_CallQueueGreeting_FileName.Y
+                ZIndex: =5
+
+        crd_CallQueueForm_CallQueueMoHType As typedDataCard.comboBoxEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="MusiconHoldType"
+            Default: =ThisItem.'Music on Hold Type'
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = txt_CallQueueTitle_Name.Text, CQ_AllowChangeMoH) = true,Parent.DisplayMode,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Call Queue management'],DataSourceInfo.DisplayName,"MusiconHoldType")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =drp_CallQueueMoHType.Selected
+            Visible: =locCurrentTab="Greeting and Music"
+            Width: =950
+            X: =0
+            Y: =3
+            ZIndex: =9
+
+            lbl_CallQueueMoHType As label:
+                AutoHeight: =true
+                Color: =ColorValue(HeaderColor)
+                FontWeight: =Semibold
+                Height: =34
+                Size: =11
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            drp_CallQueueMoHType As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =1
+                ChevronBackground: =ColorValue(HeaderColor)
+                DefaultSelectedItems: =Parent.Default
+                DisplayFields: =["Value"]
+                DisplayMode: =Parent.DisplayMode
+                Height: =35
+                IsSearchable: =false
+                Items: =Choices([@'Call Queue management'].'Music on Hold Type')
+                OnChange: |-
+                    =UpdateContext({locDropBoxUpdated: 
+                        Patch(locDropBoxUpdated, {MohType: true})
+                    });
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["Value"]
+                SearchItems: =[]
+                SelectMultiple: =false
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 700
+                X: =30
+                Y: =lbl_CallQueueMoHType.Y + lbl_CallQueueMoHType.Height + 5
+                ZIndex: =2
+
+            lbl_CallQueueMoHType_ErrorMessage As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =drp_CallQueueMoHType.Y + drp_CallQueueMoHType.Height
+                ZIndex: =3
+
+            lbl_CallQueueMoHType_Star As label:
+                Align: =Align.Center
+                Height: =lbl_CallQueueMoHType.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =lbl_CallQueueMoHType.Y
+                ZIndex: =4
+
+        crd_CallQueueForm_CallQueueMoH As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="MusiconHold"
+            Default: =If(([@MoHAudioPromptFile] = "" Or [@MoHAudioPromptFile] = Blank()) And drp_CallQueueMoHType.Selected.Value = "Custom" And locDropBoxUpdated.MoHType = false,ThisItem.'Music on Hold',[@MoHAudioPromptFile])
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = txt_CallQueueTitle_Name.Text, CQ_AllowChangeMoH) = true,Parent.DisplayMode,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Call Queue management'],DataSourceInfo.DisplayName,"MusiconHold")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =
+            MaxLength: =DataSourceInfo([@'Call Queue management'], DataSourceInfo.MaxLength, "MusiconHold")
+            Required: =false
+            Update: =txt_CallQueueMoH_FileName.Text
+            Visible: =locCurrentTab="Greeting and Music" And drp_CallQueueMoHType.Selected.Value = "Custom"
+            Width: =950
+            X: =0
+            Y: =4
+            ZIndex: =9
+
+            lbl_CallQueueMoH_FileName As label:
+                AutoHeight: =true
+                Color: =ColorValue(HeaderColor)
+                FontWeight: =Semibold
+                Height: =34
+                Size: =11
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            txt_CallQueueMoH_FileName As text:
+                BorderColor: =If(IsBlank(Parent.Error), ColorValue(HeaderColor), Color.Red)
+                BorderThickness: =1
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                Height: =35
+                MaxLength: =Parent.MaxLength
+                OnChange: =
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 700
+                X: =30
+                Y: =lbl_CallQueueMoH_FileName.Y + lbl_CallQueueMoH_FileName.Height + 5
+                ZIndex: =2
+
+            lbl_CallQueueMoH_ErrorMessage As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =txt_CallQueueMoH_FileName.Y + txt_CallQueueMoH_FileName.Height
+                ZIndex: =3
+
+            lbl_CallQueueMoH_Star As label:
+                Align: =Align.Center
+                Height: =lbl_CallQueueMoH_FileName.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =lbl_CallQueueMoH_FileName.Y
+                ZIndex: =4
+
+            btn_CallQueueMoH_Edit As icon.Add:
+                Color: =ColorValue(HeaderColor)
+                Height: =36
+                Icon: =Icon.Edit
+                OnSelect: |-
+                    =UpdateContext({
+                        locShowPopupForm: true,
+                        locPromptType: "music on hold"
+                    });
+                Width: =36
+                X: =txt_CallQueueMoH_FileName.X + txt_CallQueueMoH_FileName.Width + 5
+                Y: =txt_CallQueueMoH_FileName.Y
+                ZIndex: =5
+
+        crd_CallQueueForm_AgentAlertTime As typedDataCard.numberEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Callagentalerttime"
+            Default: =ThisItem.'Call agent alert time'
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = txt_CallQueueTitle_Name.Text, CQ_AllowChangeAgentAlertTime) = true,Parent.DisplayMode,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Call Queue management'],DataSourceInfo.DisplayName,"Callagentalerttime")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =87
+            Required: =false
+            Update: =Value(txt_AgentAlertTime.Text)
+            Visible: =locCurrentTab="Agent Alerting"
+            Width: =950
+            X: =0
+            Y: =5
+            ZIndex: =9
+
+            lbl_AgentAlertTime As label:
+                AutoHeight: =true
+                Color: =ColorValue(HeaderColor)
+                FontWeight: =Semibold
+                Height: =34
+                Size: =11
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            txt_AgentAlertTime As text:
+                Align: =Align.Center
+                BorderColor: =If(IsBlank(Parent.Error), ColorValue(HeaderColor), Color.Red)
+                BorderThickness: =1
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                Format: =TextFormat.Number
+                Height: =35
+                OnChange: |-
+                    =UpdateContext({locShowValidation: 
+                        Patch(locShowValidation, {AgentAlertTime: true})
+                    });
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 900
+                X: =30
+                Y: =lbl_AgentAlertTime.Y + lbl_AgentAlertTime.Height + 5
+                ZIndex: =2
+
+            lbl_AgentAlertTime_ErrorMessage As label:
+                AutoHeight: =true
+                Color: =Red
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: ="Value should be an increment of 15"
+                Visible: =ico_AgentAlertTime_Validation.Icon = Icon.Cancel And ico_AgentAlertTime_Validation.Visible
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =txt_AgentAlertTime.Y + txt_AgentAlertTime.Height
+                ZIndex: =3
+
+            lbl_AgentAlertTime_Star As label:
+                Align: =Align.Center
+                Height: =lbl_AgentAlertTime.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =lbl_AgentAlertTime.Y
+                ZIndex: =4
+
+            ico_AgentAlertTime_Validation As icon.Add:
+                BorderColor: =If(Self.Icon=Icon.Check, DarkGreen, DarkRed)
+                Color: =White
+                Fill: =If(Self.Icon=Icon.Check, Green, Red)
+                Height: =40
+                Icon: |
+                    =If(
+                        Value(txt_AgentAlertTime.Text) = RoundDown(txt_AgentAlertTime.Text/15, 0)*15, Icon.Check, Icon.Cancel
+                    )
+                Visible: =locShowValidation.AgentAlertTime
+                Width: =40
+                X: =txt_AgentAlertTime + txt_AgentAlertTime.Width + 5
+                Y: =lbl_AgentAlertTime.Y + lbl_AgentAlertTime.Height + 5
+                ZIndex: =5
+
+        crd_CallQueueForm_MaxWaitTime As typedDataCard.numberEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="CalltimeoutMaximumwaittime"
+            Default: =ThisItem.'Call timeout Maximum wait time'
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = txt_CallQueueTitle_Name.Text, CQ_AllowChangeCallOverflow) = true,Parent.DisplayMode,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Call Queue management'],DataSourceInfo.DisplayName,"CalltimeoutMaximumwaittime")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =87
+            Required: =false
+            Update: =Value(txt_MaxWaitTime.Text)
+            Visible: =locCurrentTab="Call Timeout Handling"
+            Width: =950
+            X: =0
+            Y: =6
+            ZIndex: =9
+
+            lbl_MaxWaitTime As label:
+                AutoHeight: =true
+                Color: =ColorValue(HeaderColor)
+                FontWeight: =Semibold
+                Height: =34
+                Size: =11
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            txt_MaxWaitTime As text:
+                Align: =Align.Center
+                BorderColor: =If(IsBlank(Parent.Error), ColorValue(HeaderColor), Color.Red)
+                BorderThickness: =1
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                Format: =TextFormat.Number
+                Height: =35
+                OnChange: |-
+                    =UpdateContext({locShowValidation: 
+                        Patch(locShowValidation, {TimeoutThreshold: true})
+                    });
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 900
+                X: =30
+                Y: =lbl_MaxWaitTime.Y + lbl_MaxWaitTime.Height + 5
+                ZIndex: =2
+
+            lbl_MaxWaitTime_Star As label:
+                Align: =Align.Center
+                Height: =lbl_MaxWaitTime.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =lbl_MaxWaitTime.Y
+                ZIndex: =4
+
+            ico_MaxWaitTime_Validation As icon.Add:
+                BorderColor: =If(Self.Icon=Icon.Check, DarkGreen, DarkRed)
+                Color: =White
+                Fill: =If(Self.Icon=Icon.Check, Green, Red)
+                Height: =40
+                Icon: |
+                    =If(
+                        Value(txt_MaxWaitTime.Text) = RoundDown(txt_MaxWaitTime.Text/15, 0)*15, Icon.Check, Icon.Cancel
+                    )
+                Visible: =locShowValidation.AgentAlertTime
+                Width: =40
+                X: =txt_MaxWaitTime.X + txt_MaxWaitTime.Width + 5
+                Y: =lbl_MaxWaitTime.Y + lbl_MaxWaitTime.Height + 5
+                ZIndex: =5
+
+            lbl_MaxWaitTime_ErrorMessage As label:
+                AutoHeight: =true
+                Color: =Red
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: ="Value should be an increment of 15"
+                Visible: =ico_MaxWaitTime_Validation.Icon = Icon.Cancel And ico_MaxWaitTime_Validation.Visible
+                Width: =Parent.Width - 60
+                X: =40
+                Y: =txt_AgentAlertTime.Y + txt_AgentAlertTime.Height
+                ZIndex: =6
+
+        crd_CallQueueForm_TimeOutHandling As typedDataCard.comboBoxEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="CallTimeoutHandling"
+            Default: =ThisItem.'Call Timeout Handling'
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = txt_CallQueueTitle_Name.Text, CQ_AllowChangeCallTimeout) = true,Parent.DisplayMode,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Call Queue management'],DataSourceInfo.DisplayName,"CallTimeoutHandling")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =drp_TimeOutHandling.Selected
+            Visible: =locCurrentTab="Call Timeout Handling"
+            Width: =950
+            X: =0
+            Y: =7
+            ZIndex: =9
+
+            lbl_TimeOutHandling As label:
+                AutoHeight: =true
+                Color: =ColorValue(HeaderColor)
+                FontWeight: =Semibold
+                Height: =34
+                Size: =11
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            drp_TimeOutHandling As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), ColorValue(HeaderColor), Color.Red)
+                BorderThickness: =1
+                ChevronBackground: =ColorValue(HeaderColor)
+                DefaultSelectedItems: =Parent.Default
+                DisplayFields: =["Value"]
+                DisplayMode: =Parent.DisplayMode
+                IsSearchable: =false
+                Items: =Choices([@'Call Queue management'].'Call Timeout Handling')
+                OnChange: |-
+                    =UpdateContext({locDropBoxUpdated: 
+                        Patch(locDropBoxUpdated, {CallTimeoutAction: true})
+                    });
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["Value"]
+                SearchItems: =[]
+                SelectMultiple: =false
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                Width: |
+                    =Parent.Width - 600
+                X: =30
+                Y: =lbl_TimeOutHandling.Y + lbl_TimeOutHandling.Height + 5
+                ZIndex: =2
+
+            lbl_TimeOutHandling_ErrorMessage As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =drp_TimeOutHandling.Y + drp_TimeOutHandling.Height
+                ZIndex: =3
+
+            lbl_TimeOutHandling_Star As label:
+                Align: =Align.Center
+                Height: =lbl_TimeOutHandling.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =lbl_TimeOutHandling.Y
+                ZIndex: =4
+
+        crd_CallQueueForm_CallOverflowThreshold As typedDataCard.numberEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Calloverflowthreshold"
+            Default: =ThisItem.'Call overflow threshold'
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = txt_CallQueueTitle_Name.Text, CQ_AllowChangeCallOverflow) = true,Parent.DisplayMode,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Call Queue management'],DataSourceInfo.DisplayName,"Calloverflowthreshold")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =87
+            Required: =false
+            Update: =Value(txt_CallOverflowThreshold.Text)
+            Visible: =locCurrentTab="Call Overflow Handling"
+            Width: =950
+            X: =0
+            Y: =8
+            ZIndex: =9
+
+            lbl_CallOverflowThreshold As label:
+                AutoHeight: =true
+                Color: =ColorValue(HeaderColor)
+                FontWeight: =Semibold
+                Height: =34
+                Size: =11
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            txt_CallOverflowThreshold As text:
+                Align: =Align.Center
+                BorderColor: =If(IsBlank(Parent.Error), ColorValue(HeaderColor), Color.Red)
+                BorderThickness: =1
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                Format: =TextFormat.Number
+                Height: =35
+                OnChange: |-
+                    =UpdateContext({locShowValidation: 
+                        Patch(locShowValidation, {OverflowThreshold: true})
+                    });
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 900
+                X: =30
+                Y: =lbl_CallOverflowThreshold.Y + lbl_CallOverflowThreshold.Height + 5
+                ZIndex: =2
+
+            lbl_CallOverflowThreshold_ErrorMessage As label:
+                AutoHeight: =true
+                Color: =Red
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: ="Value should be an increment of 15"
+                Visible: =ico_CallOverflowThreshold_Validation.Icon = Icon.Cancel And ico_CallOverflowThreshold_Validation.Visible
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =txt_CallOverflowThreshold.Y + txt_CallOverflowThreshold.Height
+                ZIndex: =3
+
+            lbl_CallOverflowThreshold_Star As label:
+                Align: =Align.Center
+                Height: =lbl_CallOverflowThreshold.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =lbl_CallOverflowThreshold.Y
+                ZIndex: =4
+
+            ico_CallOverflowThreshold_Validation As icon.Add:
+                BorderColor: =If(Self.Icon=Icon.Check, DarkGreen, DarkRed)
+                Color: =White
+                Fill: =If(Self.Icon=Icon.Check, Green, Red)
+                Height: =40
+                Icon: |
+                    =If(
+                        Value(txt_CallOverflowThreshold.Text) = RoundDown(txt_CallOverflowThreshold.Text/15, 0)*15, Icon.Check, Icon.Cancel
+                    )
+                Visible: =locShowValidation.AgentAlertTime
+                Width: =40
+                X: =txt_MaxWaitTime.X + txt_MaxWaitTime.Width + 5
+                Y: =lbl_MaxWaitTime.Y + lbl_MaxWaitTime.Height + 5
+                ZIndex: =5
+
+        crd_CallQueueForm_CallOverflowAction As typedDataCard.comboBoxEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Calloverflowaction"
+            Default: =ThisItem.'Call overflow action'
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = txt_CallQueueTitle_Name.Text, CQ_AllowChangeCallOverflow) = true,Parent.DisplayMode,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Call Queue management'],DataSourceInfo.DisplayName,"Calloverflowaction")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =drp_CallOverflowAction.Selected
+            Visible: =locCurrentTab="Call Overflow Handling"
+            Width: =950
+            X: =0
+            Y: =9
+            ZIndex: =9
+
+            lbl_CallOverflowAction As label:
+                AutoHeight: =true
+                Color: =ColorValue(HeaderColor)
+                FontWeight: =Semibold
+                Height: =34
+                Size: =11
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            drp_CallOverflowAction As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), ColorValue(HeaderColor), Color.Red)
+                BorderThickness: =1
+                ChevronBackground: =ColorValue(HeaderColor)
+                DefaultSelectedItems: =Parent.Default
+                DisplayFields: =["Value"]
+                DisplayMode: =Parent.DisplayMode
+                Height: =35
+                IsSearchable: =false
+                Items: =Choices([@'Call Queue management'].'Call overflow action')
+                OnChange: |-
+                    =UpdateContext({locDropBoxUpdated: 
+                        Patch(locDropBoxUpdated, {CallOverflowAction: true})
+                    });
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["Value"]
+                SearchItems: =[]
+                SelectMultiple: =false
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                Width: |
+                    =Parent.Width - 600
+                X: =30
+                Y: =lbl_CallOverflowAction.Y + lbl_CallOverflowAction.Height + 5
+                ZIndex: =2
+
+            lbl_CallOverflowAction_ErrorMessage As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =drp_CallOverflowAction.Y + drp_CallOverflowAction.Height
+                ZIndex: =3
+
+            lbl_CallOverflowAction_Star As label:
+                Align: =Align.Center
+                Height: =lbl_CallOverflowAction.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =lbl_CallOverflowAction.Y
+                ZIndex: =4
+
+        crd_CallQueueForm_CallOverflowTarget As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Maximumcallsinqueue"
+            Default: =If(locDropBoxUpdated.CallOverflowAction = true, "",ThisItem.'Call overflow target')
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = txt_CallQueueTitle_Name.Text, CQ_AllowChangeCallOverflow) = true,Parent.DisplayMode,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Call Queue management'],DataSourceInfo.DisplayName,"Maximumcallsinqueue")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            MaxLength: =DataSourceInfo([@'Call Queue management'], DataSourceInfo.MaxLength, "Maximumcallsinqueue")
+            Required: =false
+            Update: =txt_CallOverflowTarget.Text
+            Visible: |-
+                =locCurrentTab="Call Overflow Handling" And (!(drp_CallOverflowAction.Selected.Value = "Redirect: Voicemail") And !(drp_CallOverflowAction.Selected.Value = "Disconnect"))
+            Width: =950
+            X: =0
+            Y: =10
+            ZIndex: =9
+
+            lbl_CallOverflowTarget As label:
+                AutoHeight: =true
+                Color: =ColorValue(HeaderColor)
+                FontWeight: =Semibold
+                Height: =34
+                Size: =11
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            txt_CallOverflowTarget As text:
+                BorderColor: =If(IsBlank(Parent.Error), ColorValue(HeaderColor), Color.Red)
+                BorderThickness: =1
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                MaxLength: =Parent.MaxLength
+                OnChange: |-
+                    =UpdateContext({locShowValidation: 
+                        Patch(locShowValidation, {OverflowTarget: true})
+                    });
+                    UpdateContext({locUPN:
+                        Patch(locUPN, {CallOverflow: First(Office365Users.SearchUser({searchTerm:txt_CallOverflowTarget.Text})).DisplayName})
+                    });
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 300
+                X: =30
+                Y: =lbl_CallOverflowTarget.Y + lbl_CallOverflowTarget.Height + 5
+                ZIndex: =2
+
+            lbl_CallOverflowTarget_ErrorMessage As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: |-
+                    =If(Parent.Error,Parent.Error,If(drp_CallOverflowAction.Selected.Value = "Redirect: Person in organization" Or drp_CallOverflowAction.Selected.Value = "Redirect: Voice app","Please validate the name provided is correct",If(drp_CallOverflowAction.Selected.Value = "Redirect: External phone number" ,"Please validate the phonenumber provided is correct")))
+                Visible: =ico_CallOverflowTarget_Validation.Icon = Icon.Cancel And ico_CallOverflowTarget_Validation.Visible
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =txt_CallOverflowTarget.Y + txt_CallOverflowTarget.Height
+                ZIndex: =3
+
+            lbl_CallOverflowTarget_Star As label:
+                Align: =Align.Center
+                Height: =lbl_CallOverflowTarget.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =lbl_CallOverflowTarget.Y
+                ZIndex: =4
+
+            ico_CallOverflowTarget_Validation As icon.Add:
+                BorderColor: =If(Self.Icon=Icon.Check, DarkGreen, DarkRed)
+                Color: =White
+                Fill: =If(Self.Icon=Icon.Check, Green, Red)
+                Height: =40
+                Icon: |
+                    =If(
+                        txt_CallOverflowTarget.Text = locUPN.CallOverflow  Or IsMatch(txt_CallOverflowTarget.Text, "^\+\d{11}"), Icon.Check, Icon.Cancel
+                    )
+                Visible: =locShowValidation.OverflowTarget
+                Width: =40
+                X: =txt_CallOverflowTarget.X + txt_CallOverflowTarget.Width + 5
+                Y: =lbl_CallOverflowTarget.Y + lbl_CallOverflowTarget.Height + 5
+                ZIndex: =5
+
+        crd_CallQueueForm_CallOverFlowTargetVoicemailType As typedDataCard.comboBoxEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Calloverflowsharedvoicemailtype"
+            Default: |-
+                =If(locDropBoxUpdated.CallOverflowAction = true, {
+                      '@odata.type':"#Microsoft.Azure.Connectors.SharePoint.SPListExpandedReference",
+                       Id:-1,
+                       Value:""}
+                   , ThisItem.'Call overflow shared voicemail type')
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = txt_CallQueueTitle_Name.Text, CQ_AllowChangeCallOverflow) = true,Parent.DisplayMode,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Call Queue management'],DataSourceInfo.DisplayName,"Calloverflowsharedvoicemailtype")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =drp_CallOverFlowTargetVoicemailType.Selected
+            Visible: |-
+                =locCurrentTab="Call Overflow Handling" And (drp_CallOverflowAction
+                .Selected.Value = "Redirect: Voicemail")
+            Width: =950
+            X: =0
+            Y: =11
+            ZIndex: =9
+
+            lbl_CallOverFlowTargetVoicemailType As label:
+                AutoHeight: =true
+                Color: =ColorValue(HeaderColor)
+                FontWeight: =Semibold
+                Height: =34
+                Size: =11
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            drp_CallOverFlowTargetVoicemailType As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), ColorValue(HeaderColor), Color.Red)
+                BorderThickness: =1
+                ChevronBackground: =ColorValue(HeaderColor)
+                DefaultSelectedItems: =Parent.Default
+                DisplayFields: =["Value"]
+                DisplayMode: =Parent.DisplayMode
+                Height: =35
+                IsSearchable: =false
+                Items: =Choices([@'Call Queue management'].'Call overflow shared voicemail type')
+                OnChange: |-
+                    =UpdateContext({locOverflowVoicemailDropDownUpdated: true})
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["Value"]
+                SearchItems: =[]
+                SelectMultiple: =false
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 700
+                X: =30
+                Y: =lbl_CallOverFlowTargetVoicemailType.Y + lbl_CallOverFlowTargetVoicemailType.Height + 5
+                ZIndex: =2
+
+            lbl_CallOverFlowTargetVoicemailType_ErrorMessage As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =drp_CallOverFlowTargetVoicemailType.Y + drp_CallOverFlowTargetVoicemailType.Height
+                ZIndex: =3
+
+            lbl_CallOverFlowTargetVoicemailType_Star As label:
+                Align: =Align.Center
+                Height: =lbl_CallOverFlowTargetVoicemailType.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =lbl_CallOverFlowTargetVoicemailType.Y
+                ZIndex: =4
+
+        crd_CallQueueForm_CallOverFlowTargetVoicemailText As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Calloverflowtext"
+            Default: =If(locOverflowVoicemailDropDownUpdated = true, "", ThisItem.'Call overflow text')
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = txt_CallQueueTitle_Name.Text, CQ_AllowChangeCallOverflow) = true,Parent.DisplayMode,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Call Queue management'],DataSourceInfo.DisplayName,"Calloverflowtext")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =170
+            MaxLength: =DataSourceInfo([@'Call Queue management'], DataSourceInfo.MaxLength, "Calloverflowtext")
+            Required: =false
+            Update: =txt_CallOverFlowTargetVoicemailText.Text
+            Visible: |-
+                =locCurrentTab="Call Overflow Handling" And drp_CallOverflowAction.Selected.Value = "Redirect: Voicemail" And drp_CallOverFlowTargetVoicemailType.Selected.Value = "text"
+            Width: =950
+            X: =0
+            Y: =12
+            ZIndex: =9
+
+            lbl_CallOverFlowTargetVoicemailText As label:
+                AutoHeight: =true
+                Height: =34
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            txt_CallOverFlowTargetVoicemailText As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                Height: =80
+                MaxLength: =Parent.MaxLength
+                Mode: =TextMode.MultiLine
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =lbl_CallOverFlowTargetVoicemailText.Y + lbl_CallOverFlowTargetVoicemailText.Height + 5
+                ZIndex: =2
+
+            lbl_CallOverFlowTargetVoicemailText_ErrorMessage As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =txt_CallOverFlowTargetVoicemailText.Y + txt_CallOverFlowTargetVoicemailText.Height
+                ZIndex: =3
+
+            lbl_CallOverFlowTargetVoicemailText_Star As label:
+                Align: =Align.Center
+                Height: =lbl_CallOverFlowTargetVoicemailText.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =lbl_CallOverFlowTargetVoicemailText.Y
+                ZIndex: =4
+
+        crd_CallQueueForm_CallOverFlowTargetVoicemailAudio As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Calloverflowaudio"
+            Default: =If(([@OverflowAudioPromptFile] = "" Or [@OverflowAudioPromptFile] = Blank()) And locDropBoxUpdated.CallOverflowAction = false,ThisItem.'Call overflow audio',[@OverflowAudioPromptFile])
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = txt_CallQueueTitle_Name.Text, CQ_AllowChangeCallOverflow) = true,Parent.DisplayMode,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Call Queue management'],DataSourceInfo.DisplayName,"Calloverflowaudio")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            MaxLength: =DataSourceInfo([@'Call Queue management'], DataSourceInfo.MaxLength, "Calloverflowaudio")
+            Required: =false
+            Update: =txt_CallOverFlowTargetVoicemailAudio_FileName.Text
+            Visible: |-
+                =locCurrentTab="Call Overflow Handling" And drp_CallOverflowAction.Selected.Value = "Redirect: Voicemail" And drp_CallOverFlowTargetVoicemailType.Selected.Value = "audio file"
+            Width: =950
+            X: =0
+            Y: =13
+            ZIndex: =9
+
+            lbl_CallOverFlowTargetVoicemailAudio_FileName As label:
+                AutoHeight: =true
+                Color: =ColorValue(HeaderColor)
+                FontWeight: =Semibold
+                Height: =34
+                Size: =11
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            txt_CallOverFlowTargetVoicemailAudio_FileName As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                MaxLength: =Parent.MaxLength
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 300
+                X: =30
+                Y: =lbl_CallOverFlowTargetVoicemailAudio_FileName.Y + lbl_CallOverFlowTargetVoicemailAudio_FileName.Height + 5
+                ZIndex: =2
+
+            ctn_CallOverFlowTargetVoicemailAudio_ErrorMessage As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =txt_CallOverFlowTargetVoicemailAudio_FileName.Y + txt_CallOverFlowTargetVoicemailAudio_FileName.Height
+                ZIndex: =3
+
+            ctn_CallOverFlowTargetVoicemailAudio_Star As label:
+                Align: =Align.Center
+                Height: =lbl_CallOverFlowTargetVoicemailAudio_FileName.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =lbl_CallOverFlowTargetVoicemailAudio_FileName.Y
+                ZIndex: =4
+
+            btn_Call_OverFlow_SharedVoicemail_Upload_1 As icon.Add:
+                Color: =ColorValue(HeaderColor)
+                Height: =36
+                Icon: =Icon.Edit
+                OnSelect: |-
+                    =UpdateContext({
+                        locShowPopupForm: true,
+                        locPromptType: "overflow voicemail prompt"
+                    });
+                Width: =36
+                X: =txt_CallOverFlowTargetVoicemailAudio_FileName.X + txt_CallOverFlowTargetVoicemailAudio_FileName.Width + 5
+                Y: =lbl_CallOverFlowTargetVoicemailAudio_FileName.Y + lbl_CallOverFlowTargetVoicemailAudio_FileName.Height + 5
+                ZIndex: =5
+
+        crd_CallQueueForm_CallOverFlowTargetVoicemailTarget As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="CalloverflowSharedVoicemailtarge"
+            Default: =If(locDropBoxUpdated.CallOverflowAction = true, "",ThisItem.'Call overflow Shared Voicemail target')
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = txt_CallQueueTitle_Name.Text, CQ_AllowChangeCallOverflow) = true,Parent.DisplayMode,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Call Queue management'],DataSourceInfo.DisplayName,"CalloverflowSharedVoicemailtarge")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            MaxLength: =DataSourceInfo([@'Call Queue management'], DataSourceInfo.MaxLength, "CalloverflowSharedVoicemailtarge")
+            Required: =false
+            Update: =txt_CallOverFlowTargetVoicemailTarget.Text
+            Visible: |-
+                =locCurrentTab="Call Overflow Handling" And drp_CallOverflowAction.Selected.Value = "Redirect: Voicemail"
+            Width: =950
+            X: =0
+            Y: =14
+            ZIndex: =9
+
+            lbl_CallOverFlowTargetVoicemailTarget As label:
+                AutoHeight: =true
+                Color: =ColorValue(HeaderColor)
+                FontWeight: =Semibold
+                Height: =34
+                Size: =11
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            txt_CallOverFlowTargetVoicemailTarget As text:
+                BorderColor: =If(IsBlank(Parent.Error), ColorValue(HeaderColor), Color.Red)
+                BorderThickness: =1
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                Height: =35
+                MaxLength: =Parent.MaxLength
+                OnChange: |-
+                    =UpdateContext({locShowValidation: 
+                        Patch(locShowValidation, {OverflowVoicemailTarget: true})
+                    });
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 300
+                X: =30
+                Y: =lbl_CallOverFlowTargetVoicemailTarget.Y + lbl_CallOverFlowTargetVoicemailTarget.Height + 5
+                ZIndex: =2
+
+            lbl_CallOverFlowTargetVoicemailTarget_ErrorMessage As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =txt_CallOverFlowTargetVoicemailTarget.Y + txt_CallOverFlowTargetVoicemailTarget.Height
+                ZIndex: =3
+
+            lbl_CallOverFlowTargetVoicemailTarget_Star As label:
+                Align: =Align.Center
+                Height: =lbl_CallOverFlowTargetVoicemailTarget.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =lbl_CallOverFlowTargetVoicemailTarget.Y
+                ZIndex: =4
+
+            ico_CallOverflowTargetVoicemailTarget_Validation As icon.Add:
+                BorderColor: =If(Self.Icon=Icon.Check, DarkGreen, DarkRed)
+                Color: =White
+                Fill: =If(Self.Icon=Icon.Check, Green, Red)
+                Height: =40
+                Icon: |-
+                    =If(
+                        !IsBlank(txt_CallOverFlowTargetVoicemailTarget.Text),
+                        Icon.Check,
+                        Icon.Cancel
+                    )
+                Visible: =locShowValidation.OverflowTarget
+                Width: =40
+                X: =696
+                Y: =lbl_CallOverFlowTargetVoicemailTarget.Y + lbl_CallOverFlowTargetVoicemailTarget.Height + 5
+                ZIndex: =5
+
+        crd_CallQueueForm_CallTimeoutTargetVoicemailType As typedDataCard.comboBoxEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Calltimeoutsharedvoicemailtype"
+            Default: |-
+                =If(locDropBoxUpdated.CallTimeoutAction = true,{
+                      '@odata.type':"#Microsoft.Azure.Connectors.SharePoint.SPListExpandedReference",
+                       Id:-1,
+                       Value:""}, ThisItem.'Call timeout shared voicemail type')
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = txt_CallQueueTitle_Name.Text, CQ_AllowChangeCallTimeout) = true,Parent.DisplayMode,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Call Queue management'],DataSourceInfo.DisplayName,"Calltimeoutsharedvoicemailtype")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =drp_CallTimeoutTargetVoicemailType.Selected
+            Visible: |-
+                =locCurrentTab="Call Timeout Handling" And drp_TimeOutHandling.Selected.Value = "Redirect: Voicemail"
+            Width: =950
+            X: =0
+            Y: =15
+            ZIndex: =9
+
+            lbl_CallTimeoutTargetVoicemailType As label:
+                AutoHeight: =true
+                Height: =34
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            drp_CallTimeoutTargetVoicemailType As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                DefaultSelectedItems: =Parent.Default
+                DisplayFields: =["Value"]
+                DisplayMode: =Parent.DisplayMode
+                IsSearchable: =false
+                Items: =Choices([@'Call Queue management'].'Call timeout shared voicemail type')
+                OnChange: |-
+                    =UpdateContext({locTimeoutVoicemailDropDownUpdated: true})
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["Value"]
+                SearchItems: =[]
+                SelectMultiple: =false
+                Tooltip: =Parent.DisplayName
+                Width: |
+                    =Parent.Width - 700
+                X: =30
+                Y: =lbl_CallTimeoutTargetVoicemailType.Y + lbl_CallTimeoutTargetVoicemailType.Height + 5
+                ZIndex: =2
+
+            lbl_CallTimeoutTargetVoicemailType_ErrorMessage As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =drp_CallTimeoutTargetVoicemailType.Y + drp_CallTimeoutTargetVoicemailType.Height
+                ZIndex: =3
+
+            lbl_CallTimeoutTargetVoicemailType_Star As label:
+                Align: =Align.Center
+                Height: =lbl_CallTimeoutTargetVoicemailType.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =lbl_CallTimeoutTargetVoicemailType.Y
+                ZIndex: =4
+
+        crd_CallQueueForm_CallTimeoutTarget As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Target"
+            Default: =If(locDropBoxUpdated.CallTimeoutAction = true, "", ThisItem.'Call Timeout Target')
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = txt_CallQueueTitle_Name.Text, CQ_AllowChangeCallTimeout) = true,Parent.DisplayMode,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Call Queue management'],DataSourceInfo.DisplayName,"Target")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            MaxLength: =DataSourceInfo([@'Call Queue management'], DataSourceInfo.MaxLength, "Target")
+            Required: =false
+            Update: =txt_CallTimeoutTarget.Text
+            Visible: |-
+                =locCurrentTab="Call Timeout Handling" And (!(drp_TimeOutHandling.Selected.Value = "Redirect: Voicemail") And !(drp_TimeOutHandling.Selected.Value = "Disconnect"))
+            Width: =950
+            X: =0
+            Y: =16
+            ZIndex: =9
+
+            lbl_CallTimeoutTarget As label:
+                AutoHeight: =true
+                Height: =34
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            txt_CallTimeoutTarget As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                MaxLength: =Parent.MaxLength
+                OnChange: |-
+                    =UpdateContext({locShowValidation: 
+                        Patch(locShowValidation, {TimeoutTarget: true})
+                    });
+                    UpdateContext({locUPN:
+                        Patch(locUPN, {CallTimeOut: First(Office365Users.SearchUser({searchTerm:txt_CallTimeoutTarget.Text})).DisplayName})
+                    });
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 300
+                X: =30
+                Y: =lbl_CallTimeoutTarget.Y + lbl_CallTimeoutTarget.Height + 5
+                ZIndex: =2
+
+            lbl_CallTimeoutTarget_ErrorMessage As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: |-
+                    =If(Parent.Error,Parent.Error,If(drp_TimeOutHandling.Selected.Value = "Redirect: Person in organization" Or drp_TimeOutHandling.Selected.Value = "Redirect: Voice app","Please validate the name provided is correct",If(drp_TimeOutHandling.Selected.Value = "Redirect: External phone number" ,"Please validate the phonenumber provided is correct")))
+                Visible: =ico_CallTimeoutTarget_Validation.Icon = Icon.Cancel And ico_CallTimeoutTarget_Validation.Visible
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =txt_CallTimeoutTarget.Y + txt_CallTimeoutTarget.Height
+                ZIndex: =3
+
+            lbl_CallTimeoutTarget_Star As label:
+                Align: =Align.Center
+                Height: =lbl_CallTimeoutTarget.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =lbl_CallTimeoutTarget.Y
+                ZIndex: =4
+
+            ico_CallTimeoutTarget_Validation As icon.Add:
+                BorderColor: =If(Self.Icon=Icon.Check, DarkGreen, DarkRed)
+                Color: =White
+                Fill: =If(Self.Icon=Icon.Check, Green, Red)
+                Height: =40
+                Icon: |-
+                    =If(
+                        txt_CallTimeoutTarget.Text = locUPN.CallTimeOut Or IsMatch(txt_CallTimeoutTarget.Text, "^\+\d{11}"), Icon.Check, Icon.Cancel
+                    )
+                Visible: =locShowValidation.TimeoutTarget
+                Width: =40
+                X: =txt_CallTimeoutTarget.X + txt_CallTimeoutTarget.Width + 5
+                Y: =lbl_CallTimeoutTarget.Y + lbl_CallTimeoutTarget.Height + 5
+                ZIndex: =5
+
+        crd_CallQueueForm_CallTimeoutTargetVoicemailAudio As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Calltimeoutaudio"
+            Default: =If(([@TimeoutAudioPromptFile] = "" Or [@TimeoutAudioPromptFile] = Blank()) And locDropBoxUpdated.CallTimeoutAction = true,ThisItem.'Call timeout audio',[@TimeoutAudioPromptFile])
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = txt_CallQueueTitle_Name.Text, CQ_AllowChangeCallTimeout) = true,Parent.DisplayMode,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Call Queue management'],DataSourceInfo.DisplayName,"Calltimeoutaudio")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =
+            MaxLength: =DataSourceInfo([@'Call Queue management'], DataSourceInfo.MaxLength, "Calltimeoutaudio")
+            Required: =false
+            Update: =txt_CallTimeoutTargetVoicemailAudio_FileName.Text
+            Visible: |-
+                =locCurrentTab="Call Timeout Handling" And drp_TimeOutHandling.Selected.Value = "Redirect: Voicemail" And drp_CallTimeoutTargetVoicemailType.Selected.Value = "audio file"
+            Width: =950
+            X: =0
+            Y: =17
+            ZIndex: =9
+
+            lbl_CallTimeoutTargetVoicemailAudio_FileName As label:
+                AutoHeight: =true
+                Height: =34
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            txt_CallTimeoutTargetVoicemailAudio_FileName As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                MaxLength: =Parent.MaxLength
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 300
+                X: =30
+                Y: =lbl_CallTimeoutTargetVoicemailAudio_FileName.Y + lbl_CallTimeoutTargetVoicemailAudio_FileName.Height + 5
+                ZIndex: =2
+
+            lbl_CallTimeoutTargetVoicemailAudio_ErrorMessage As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =txt_CallTimeoutTargetVoicemailAudio_FileName.Y + txt_CallTimeoutTargetVoicemailAudio_FileName.Height
+                ZIndex: =3
+
+            lbl_CallTimeoutTargetVoicemailAudio_Star As label:
+                Align: =Align.Center
+                Height: =lbl_CallTimeoutTargetVoicemailAudio_FileName.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =lbl_CallTimeoutTargetVoicemailAudio_FileName.Y
+                ZIndex: =4
+
+            btn_Call_Timeout_SharedVoicemail_Upload_1 As icon.Add:
+                Height: =40
+                Icon: =Icon.Edit
+                OnSelect: |-
+                    =UpdateContext({
+                        locShowPopupForm: true,
+                        locPromptType: "timeout voicemail prompt"
+                    });
+                Width: =40
+                X: =txt_CallTimeoutTargetVoicemailAudio_FileName.X + txt_CallTimeoutTargetVoicemailAudio_FileName.Width + 5
+                Y: =txt_CallTimeoutTargetVoicemailAudio_FileName.Y
+                ZIndex: =5
+
+        crd_CallQueueForm_CallTimeoutTargetVoicemailText As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Calltimeouttext"
+            Default: =If(locDropBoxUpdated.CallTimeoutAction = true,"", ThisItem.'Call timeout text')
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = txt_CallQueueTitle_Name.Text, CQ_AllowChangeCallTimeout) = true,Parent.DisplayMode,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Call Queue management'],DataSourceInfo.DisplayName,"Calltimeouttext")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =170
+            MaxLength: =DataSourceInfo([@'Call Queue management'], DataSourceInfo.MaxLength, "Calltimeouttext")
+            Required: =false
+            Update: =txt_CallTimeoutTargetVoicemailText.Text
+            Visible: |-
+                =locCurrentTab="Call Timeout Handling" And drp_TimeOutHandling.Selected.Value = "Redirect: Voicemail" And drp_CallTimeoutTargetVoicemailType.Selected.Value = "text"
+            Width: =950
+            X: =0
+            Y: =18
+            ZIndex: =9
+
+            lbl_CallTimeoutTargetVoicemailText As label:
+                AutoHeight: =true
+                Height: =34
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            txt_CallTimeoutTargetVoicemailText As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                Height: =80
+                MaxLength: =Parent.MaxLength
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Tooltip: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =lbl_CallTimeoutTargetVoicemailText.Y + lbl_CallTimeoutTargetVoicemailText.Height + 5
+                ZIndex: =2
+
+            lbl_CallTimeoutTargetVoicemailText_ErrorMessage As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =txt_CallTimeoutTargetVoicemailText.Y + txt_CallTimeoutTargetVoicemailText.Height
+                ZIndex: =3
+
+            lbl_CallTimeoutTargetVoicemailText_Star As label:
+                Align: =Align.Center
+                Height: =lbl_CallTimeoutTargetVoicemailText.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =lbl_CallTimeoutTargetVoicemailText.Y
+                ZIndex: =4
+
+        crd_CallQueueForm_CallTimeoutTargetVoicemailTarget As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="CallTimeoutSharedVoicemailtarget"
+            Default: =If(locDropBoxUpdated.CallTimeoutAction = true, "", ThisItem.'Call Timeout Shared Voicemail target')
+            DisplayMode: =If(LookUp('User administration', User.DisplayName = locUserFullName && Title = txt_CallQueueTitle_Name.Text, CQ_AllowChangeCallTimeout) = true,Parent.DisplayMode,DisplayMode.Disabled)
+            DisplayName: =DataSourceInfo([@'Call Queue management'],DataSourceInfo.DisplayName,"CallTimeoutSharedVoicemailtarget")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =
+            MaxLength: =DataSourceInfo([@'Call Queue management'], DataSourceInfo.MaxLength, "CallTimeoutSharedVoicemailtarget")
+            Required: =false
+            Update: =txt_CallTimeoutTargetVoicemailTarget.Text
+            Visible: |-
+                =locCurrentTab="Call Timeout Handling" And drp_TimeOutHandling.Selected.Value = "Redirect: Voicemail"
+            Width: =950
+            X: =0
+            Y: =19
+            ZIndex: =9
+
+            lbl_CallTimeoutTargetVoicemailTarget As label:
+                AutoHeight: =true
+                Height: =34
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =1
+
+            txt_CallTimeoutTargetVoicemailTarget As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                MaxLength: =Parent.MaxLength
+                OnChange: |-
+                    =UpdateContext({locShowValidation: 
+                        Patch(locShowValidation, {TimeoutVoicemailTarget: true})
+                    });
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Tooltip: =Parent.DisplayName
+                Width: |
+                    =Parent.Width - 300
+                X: =30
+                Y: =lbl_CallTimeoutTargetVoicemailTarget.Y + lbl_CallTimeoutTargetVoicemailTarget.Height + 5
+                ZIndex: =2
+
+            lbl_CallTimeoutTargetVoicemailTarget_ErrorMessage As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =txt_CallTimeoutTargetVoicemailTarget.Y + txt_CallTimeoutTargetVoicemailTarget.Height
+                ZIndex: =3
+
+            lbl_CallTimeoutTargetVoicemailTarget_Star As label:
+                Align: =Align.Center
+                Height: =lbl_CallTimeoutTargetVoicemailTarget.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =lbl_CallTimeoutTargetVoicemailTarget.Y
+                ZIndex: =4
+
+            ico_CallTimeoutTargetVoicemailTarget_Validation As icon.Add:
+                BorderColor: =If(Self.Icon=Icon.Check, DarkGreen, DarkRed)
+                Color: =White
+                Fill: =If(Self.Icon=Icon.Check, Green, Red)
+                Height: =40
+                Icon: |-
+                    =If(
+                        !IsBlank(txt_CallTimeoutTargetVoicemailTarget.Text),
+                        Icon.Check,
+                        Icon.Cancel
+                    )
+                Visible: =locShowValidation.TimeoutVoicemailTarget
+                Width: =40
+                X: =698
+                Y: =lbl_CallTimeoutTargetVoicemailTarget.Y + lbl_CallTimeoutTargetVoicemailTarget.Height + 5
+                ZIndex: =5
+
+    btn_CallQueueMenu_AgentAlerting As button:
+        Align: =Center
+        BorderThickness: =0
+        Color: =RGBA(0, 0, 0, 1)
+        Fill: =RGBA(0, 0, 0, 0)
+        FontWeight: =If(locCurrentTab = "Agent Alerting", FontWeight.Bold,FontWeight.Normal)
+        Height: =32
+        HoverColor: =Black
+        HoverFill: =RGBA(0, 0, 0, 0)
+        OnSelect: =Set(locCurrentTab, Self.Text)
+        PressedColor: =Black
+        PressedFill: =RGBA(0,0,0,0)
+        RadiusBottomLeft: =0
+        RadiusBottomRight: =0
+        RadiusTopLeft: =0
+        RadiusTopRight: =0
+        Size: =10
+        Text: ="Agent Alerting"
+        Width: =140
+        X: =btn_CallQueueMenu_GreetingMusic.X+btn_CallQueueMenu_GreetingMusic.Width
+        Y: =110
+        ZIndex: =10
+
+    btn_CallQueueForm_Cancel As button:
+        BorderColor: =RGBA(51, 52, 74, 1)
+        BorderThickness: =1
+        Fill: =ColorValue(CancelColor)
+        FocusedBorderThickness: =1
+        HoverBorderColor: =RGBA(51, 52, 74, 1)
+        HoverColor: =RGBA(51, 52, 74, 1)
+        HoverFill: =
+        OnSelect: |-
+            =Set(locCurrentTab,"");
+            Set(GreetingAudioPromptFile, "");
+            Set(MoHAudioPromptFile, "");
+            Set(OverflowAudioPromptFile, "");
+            Set(TimeoutAudioPromptFile, "");
+            Back()
+        PressedBorderColor: =RGBA(51, 52, 74, 1)
+        PressedColor: =RGBA(51, 52, 74, 1)
+        PressedFill: =
+        RadiusBottomLeft: =0
+        RadiusBottomRight: =0
+        RadiusTopLeft: =0
+        RadiusTopRight: =0
+        Size: =12
+        Text: ="Cancel"
+        X: =948
+        Y: =702
+        ZIndex: =17
+
+    grp_UploadWindow_Popup As group:
+        Height: =5
+        Width: =5
+        X: =40
+        Y: =40
+        ZIndex: =17
+
+        lbl_UploadForm_Overlay As label:
+            Fill: =RGBA(128, 128, 128, 0.2)
+            Height: =App.Height
+            Text: =
+            Visible: =locShowPopupForm
+            Width: =App.Width
+            ZIndex: =11
+
+        lbl_UploadForm_Window As label:
+            Fill: =RGBA(243, 242, 241, 1)
+            Height: =375
+            Text: =
+            Visible: =locShowPopupForm
+            Width: =1152
+            X: =187
+            Y: =187
+            ZIndex: =12
+
+        att_UploadForm_AudioPrompt As attachments:
+            BorderColor: =Color.White
+            BorderThickness: =0
+            DisplayMode: =Edit
+            Fill: =RGBA(243, 242, 241, 1)
+            FontWeight: =Semibold
+            Height: =161
+            IsInDataCard: =true
+            Items: =
+            MaxAttachments: =1
+            MaxAttachmentSize: =5
+            OnAddFile: |-
+                =If(Not(EndsWith(First(Self.Attachments).Name, ".mp3")) And Not(EndsWith(First(Self.Attachments).Name, ".wav")) And Not(EndsWith(First(Self.Attachments).Name, ".wma")),Notify("The filetype you uploaded is not support. Please upload a file of one of the following types: mp3, wav and wma.", NotificationType.Error); Reset(Self))
+            PaddingBottom: =5
+            PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+            PaddingRight: =5
+            PaddingTop: =5
+            Size: =11
+            Tooltip: =
+            Visible: =locShowPopupForm
+            Width: =431
+            X: =472
+            Y: =248
+            ZIndex: =13
+
+        btn_UploadForm_Submit As button:
+            BorderThickness: =0
+            DisplayMode: |-
+                =If(
+                    CountRows(att_UploadForm_AudioPrompt.Attachments) > 0,
+                    DisplayMode.Edit,
+                    DisplayMode.Disabled
+                )
+            Fill: =ColorValue(UpdateColor)
+            HoverFill: =RGBA(51, 52, 74, 1)
+            OnSelect: |-
+                =UploadFile.Run(
+                    {
+                        contentBytes: First(att_UploadForm_AudioPrompt.Attachments).Value,
+                        name: First(att_UploadForm_AudioPrompt.Attachments).Name
+                    },
+                    txt_CallQueueTitle_Name,
+                    Substitute(locPromptType, " ", "_")
+                );
+                
+                If(locPromptType = "greeting", Set(GreetingAudioPromptFile, Concatenate(Substitute(locPromptType, " ", "_"),".",Trim(Last(FirstN(Split(First(att_UploadForm_AudioPrompt.Attachments).Name, "."),2)).Result))));
+                If(locPromptType = "music on hold", Set(MoHAudioPromptFile, Concatenate(Substitute(locPromptType, " ", "_"),".",Trim(Last(FirstN(Split(First(att_UploadForm_AudioPrompt.Attachments).Name, "."),2)).Result))));
+                If(locPromptType = "overflow voicemail prompt", Set(OverflowAudioPromptFile, Concatenate(Substitute(locPromptType, " ", "_"),".",Trim(Last(FirstN(Split(First(att_UploadForm_AudioPrompt.Attachments).Name, "."),2)).Result))));
+                If(locPromptType = "timeout voicemail prompt", Set(TimeoutAudioPromptFile, Concatenate(Substitute(locPromptType, " ", "_"),".",Trim(Last(FirstN(Split(First(att_UploadForm_AudioPrompt.Attachments).Name, "."),2)).Result))));
+                
+                Reset(att_UploadForm_AudioPrompt);
+                
+                UpdateContext({
+                    locShowPopupForm: false
+                });
+            PressedBorderColor: =RGBA(51, 52, 74, 1)
+            PressedColor: =RGBA(255, 255, 255, 1)
+            PressedFill: =RGBA(51, 52, 74, 1)
+            Size: =12
+            Text: ="Upload"
+            Visible: =locShowPopupForm
+            X: =570
+            Y: =438
+            ZIndex: =14
+
+        ctn_UploadForm_Header As groupContainer.manualLayoutContainer:
+            ContentLanguage: =
+            Fill: =ColorValue(HeaderColor)
+            Height: =47
+            Visible: =locShowPopupForm
+            Width: =1152
+            X: =187
+            Y: =180
+            ZIndex: =15
+
+            lbl_UploadForm_Title As label:
+                Align: =Align.Center
+                Color: =RGBA(255, 255, 255, 1)
+                FontWeight: =Semibold
+                Height: =35
+                Size: =14
+                Text: ="Upload " & locPromptType & " audio file"
+                Width: =626
+                X: =207
+                Y: =6
+                ZIndex: =1
+
+        btn_UploadForm_Cancel As button:
+            BorderThickness: =0
+            Fill: =ColorValue(CancelColor)
+            HoverBorderColor: =RGBA(51, 52, 74, 1)
+            HoverFill: =RGBA(51, 52, 74, 1)
+            OnSelect: |-
+                =UpdateContext({
+                    locShowPopupForm: false
+                });
+            PressedBorderColor: =RGBA(51, 52, 74, 1)
+            PressedColor: =RGBA(255, 255, 255, 1)
+            PressedFill: =RGBA(51, 52, 74, 1)
+            RadiusBottomLeft: =0
+            RadiusBottomRight: =0
+            RadiusTopLeft: =0
+            RadiusTopRight: =0
+            Size: =12
+            Text: ="Cancel"
+            Visible: =locShowPopupForm
+            X: =799
+            Y: =438
+            ZIndex: =16
+
+    btn_CallQueueForm_Next As button:
+        BorderColor: =RGBA(51, 52, 74, 1)
+        BorderThickness: =0
+        DisplayMode: =If(locCurrentTab = "Call Timeout Handling", Disabled, Edit)
+        Fill: =ColorValue(NextColor)
+        HoverBorderColor: =RGBA(51, 52, 74, 1)
+        HoverFill: =
+        OnSelect: |+
+            =If(locCurrentTab = "Greeting and Music",Set(locCurrentTab,"Agent Alerting"),If(locCurrentTab = "Agent Alerting",Set(locCurrentTab,"Call Overflow Handling"),If(locCurrentTab = "Call Overflow Handling",Set(locCurrentTab,"Call Timeout Handling"),"")));
+            
+        PressedBorderColor: =RGBA(51, 52, 74, 1)
+        PressedColor: =RGBA(255, 255, 255, 1)
+        PressedFill: =RGBA(51, 52, 74, 1)
+        RadiusBottomLeft: =0
+        RadiusBottomRight: =0
+        RadiusTopLeft: =0
+        RadiusTopRight: =0
+        Size: =12
+        Text: ="Next"
+        X: =383
+        Y: =702
+        ZIndex: =18
+
+    btn_CallQueueForm_Submit As button:
+        BorderColor: =RGBA(51, 52, 74, 1)
+        BorderThickness: =0
+        DisabledColor: =RGBA(255, 255, 255, 1)
+        DisabledFill: =RGBA(219, 219, 219, 1)
+        DisplayMode: =If(frm_CallQueue.Unsaved, DisplayMode.Edit, DisplayMode.Disabled)
+        Fill: =ColorValue(UpdateColor)
+        HoverBorderColor: =RGBA(51, 52, 74, 1)
+        HoverFill: =
+        OnSelect: |-
+            =SubmitForm(frm_CallQueue);
+            Set(GreetingAudioPromptFile, "");
+            Set(MoHAudioPromptFile, "");
+            Set(OverflowAudioPromptFile, "");
+            Set(TimeoutAudioPromptFile, "");
+            Navigate('Home Screen',ScreenTransition.None)
+        PressedBorderColor: =RGBA(51, 52, 74, 1)
+        PressedColor: =RGBA(255, 255, 255, 1)
+        PressedFill: =RGBA(51, 52, 74, 1)
+        RadiusBottomLeft: =0
+        RadiusBottomRight: =0
+        RadiusTopLeft: =0
+        RadiusTopRight: =0
+        Size: =12
+        Text: ="Update"
+        X: =568
+        Y: =702
+        ZIndex: =19
+
+    btn_CallQueueForm_Back As button:
+        BorderColor: =RGBA(51, 52, 74, 1)
+        BorderThickness: =If(DisplayMode.Edit,1,0)
+        DisabledColor: =RGBA(255, 255, 255, 1)
+        DisabledFill: =RGBA(219, 219, 219, 1)
+        DisplayMode: =If(locCurrentTab = "Greeting and Music", Disabled, Edit)
+        Fill: =ColorValue(BackColor)
+        FocusedBorderThickness: =1
+        HoverBorderColor: =RGBA(51, 52, 74, 1)
+        HoverColor: =RGBA(51, 52, 74, 1)
+        HoverFill: =
+        OnSelect: =If(locCurrentTab = "Agent Alerting",Set(locCurrentTab,"Greeting and Music"),If(locCurrentTab = "Call Overflow Handling",Set(locCurrentTab,"Agent Alerting"),If(locCurrentTab = "Call Timeout Handling",Set(locCurrentTab,"Call Overflow Handling"),"")));
+        PressedBorderColor: =RGBA(51, 52, 74, 1)
+        PressedColor: =RGBA(51, 52, 74, 1)
+        PressedFill: =
+        RadiusBottomLeft: =0
+        RadiusBottomRight: =0
+        RadiusTopLeft: =0
+        RadiusTopRight: =0
+        Size: =12
+        Text: ="Back"
+        X: =200
+        Y: =702
+        ZIndex: =20
+
+    Label4_1 As label:
+        FontWeight: =Semibold
+        Text: =CQName.Name
+        Width: =600
+        X: =98
+        Y: =71
+        ZIndex: =21
+
+    lbl_AutoAttendant_name_header_3 As label:
+        Color: =RGBA(255, 255, 255, 1)
+        Fill: =ColorValue(CQColor)
+        FontWeight: =Semibold
+        Height: =6
+        PaddingBottom: =15
+        PaddingLeft: =15
+        PaddingRight: =15
+        PaddingTop: =15
+        Size: =14
+        Text: =""
+        Width: =1306
+        X: =60
+        Y: =762
+        ZIndex: =22
+
+    "'navbar-greeting-and-music' As rectangle":
+        Fill: =ColorValue(CQColor)
+        Height: =4
+        Visible: =If(locCurrentTab = "Greeting and Music",true,false)
+        Width: =btn_CallQueueMenu_GreetingMusic.Width
+        X: =btn_CallQueueMenu_GreetingMusic.X
+        Y: =141
+        ZIndex: =23
+
+    "'navbar-agent-alerting' As rectangle":
+        Fill: =ColorValue(CQColor)
+        Height: =4
+        Visible: =If(locCurrentTab = "Agent Alerting",true,false)
+        Width: =btn_CallQueueMenu_AgentAlerting.Width
+        X: =btn_CallQueueMenu_AgentAlerting.X
+        Y: =141
+        ZIndex: =24
+
+    "'navbar-call-overflow-handling' As rectangle":
+        Fill: =ColorValue(CQColor)
+        Height: =4
+        Visible: =If(locCurrentTab = "Call Overflow Handling",true,false)
+        Width: =btn_CallQueueMenu_CallOverflow.Width
+        X: =btn_CallQueueMenu_CallOverflow.X
+        Y: =141
+        ZIndex: =25
+
+    "'navbar-call-timeout-handling' As rectangle":
+        Fill: =ColorValue(CQColor)
+        Height: =4
+        Visible: =If(locCurrentTab = "Call Timeout Handling",true,false)
+        Width: =btn_CallQueueMenu_CallTimeout.Width
+        X: =btn_CallQueueMenu_CallTimeout.X
+        Y: =141
+        ZIndex: =26
+

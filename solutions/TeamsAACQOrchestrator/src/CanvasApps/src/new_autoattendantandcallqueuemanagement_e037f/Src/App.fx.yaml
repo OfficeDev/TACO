@@ -1,0 +1,15 @@
+App As appinfo:
+    BackEnabled: =false
+    OnStart: |-
+        =Set(colSidebarMenu,
+        Table(
+            {Value: "Home", Icon: Icon.Home, Screen: 'Home Screen'},
+            {Value: "Auto Attendants", Icon: Icon.Waypoint, Screen: 'Auto Attendants Screen', Screen2: 'Auto Attendant Edit Screen'},
+            {Value: "Call Queues", Icon: Icon.Waypoint, Screen: 'Call Queues Screen', Screen2: 'Call Queue Edit Screen'},
+            {Value: "User Management", Icon: Icon.Waypoint, Screen: 'User Management Screen', Screen2: 'User Management Edit Screen'}
+         )
+        );
+        Set(locCurrentTab, "");
+        Set(locUserFullName, User().FullName);
+    StartScreen: =
+

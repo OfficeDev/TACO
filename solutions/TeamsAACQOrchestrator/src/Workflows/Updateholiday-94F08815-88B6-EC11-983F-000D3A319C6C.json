@@ -1,0 +1,1811 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_sharepointonline_1": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "new_sharedsharepointonline_89176"
+        },
+        "api": {
+          "name": "shared_sharepointonline"
+        }
+      },
+      "shared_keyvault": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "new_CONVault"
+        },
+        "api": {
+          "name": "shared_keyvault"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        },
+        "VAR - TeamsvoicemanagementSPSite (new_TeamsvoicemanagementSPSite)": {
+          "defaultValue": "AACQMgt",
+          "type": "String",
+          "metadata": {
+            "schemaName": "new_TeamsvoicemanagementSPSite",
+            "description": "SharePoint Site name containing the content for the application"
+          }
+        },
+        "VAR - FunctionApp (new_VARFunctionApp)": {
+          "defaultValue": "taco-ukwtg",
+          "type": "String",
+          "metadata": {
+            "schemaName": "new_VARFunctionApp",
+            "description": "Name of the function app"
+          }
+        },
+        "VAR - FunctionKey (new_VARFunctionKey)": {
+          "defaultValue": "462tk2llK8lgL0sFAGiIY3qMb5aAehPGpIujhc3Kjx51AzFuh4-uwQ==",
+          "type": "String",
+          "metadata": {
+            "schemaName": "new_VARFunctionKey",
+            "description": "Host key of the function app"
+          }
+        },
+        "VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)": {
+          "defaultValue": "https://m365x14050590.sharepoint.com/sites/AACQMgt",
+          "type": "String",
+          "metadata": {
+            "schemaName": "new_VARSPOSiteAutoAttendantandCallQueueManagement",
+            "description": "SharePoint Site address where the applications Lists are stored"
+          }
+        },
+        "VAR - SPO List - Auto Attendant Holidays (new_VARSPOListAutoAttendantHolidays)": {
+          "defaultValue": "c3320e53-9174-4e66-b431-914dcc1082b4",
+          "type": "String",
+          "metadata": {
+            "schemaName": "new_VARSPOListAutoAttendantHolidays",
+            "description": "Auto Attendant Holidays"
+          }
+        },
+        "VAR - SPO List - Holidays (new_VARSPOListHolidays)": {
+          "defaultValue": "9ff23bcc-6155-43aa-8805-02ea35378ba3",
+          "type": "String",
+          "metadata": {
+            "schemaName": "new_VARSPOListHolidays",
+            "description": "holidays"
+          }
+        },
+        "VAR - Tenant (new_VARTenant)": {
+          "defaultValue": "M365x14050590.OnMicrosoft.com",
+          "type": "String",
+          "metadata": {
+            "schemaName": "new_VARTenant",
+            "description": "Tenant name, for example. contoso.onmicrosoft.com"
+          }
+        },
+        "VAR - application id (new_VARapplicationid)": {
+          "defaultValue": "c4b9ee70-6da2-42b4-9fee-cf7b1531d268",
+          "type": "String",
+          "metadata": {
+            "schemaName": "new_VARapplicationid"
+          }
+        },
+        "VAR - SPO List - Voice management audit (new_VARSPOListVoicemanagementaudit)": {
+          "defaultValue": "28e7817f-0a5c-450a-ae02-6b8b2203c6ac",
+          "type": "String",
+          "metadata": {
+            "schemaName": "new_VARSPOListVoicemanagementaudit",
+            "description": "Voice management audit"
+          }
+        }
+      },
+      "triggers": {
+        "When_an_item_is_created_or_modified": {
+          "recurrence": {
+            "interval": 1,
+            "frequency": "Minute"
+          },
+          "splitOn": "@triggerOutputs()?['body/value']",
+          "metadata": {
+            "operationMetadataId": "1419885d-5a48-477b-aee7-a48641c9f6e0"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_sharepointonline_1",
+              "operationId": "GetOnUpdatedItems",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+            },
+            "parameters": {
+              "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+              "table": "@parameters('VAR - SPO List - Auto Attendant Holidays (new_VARSPOListAutoAttendantHolidays)')"
+            },
+            "authentication": "@parameters('$authentication')"
+          },
+          "conditions": [
+            {
+              "expression": "@equals(triggerOutputs()?['body/Provisioningstatus/Value'], 'not provisioned')"
+            }
+          ]
+        }
+      },
+      "actions": {
+        "Get_changes_for_an_item_or_a_file_(properties_only)": {
+          "runAfter": {},
+          "metadata": {
+            "operationMetadataId": "a2a7898c-2a3e-4e5f-a75e-94db9da31e98"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_sharepointonline_1",
+              "operationId": "GetItemChanges",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+            },
+            "parameters": {
+              "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+              "table": "@parameters('VAR - SPO List - Auto Attendant Holidays (new_VARSPOListAutoAttendantHolidays)')",
+              "id": "@triggerOutputs()?['body/ID']",
+              "since": "@triggerOutputs()?['body/{TriggerWindowStartToken}']",
+              "until": "@triggerOutputs()?['body/{TriggerWindowEndToken}']",
+              "includeDrafts": false
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        },
+        "Initialize_Action_variable": {
+          "runAfter": {
+            "Get_changes_for_an_item_or_a_file_(properties_only)": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "d91cf493-00a4-45e0-9a2a-768c86ed15dc"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "Action",
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "Initialize_Result_variable": {
+          "runAfter": {
+            "Initialize_Action_variable": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "faa31e2e-d26d-4a68-9876-7fee5ba67e77"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "Result",
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "Check_provisioning_status": {
+          "actions": {
+            "Get_secret": {
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "b3b5d67e-5d7a-4257-8052-7ce1c29df88f"
+              },
+              "type": "OpenApiConnection",
+              "inputs": {
+                "host": {
+                  "connectionName": "shared_keyvault",
+                  "operationId": "GetSecret",
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_keyvault"
+                },
+                "parameters": {
+                  "secretName": "TACO-appSecret"
+                },
+                "authentication": "@parameters('$authentication')"
+              },
+              "runtimeConfiguration": {
+                "secureData": {
+                  "properties": [
+                    "inputs",
+                    "outputs"
+                  ]
+                }
+              }
+            },
+            "Validate_if_holiday_association_is_marked_for_deletion": {
+              "actions": {
+                "Remove_auto_attendant_holiday_association_": {
+                  "runAfter": {},
+                  "metadata": {
+                    "operationMetadataId": "5f9e90ca-b702-4605-ac42-a52d8512572a"
+                  },
+                  "type": "Http",
+                  "inputs": {
+                    "method": "POST",
+                    "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Remove-AutoAttendantHoliday",
+                    "headers": {
+                      "@{parameters('VAR - FunctionKey (new_VARFunctionKey)')}x-functions-key": ""
+                    },
+                    "body": {
+                      "Identity": "@triggerOutputs()?['body/AutoAttendant/Value']",
+                      "HolidayName": "@triggerOutputs()?['body/Holiday/Value']"
+                    },
+                    "authentication": {
+                      "type": "ActiveDirectoryOAuth",
+                      "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+                      "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+                      "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+                      "secret": "@outputs('Get_secret')?['body/value']"
+                    }
+                  }
+                },
+                "Confirm_auto_attendant_holiday_association_was_deleted": {
+                  "actions": {
+                    "Delete_item": {
+                      "runAfter": {},
+                      "metadata": {
+                        "operationMetadataId": "f9fb9a57-192b-4471-9651-9cc7849dc20a"
+                      },
+                      "type": "OpenApiConnection",
+                      "inputs": {
+                        "host": {
+                          "connectionName": "shared_sharepointonline_1",
+                          "operationId": "DeleteItem",
+                          "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                        },
+                        "parameters": {
+                          "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                          "table": "@parameters('VAR - SPO List - Auto Attendant Holidays (new_VARSPOListAutoAttendantHolidays)')",
+                          "id": "@triggerOutputs()?['body/ID']"
+                        },
+                        "authentication": "@parameters('$authentication')"
+                      }
+                    },
+                    "Remove_auto_attendant_holiday_association:_result:_success": {
+                      "runAfter": {
+                        "Delete_item": [
+                          "Succeeded"
+                        ]
+                      },
+                      "metadata": {
+                        "operationMetadataId": "860a6643-904c-4cd9-8ddf-a53f28b2db91"
+                      },
+                      "type": "SetVariable",
+                      "inputs": {
+                        "name": "Result",
+                        "value": "Success"
+                      }
+                    },
+                    "Remove_auto_attendant_holiday_association:_result:_success:_audit_log": {
+                      "runAfter": {
+                        "Remove_auto_attendant_holiday_association:_result:_success": [
+                          "Succeeded"
+                        ]
+                      },
+                      "metadata": {
+                        "operationMetadataId": "34214f5a-33f0-43b8-ad27-2b0e0d400f07"
+                      },
+                      "type": "OpenApiConnection",
+                      "inputs": {
+                        "host": {
+                          "connectionName": "shared_sharepointonline_1",
+                          "operationId": "PostItem",
+                          "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                        },
+                        "parameters": {
+                          "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                          "table": "@parameters('VAR - SPO List - Voice management audit (new_VARSPOListVoicemanagementaudit)')",
+                          "item/Title": "Removed holiday settings",
+                          "item/Timestamp": "@utcNow()",
+                          "item/Result": "@variables('Result')",
+                          "item/AffectedObject": "@triggerOutputs()?['body/AutoAttendant/Value']",
+                          "item/User": "@triggerOutputs()?['body/Editor/DisplayName']",
+                          "item/Message": "Removed holiday association: @{triggerOutputs()?['body/Holiday/Value']}"
+                        },
+                        "authentication": "@parameters('$authentication')"
+                      }
+                    }
+                  },
+                  "runAfter": {
+                    "Remove_auto_attendant_holiday_association:_action": [
+                      "Succeeded"
+                    ]
+                  },
+                  "else": {
+                    "actions": {
+                      "Remove_auto_attendant_holiday_association:_result:_failed": {
+                        "runAfter": {},
+                        "metadata": {
+                          "operationMetadataId": "3db7c649-3da5-4c7e-a9e5-649b8cbaab09"
+                        },
+                        "type": "SetVariable",
+                        "inputs": {
+                          "name": "Result",
+                          "value": "Failed"
+                        }
+                      },
+                      "Remove_auto_attendant_holiday_association:_result:_failed:_audit_log": {
+                        "runAfter": {
+                          "Remove_auto_attendant_holiday_association:_result:_failed": [
+                            "Succeeded"
+                          ]
+                        },
+                        "metadata": {
+                          "operationMetadataId": "eb5514e6-777e-4d63-95da-e841ed1a1be4"
+                        },
+                        "type": "OpenApiConnection",
+                        "inputs": {
+                          "host": {
+                            "connectionName": "shared_sharepointonline_1",
+                            "operationId": "PostItem",
+                            "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                          },
+                          "parameters": {
+                            "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                            "table": "@parameters('VAR - SPO List - Voice management audit (new_VARSPOListVoicemanagementaudit)')",
+                            "item/Title": "Removed holiday settings",
+                            "item/Timestamp": "@utcNow()",
+                            "item/Result": "@variables('Result')",
+                            "item/AffectedObject": "@triggerOutputs()?['body/AutoAttendant/Value']",
+                            "item/User": "@triggerOutputs()?['body/Editor/DisplayName']",
+                            "item/Message": "Removed holiday association: @{triggerOutputs()?['body/Holiday/Value']}"
+                          },
+                          "authentication": "@parameters('$authentication')"
+                        }
+                      }
+                    }
+                  },
+                  "expression": {
+                    "equals": [
+                      "@outputs('Remove_auto_attendant_holiday_association_')['statusCode']",
+                      200
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "d49efa41-731d-49fb-8fb0-1329e855e728"
+                  },
+                  "type": "If"
+                },
+                "Remove_auto_attendant_holiday_association:_action": {
+                  "runAfter": {
+                    "Remove_auto_attendant_holiday_association_": [
+                      "Succeeded"
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "40f0c90b-fdab-49d2-b675-c7fcc70147f9"
+                  },
+                  "type": "SetVariable",
+                  "inputs": {
+                    "name": "Action",
+                    "value": "Removed auto attendant holiday association"
+                  }
+                }
+              },
+              "runAfter": {
+                "Get_secret": [
+                  "Succeeded"
+                ]
+              },
+              "else": {
+                "actions": {
+                  "Retrieve_holiday_settings": {
+                    "runAfter": {},
+                    "metadata": {
+                      "operationMetadataId": "6d5f6682-ab5a-4673-8195-91132af23884"
+                    },
+                    "type": "OpenApiConnection",
+                    "inputs": {
+                      "host": {
+                        "connectionName": "shared_sharepointonline_1",
+                        "operationId": "GetItems",
+                        "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                      },
+                      "parameters": {
+                        "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                        "table": "@parameters('VAR - SPO List - Holidays (new_VARSPOListHolidays)')",
+                        "$filter": "Title eq '@{triggerOutputs()?['body/Holiday/Value']}'",
+                        "$top": 1
+                      },
+                      "authentication": "@parameters('$authentication')"
+                    }
+                  },
+                  "Apply_to_each": {
+                    "foreach": "@outputs('Retrieve_holiday_settings')?['body/value']",
+                    "actions": {
+                      "Condition": {
+                        "actions": {
+                          "Holiday_not_provisioned:_determine_greeting_option": {
+                            "runAfter": {},
+                            "cases": {
+                              "Holiday_not_provisioned:_Greeting:_audio": {
+                                "case": "Play an audio file",
+                                "actions": {
+                                  "Holiday_not_provisioned:_Greeting:_audio:_Call_routing_options": {
+                                    "runAfter": {},
+                                    "cases": {
+                                      "Holiday_not_provisioned:_Greeting:_audio:_Redirect:_Voicemail": {
+                                        "case": "Redirect: Voicemail",
+                                        "actions": {
+                                          "Holiday_not_provisioned:_Greeting:_audio:_Call_routing_options:_voicemail": {
+                                            "runAfter": {},
+                                            "type": "Http",
+                                            "inputs": {
+                                              "method": "POST",
+                                              "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Add-AutoAttendantHoliday",
+                                              "headers": {
+                                                "@{parameters('VAR - FunctionKey (new_VARFunctionKey)')}x-functions-key": ""
+                                              },
+                                              "body": {
+                                                "Identity": "@triggerOutputs()?['body/AutoAttendant/Value']",
+                                                "HolidayName": "@triggerOutputs()?['body/Holiday/Value']",
+                                                "HolidayStartDate": "@items('Apply_to_each')?['StartDate']",
+                                                "HolidayEndDate": "@items('Apply_to_each')?['EndDate']",
+                                                "HolidayGreetingType": "audio",
+                                                "HolidayGreetingAudio": "@triggerOutputs()?['body/Greetingaudio']",
+                                                "HolidayRedirectTarget": "@triggerOutputs()?['body/Holiday_x003a_Callroutingtarget']",
+                                                "HolidayRedirectType": "@triggerOutputs()?['body/Holiday_x003a_Callroutingoptions/Value']",
+                                                "HolidayVoicemailTarget": "@triggerOutputs()?['body/Holiday_x003a_CalloverflowShared']",
+                                                "HolidayVoicemailSuppression": "@triggerOutputs()?['body/Callroutingvoicemailpromptsuppre']",
+                                                "SPSite": "@parameters('VAR - TeamsvoicemanagementSPSite (new_TeamsvoicemanagementSPSite)')"
+                                              },
+                                              "authentication": {
+                                                "type": "ActiveDirectoryOAuth",
+                                                "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+                                                "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                                "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                                "secret": "@outputs('Get_secret')?['body/value']"
+                                              }
+                                            }
+                                          },
+                                          "Holiday_not_provisioned:_Greeting:_audio:_routing_options:_voicemail:_check": {
+                                            "actions": {
+                                              "Holiday_not_provisioned:_Greeting:_audio:_result_success": {
+                                                "runAfter": {},
+                                                "type": "SetVariable",
+                                                "inputs": {
+                                                  "name": "Result",
+                                                  "value": "Success"
+                                                }
+                                              }
+                                            },
+                                            "runAfter": {
+                                              "Holiday_not_provisioned:_Greeting:_audio:_voicemail:_action": [
+                                                "Succeeded"
+                                              ]
+                                            },
+                                            "else": {
+                                              "actions": {
+                                                "Holiday_not_provisioned:_Greeting:_audio:_result_failed": {
+                                                  "runAfter": {},
+                                                  "type": "SetVariable",
+                                                  "inputs": {
+                                                    "name": "Result",
+                                                    "value": "Failed"
+                                                  }
+                                                }
+                                              }
+                                            },
+                                            "expression": {
+                                              "equals": [
+                                                "@outputs('Holiday_not_provisioned:_Greeting:_audio:_Call_routing_options:_voicemail')['statusCode']",
+                                                200
+                                              ]
+                                            },
+                                            "type": "If"
+                                          },
+                                          "Holiday_not_provisioned:_Greeting:_audio:_voicemail:_action": {
+                                            "runAfter": {
+                                              "Holiday_not_provisioned:_Greeting:_audio:_Call_routing_options:_voicemail": [
+                                                "Succeeded"
+                                              ]
+                                            },
+                                            "type": "SetVariable",
+                                            "inputs": {
+                                              "name": "Action",
+                                              "value": "Added holiday to auto attendant: audio greeting - voicemail"
+                                            }
+                                          }
+                                        }
+                                      },
+                                      "Holiday_not_provisioned:_Greeting:_audio:_Disconnect": {
+                                        "case": "Disconnect",
+                                        "actions": {
+                                          "Holiday_not_provisioned:_Greeting:_audio:_Call_routing_options:_disconnect": {
+                                            "runAfter": {},
+                                            "type": "Http",
+                                            "inputs": {
+                                              "method": "POST",
+                                              "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Add-AutoAttendantHoliday",
+                                              "headers": {
+                                                "x-functions-key": "@parameters('VAR - FunctionKey (new_VARFunctionKey)')"
+                                              },
+                                              "body": {
+                                                "Identity": "@triggerOutputs()?['body/AutoAttendant/Value']",
+                                                "HolidayName": "@triggerOutputs()?['body/Holiday/Value']",
+                                                "HolidayStartDate": "@items('Apply_to_each')?['StartDate']",
+                                                "HolidayEndDate": "@items('Apply_to_each')?['EndDate']",
+                                                "HolidayGreetingType": "audio",
+                                                "HolidayGreetingAudio": "@triggerOutputs()?['body/Greetingaudio']",
+                                                "HolidayRedirectType": "@triggerOutputs()?['body/Holiday_x003a_Callroutingoptions/Value']",
+                                                "SPSite": "@parameters('VAR - TeamsvoicemanagementSPSite (new_TeamsvoicemanagementSPSite)')"
+                                              },
+                                              "authentication": {
+                                                "type": "ActiveDirectoryOAuth",
+                                                "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+                                                "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                                "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                                "secret": "@outputs('Get_secret')?['body/value']"
+                                              }
+                                            }
+                                          },
+                                          "Holiday_not_provisioned:_Greeting:_audio:_disconnect:_action": {
+                                            "runAfter": {
+                                              "Holiday_not_provisioned:_Greeting:_audio:_Call_routing_options:_disconnect": [
+                                                "Succeeded"
+                                              ]
+                                            },
+                                            "type": "SetVariable",
+                                            "inputs": {
+                                              "name": "Action",
+                                              "value": "Added holiday to auto attendant: audio greeting - disconnect"
+                                            }
+                                          },
+                                          "Holiday_not_provisioned:_Greeting:_audio:_routing_options:_disconnect:_check": {
+                                            "actions": {
+                                              "Holiday_not_provisioned:_Greeting:_audio:_disconnect:_result_success": {
+                                                "runAfter": {},
+                                                "type": "SetVariable",
+                                                "inputs": {
+                                                  "name": "Action",
+                                                  "value": "Success"
+                                                }
+                                              }
+                                            },
+                                            "runAfter": {
+                                              "Holiday_not_provisioned:_Greeting:_audio:_disconnect:_action": [
+                                                "Succeeded"
+                                              ]
+                                            },
+                                            "else": {
+                                              "actions": {
+                                                "Holiday_not_provisioned:_Greeting:_audio:_disconnect:_result_failed": {
+                                                  "runAfter": {},
+                                                  "type": "SetVariable",
+                                                  "inputs": {
+                                                    "name": "Result",
+                                                    "value": "Failed"
+                                                  }
+                                                }
+                                              }
+                                            },
+                                            "expression": {
+                                              "equals": [
+                                                "@outputs('Holiday_not_provisioned:_Greeting:_audio:_Call_routing_options:_disconnect')['statusCode']",
+                                                200
+                                              ]
+                                            },
+                                            "type": "If"
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "default": {
+                                      "actions": {
+                                        "Holiday_not_provisioned:_Greeting:_audio:_Call_routing_options:_other": {
+                                          "runAfter": {},
+                                          "type": "Http",
+                                          "inputs": {
+                                            "method": "POST",
+                                            "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Add-AutoAttendantHoliday",
+                                            "headers": {
+                                              "x-functions-key": "@parameters('VAR - FunctionKey (new_VARFunctionKey)')"
+                                            },
+                                            "body": {
+                                              "Identity": "@triggerOutputs()?['body/AutoAttendant/Value']",
+                                              "HolidayName": "@triggerOutputs()?['body/Holiday/Value']",
+                                              "HolidayStartDate": "@items('Apply_to_each')?['StartDate']",
+                                              "HolidayEndDate": "@items('Apply_to_each')?['EndDate']",
+                                              "HolidayGreetingType": "audio",
+                                              "HolidayGreetingAudio": "@triggerOutputs()?['body/Greetingaudio']",
+                                              "HolidayRedirectTarget": "@triggerOutputs()?['body/Holiday_x003a_Callroutingtarget']",
+                                              "HolidayRedirectType": "@triggerOutputs()?['body/Holiday_x003a_Callroutingoptions/Value']",
+                                              "SPSite": "@parameters('VAR - TeamsvoicemanagementSPSite (new_TeamsvoicemanagementSPSite)')"
+                                            },
+                                            "authentication": {
+                                              "type": "ActiveDirectoryOAuth",
+                                              "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+                                              "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                              "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                              "secret": "@outputs('Get_secret')?['body/value']"
+                                            }
+                                          }
+                                        },
+                                        "Holiday_not_provisioned:_Greeting:_audio:_other:_action": {
+                                          "runAfter": {
+                                            "Holiday_not_provisioned:_Greeting:_audio:_Call_routing_options:_other": [
+                                              "Succeeded"
+                                            ]
+                                          },
+                                          "type": "SetVariable",
+                                          "inputs": {
+                                            "name": "Action",
+                                            "value": "Added holiday to auto attendant: audio greeting - other"
+                                          }
+                                        },
+                                        "Holiday_not_provisioned:_Greeting:_audio:_routing_options:_other:_check": {
+                                          "actions": {
+                                            "Holiday_not_provisioned:_Greeting:_audio:_other:_result_success": {
+                                              "runAfter": {},
+                                              "type": "SetVariable",
+                                              "inputs": {
+                                                "name": "Result",
+                                                "value": "Success"
+                                              }
+                                            }
+                                          },
+                                          "runAfter": {
+                                            "Holiday_not_provisioned:_Greeting:_audio:_other:_action": [
+                                              "Succeeded"
+                                            ]
+                                          },
+                                          "else": {
+                                            "actions": {
+                                              "Holiday_not_provisioned:_Greeting:_audio:_other:_result_failed": {
+                                                "runAfter": {},
+                                                "type": "SetVariable",
+                                                "inputs": {
+                                                  "name": "Result",
+                                                  "value": "Failed"
+                                                }
+                                              }
+                                            }
+                                          },
+                                          "expression": {
+                                            "equals": [
+                                              "@outputs('Holiday_not_provisioned:_Greeting:_audio:_Call_routing_options:_other')['statusCode']",
+                                              200
+                                            ]
+                                          },
+                                          "type": "If"
+                                        }
+                                      }
+                                    },
+                                    "expression": "@triggerOutputs()?['body/Holiday_x003a_Callroutingoptions/Value']",
+                                    "type": "Switch"
+                                  }
+                                }
+                              },
+                              "Holiday_not_provisioned:_Greeting:_text": {
+                                "case": "Add a greeting message",
+                                "actions": {
+                                  "Holiday_not_provisioned:_Greeting:_text:_Call_routing_options": {
+                                    "runAfter": {},
+                                    "cases": {
+                                      "Holiday_not_provisioned:_Greeting:_text:_Redirect:_Voicemail": {
+                                        "case": "Redirect: Voicemail",
+                                        "actions": {
+                                          "Holiday_not_provisioned:_Greeting:_text:_Call_routing_options:_voicemail": {
+                                            "runAfter": {},
+                                            "type": "Http",
+                                            "inputs": {
+                                              "method": "POST",
+                                              "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Add-AutoAttendantHoliday?code=@{parameters('VAR - FunctionKey (new_VARFunctionKey)')}",
+                                              "body": {
+                                                "Identity": "@triggerOutputs()?['body/AutoAttendant/Value']",
+                                                "HolidayName": "@triggerOutputs()?['body/Holiday/Value']",
+                                                "HolidayStartDate": "@items('Apply_to_each')?['StartDate']",
+                                                "HolidayEndDate": "@items('Apply_to_each')?['EndDate']",
+                                                "HolidayGreetingType": "text",
+                                                "HolidayGreetingText": "@triggerOutputs()?['body/Greetingtext']",
+                                                "HolidayRedirectTarget": "@triggerOutputs()?['body/Holiday_x003a_Callroutingtarget']",
+                                                "HolidayRedirectType": "@triggerOutputs()?['body/Holiday_x003a_Callroutingoptions/Value']",
+                                                "HolidayVoicemailTarget": "@triggerOutputs()?['body/Holiday_x003a_CalloverflowShared']",
+                                                "HolidayVoicemailSuppression": "@triggerOutputs()?['body/Callroutingvoicemailpromptsuppre']"
+                                              }
+                                            }
+                                          },
+                                          "Holiday_not_provisioned:_Greeting:_text:_voicemail:_action": {
+                                            "runAfter": {
+                                              "Holiday_not_provisioned:_Greeting:_text:_Call_routing_options:_voicemail": [
+                                                "Succeeded"
+                                              ]
+                                            },
+                                            "type": "SetVariable",
+                                            "inputs": {
+                                              "name": "Action",
+                                              "value": "Added holiday to auto attendant: text greeting - voicemail"
+                                            }
+                                          },
+                                          "Condition_3": {
+                                            "actions": {
+                                              "Holiday_not_provisioned:_Greeting:_text:_voicemail:_result_success": {
+                                                "runAfter": {},
+                                                "type": "SetVariable",
+                                                "inputs": {
+                                                  "name": "Result",
+                                                  "value": "Success"
+                                                }
+                                              }
+                                            },
+                                            "runAfter": {
+                                              "Holiday_not_provisioned:_Greeting:_text:_voicemail:_action": [
+                                                "Succeeded"
+                                              ]
+                                            },
+                                            "else": {
+                                              "actions": {
+                                                "Holiday_not_provisioned:_Greeting:_text:_voicemail:_result_failed": {
+                                                  "runAfter": {},
+                                                  "type": "SetVariable",
+                                                  "inputs": {
+                                                    "name": "Result",
+                                                    "value": "Failed"
+                                                  }
+                                                }
+                                              }
+                                            },
+                                            "expression": {
+                                              "equals": [
+                                                "@outputs('Holiday_not_provisioned:_Greeting:_text:_Call_routing_options:_voicemail')['statusCode']",
+                                                200
+                                              ]
+                                            },
+                                            "type": "If"
+                                          }
+                                        }
+                                      },
+                                      "Holiday_not_provisioned:_Greeting:_text:_Disconnect": {
+                                        "case": "Disconnect",
+                                        "actions": {
+                                          "Holiday_not_provisioned:_Greeting:_text:_Call_routing_options:_disconnect": {
+                                            "runAfter": {},
+                                            "type": "Http",
+                                            "inputs": {
+                                              "method": "POST",
+                                              "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Add-AutoAttendantHoliday?code=@{parameters('VAR - FunctionKey (new_VARFunctionKey)')}",
+                                              "body": {
+                                                "Identity": "@triggerOutputs()?['body/AutoAttendant/Value']",
+                                                "HolidayName": "@triggerOutputs()?['body/Holiday/Value']",
+                                                "HolidayStartDate": "@items('Apply_to_each')?['StartDate']",
+                                                "HolidayEndDate": "@items('Apply_to_each')?['EndDate']",
+                                                "HolidayGreetingType": "@triggerOutputs()?['body/Greetingoptions/Value']",
+                                                "HolidayGreetingText": "text",
+                                                "HolidayRedirectType": "@triggerOutputs()?['body/Holiday_x003a_Callroutingoptions/Value']"
+                                              }
+                                            }
+                                          },
+                                          "Holiday_not_provisioned:_Greeting:_text:_disconnect:_action": {
+                                            "runAfter": {
+                                              "Holiday_not_provisioned:_Greeting:_text:_Call_routing_options:_disconnect": [
+                                                "Succeeded"
+                                              ]
+                                            },
+                                            "type": "SetVariable",
+                                            "inputs": {
+                                              "name": "Action",
+                                              "value": "Added holiday to auto attendant: text greeting - disconnect"
+                                            }
+                                          },
+                                          "Condition_4": {
+                                            "actions": {
+                                              "Holiday_not_provisioned:_Greeting:_text:_disconnect:_result_success": {
+                                                "runAfter": {},
+                                                "type": "SetVariable",
+                                                "inputs": {
+                                                  "name": "Result",
+                                                  "value": "Success"
+                                                }
+                                              }
+                                            },
+                                            "runAfter": {
+                                              "Holiday_not_provisioned:_Greeting:_text:_disconnect:_action": [
+                                                "Succeeded"
+                                              ]
+                                            },
+                                            "else": {
+                                              "actions": {
+                                                "Holiday_not_provisioned:_Greeting:_text:_disconnect:_result_failed": {
+                                                  "runAfter": {},
+                                                  "type": "SetVariable",
+                                                  "inputs": {
+                                                    "name": "Result",
+                                                    "value": "Failed"
+                                                  }
+                                                }
+                                              }
+                                            },
+                                            "expression": {
+                                              "equals": [
+                                                "@outputs('Holiday_not_provisioned:_Greeting:_text:_Call_routing_options:_disconnect')['statusCode']",
+                                                200
+                                              ]
+                                            },
+                                            "type": "If"
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "default": {
+                                      "actions": {
+                                        "Holiday_not_provisioned:_Greeting:_text:_Call_routing_options:_other": {
+                                          "runAfter": {},
+                                          "type": "Http",
+                                          "inputs": {
+                                            "method": "POST",
+                                            "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Add-AutoAttendantHoliday?code=@{parameters('VAR - FunctionKey (new_VARFunctionKey)')}",
+                                            "body": {
+                                              "Identity": "@triggerOutputs()?['body/AutoAttendant/Value']",
+                                              "HolidayName": "@triggerOutputs()?['body/Holiday/Value']",
+                                              "HolidayStartDate": "@items('Apply_to_each')?['StartDate']",
+                                              "HolidayEndDate": "@items('Apply_to_each')?['EndDate']",
+                                              "HolidayGreetingType": "text",
+                                              "HolidayGreetingText": "@triggerOutputs()?['body/Greetingtext']",
+                                              "HolidayRedirectTarget": "@triggerOutputs()?['body/Holiday_x003a_Callroutingtarget']",
+                                              "HolidayRedirectType": "@triggerOutputs()?['body/Holiday_x003a_Callroutingoptions/Value']"
+                                            }
+                                          }
+                                        },
+                                        "Holiday_not_provisioned:_Greeting:_text:_other:_action": {
+                                          "runAfter": {
+                                            "Holiday_not_provisioned:_Greeting:_text:_Call_routing_options:_other": [
+                                              "Succeeded"
+                                            ]
+                                          },
+                                          "type": "SetVariable",
+                                          "inputs": {
+                                            "name": "Action",
+                                            "value": "Added holiday to auto attendant: text greeting - other"
+                                          }
+                                        },
+                                        "Condition_5": {
+                                          "actions": {
+                                            "Holiday_not_provisioned:_Greeting:_text:_other:_result_success": {
+                                              "runAfter": {},
+                                              "type": "SetVariable",
+                                              "inputs": {
+                                                "name": "Result",
+                                                "value": "Success"
+                                              }
+                                            }
+                                          },
+                                          "runAfter": {
+                                            "Holiday_not_provisioned:_Greeting:_text:_other:_action": [
+                                              "Succeeded"
+                                            ]
+                                          },
+                                          "else": {
+                                            "actions": {
+                                              "Holiday_not_provisioned:_Greeting:_text:_other:_result_failed": {
+                                                "runAfter": {},
+                                                "type": "SetVariable",
+                                                "inputs": {
+                                                  "name": "Result",
+                                                  "value": "Failed"
+                                                }
+                                              }
+                                            }
+                                          },
+                                          "expression": {
+                                            "equals": [
+                                              "@outputs('Holiday_not_provisioned:_Greeting:_text:_Call_routing_options:_other')['statusCode']",
+                                              200
+                                            ]
+                                          },
+                                          "type": "If"
+                                        }
+                                      }
+                                    },
+                                    "expression": "@triggerOutputs()?['body/Holiday_x003a_Callroutingoptions/Value']",
+                                    "type": "Switch"
+                                  }
+                                }
+                              }
+                            },
+                            "default": {
+                              "actions": {
+                                "Holiday_not_provisioned:_Greeting:_no_greeting:_Call_routing_options": {
+                                  "runAfter": {},
+                                  "cases": {
+                                    "Holiday_not_provisioned:_Greeting:_no_greeting:_Voicemail": {
+                                      "case": "Redirect: Voicemail",
+                                      "actions": {
+                                        "Holiday_not_provisioned:_No_greeting:_Call_routing_options:_voicemail": {
+                                          "runAfter": {},
+                                          "type": "Http",
+                                          "inputs": {
+                                            "method": "POST",
+                                            "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Add-AutoAttendantHoliday",
+                                            "headers": {
+                                              "x-functions-key": "@parameters('VAR - FunctionKey (new_VARFunctionKey)')"
+                                            },
+                                            "body": {
+                                              "Identity": "@triggerOutputs()?['body/AutoAttendant/Value']",
+                                              "HolidayName": "@triggerOutputs()?['body/Holiday/Value']",
+                                              "HolidayStartDate": "@items('Apply_to_each')?['StartDate']",
+                                              "HolidayEndDate": "@items('Apply_to_each')?['EndDate']",
+                                              "HolidayGreetingType": "@triggerOutputs()?['body/Greetingoptions/Value']",
+                                              "HolidayRedirectTarget": "@triggerOutputs()?['body/Holiday_x003a_Callroutingtarget']",
+                                              "HolidayRedirectType": "@triggerOutputs()?['body/Holiday_x003a_Callroutingoptions/Value']",
+                                              "HolidayVoicemailTarget": "@triggerOutputs()?['body/Holiday_x003a_CalloverflowShared']",
+                                              "HolidayVoicemailSuppression": "@triggerOutputs()?['body/Callroutingvoicemailpromptsuppre']"
+                                            },
+                                            "authentication": {
+                                              "type": "ActiveDirectoryOAuth",
+                                              "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+                                              "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                              "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                              "secret": "@outputs('Get_secret')?['body/value']"
+                                            }
+                                          }
+                                        },
+                                        "Holiday_not_provisioned:_Greeting:_No_greeting:_voicemail:_action": {
+                                          "runAfter": {
+                                            "Holiday_not_provisioned:_No_greeting:_Call_routing_options:_voicemail": [
+                                              "Succeeded"
+                                            ]
+                                          },
+                                          "type": "SetVariable",
+                                          "inputs": {
+                                            "name": "Action",
+                                            "value": "Added holiday to auto attendant: no greeting - voicemail"
+                                          }
+                                        },
+                                        "Condition_6": {
+                                          "actions": {
+                                            "Holiday_not_provisioned:_Greeting:_no_greeting:_voicemail:_result_success": {
+                                              "runAfter": {},
+                                              "type": "SetVariable",
+                                              "inputs": {
+                                                "name": "Result",
+                                                "value": "Success"
+                                              }
+                                            }
+                                          },
+                                          "runAfter": {
+                                            "Holiday_not_provisioned:_Greeting:_No_greeting:_voicemail:_action": [
+                                              "Succeeded"
+                                            ]
+                                          },
+                                          "else": {
+                                            "actions": {
+                                              "Holiday_not_provisioned:_Greeting:_no_greeting:_voicemail:_result_failed": {
+                                                "runAfter": {},
+                                                "type": "SetVariable",
+                                                "inputs": {
+                                                  "name": "Result",
+                                                  "value": "Failed"
+                                                }
+                                              }
+                                            }
+                                          },
+                                          "expression": {
+                                            "equals": [
+                                              "@outputs('Holiday_not_provisioned:_No_greeting:_Call_routing_options:_voicemail')['statusCode']",
+                                              200
+                                            ]
+                                          },
+                                          "type": "If"
+                                        }
+                                      }
+                                    },
+                                    "Holiday_not_provisioned:_Greeting:_no_greeting:_disconnect": {
+                                      "case": "Disconnect",
+                                      "actions": {
+                                        "Holiday_not_provisioned:_No_greeting:_Call_routing_options:_disconnect": {
+                                          "runAfter": {},
+                                          "type": "Http",
+                                          "inputs": {
+                                            "method": "POST",
+                                            "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Add-AutoAttendantHoliday",
+                                            "headers": {
+                                              "x-functions-key": "@parameters('VAR - FunctionKey (new_VARFunctionKey)')"
+                                            },
+                                            "body": {
+                                              "Identity": "@triggerOutputs()?['body/AutoAttendant/Value']",
+                                              "HolidayName": "@triggerOutputs()?['body/Holiday/Value']",
+                                              "HolidayStartDate": "@items('Apply_to_each')?['StartDate']",
+                                              "HolidayEndDate": "@items('Apply_to_each')?['EndDate']",
+                                              "HolidayGreetingType": "@triggerOutputs()?['body/Greetingoptions/Value']",
+                                              "HolidayRedirectType": "@triggerOutputs()?['body/Holiday_x003a_Callroutingoptions/Value']"
+                                            },
+                                            "authentication": {
+                                              "type": "ActiveDirectoryOAuth",
+                                              "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+                                              "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                              "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                              "secret": "@outputs('Get_secret')?['body/value']"
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "default": {
+                                    "actions": {
+                                      "Holiday_not_provisioned:_No_greeting:_Call_routing_options:_other": {
+                                        "runAfter": {},
+                                        "type": "Http",
+                                        "inputs": {
+                                          "method": "POST",
+                                          "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Add-AutoAttendantHoliday",
+                                          "headers": {
+                                            "x-functions-key": "@parameters('VAR - FunctionKey (new_VARFunctionKey)')"
+                                          },
+                                          "body": {
+                                            "Identity": "@triggerOutputs()?['body/AutoAttendant/Value']",
+                                            "HolidayName": "@triggerOutputs()?['body/Holiday/Value']",
+                                            "HolidayStartDate": "@items('Apply_to_each')?['StartDate']",
+                                            "HolidayEndDate": "@items('Apply_to_each')?['EndDate']",
+                                            "HolidayGreetingType": "@triggerOutputs()?['body/Greetingoptions/Value']",
+                                            "HolidayRedirectTarget": "@triggerOutputs()?['body/Holiday_x003a_Callroutingtarget']",
+                                            "HolidayRedirectType": "@triggerOutputs()?['body/Holiday_x003a_Callroutingoptions/Value']"
+                                          },
+                                          "authentication": {
+                                            "type": "ActiveDirectoryOAuth",
+                                            "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+                                            "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                            "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                            "secret": "@outputs('Get_secret')?['body/value']"
+                                          }
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "expression": "@triggerOutputs()?['body/Holiday_x003a_Callroutingoptions/Value']",
+                                  "type": "Switch"
+                                }
+                              }
+                            },
+                            "expression": "@triggerOutputs()?['body/Greetingoptions/Value']",
+                            "metadata": {
+                              "operationMetadataId": "66e3a455-588a-4061-b1d2-ee959793caca"
+                            },
+                            "type": "Switch"
+                          },
+                          "Add_auto_attendant_holiday_association:_result": {
+                            "actions": {
+                              "New_AA_association_with_holiday:_result_success": {
+                                "runAfter": {},
+                                "metadata": {
+                                  "operationMetadataId": "5f2b037d-fb5d-4635-ae7d-e820751f76f3"
+                                },
+                                "type": "OpenApiConnection",
+                                "inputs": {
+                                  "host": {
+                                    "connectionName": "shared_sharepointonline_1",
+                                    "operationId": "PatchItem",
+                                    "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                                  },
+                                  "parameters": {
+                                    "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                                    "table": "@parameters('VAR - SPO List - Holidays (new_VARSPOListHolidays)')",
+                                    "id": "@items('Apply_to_each')?['ID']",
+                                    "item/Title": "@items('Apply_to_each')?['Title']",
+                                    "item/StartDate": "@items('Apply_to_each')?['StartDate']",
+                                    "item/EndDate": "@items('Apply_to_each')?['EndDate']",
+                                    "item/Provisioningstatus/Value": "provisioned"
+                                  },
+                                  "authentication": "@parameters('$authentication')"
+                                }
+                              },
+                              "New_AA_association_with_holiday:_result_success:_audit_log": {
+                                "runAfter": {
+                                  "New_AA_association_with_holiday:_result_success": [
+                                    "Succeeded"
+                                  ]
+                                },
+                                "metadata": {
+                                  "operationMetadataId": "4ec05d79-6bf2-4080-90b0-24d8cb6a6353"
+                                },
+                                "type": "OpenApiConnection",
+                                "inputs": {
+                                  "host": {
+                                    "connectionName": "shared_sharepointonline_1",
+                                    "operationId": "PostItem",
+                                    "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                                  },
+                                  "parameters": {
+                                    "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                                    "table": "@parameters('VAR - SPO List - Voice management audit (new_VARSPOListVoicemanagementaudit)')",
+                                    "item/Title": "New auto attendant associated with holiday",
+                                    "item/Timestamp": "@utcNow()",
+                                    "item/Result": "@variables('Result')",
+                                    "item/AffectedObject": "@triggerOutputs()?['body/AutoAttendant/Value']",
+                                    "item/User": "@outputs('New_AA_association_with_holiday:_result_success')?['body/Editor/DisplayName']",
+                                    "item/Message": "Added holiday association: @{triggerOutputs()?['body/Holiday/Value']}"
+                                  },
+                                  "authentication": "@parameters('$authentication')"
+                                }
+                              }
+                            },
+                            "runAfter": {
+                              "Holiday_not_provisioned:_determine_greeting_option": [
+                                "Succeeded"
+                              ]
+                            },
+                            "else": {
+                              "actions": {
+                                "New_AA_association_with_holiday:_result_failed:_audit_log": {
+                                  "runAfter": {},
+                                  "metadata": {
+                                    "operationMetadataId": "20c8dad1-e26a-4257-a0d6-5343b5dd7a1a"
+                                  },
+                                  "type": "OpenApiConnection",
+                                  "inputs": {
+                                    "host": {
+                                      "connectionName": "shared_sharepointonline_1",
+                                      "operationId": "PostItem",
+                                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                                    },
+                                    "parameters": {
+                                      "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                                      "table": "@parameters('VAR - SPO List - Voice management audit (new_VARSPOListVoicemanagementaudit)')",
+                                      "item/Title": "New auto attendant associated with holiday",
+                                      "item/Timestamp": "@utcNow()",
+                                      "item/Result": "@variables('Result')",
+                                      "item/AffectedObject": "@triggerOutputs()?['body/AutoAttendant/Value']",
+                                      "item/User": "@triggerOutputs()?['body/Editor/DisplayName']",
+                                      "item/Message": "Added holiday association: @{triggerOutputs()?['body/Holiday/Value']}"
+                                    },
+                                    "authentication": "@parameters('$authentication')"
+                                  }
+                                }
+                              }
+                            },
+                            "expression": {
+                              "equals": [
+                                "@variables('Result')",
+                                "Success"
+                              ]
+                            },
+                            "metadata": {
+                              "operationMetadataId": "0082ab62-1309-4cde-8fcb-ced9ac6d7d27"
+                            },
+                            "type": "If"
+                          }
+                        },
+                        "runAfter": {},
+                        "else": {
+                          "actions": {
+                            "Switch": {
+                              "runAfter": {},
+                              "cases": {
+                                "Greeting:_audio": {
+                                  "case": "Play an audio file",
+                                  "actions": {
+                                    "Greeting:_audio:_Call_routing_options": {
+                                      "runAfter": {},
+                                      "cases": {
+                                        "Greeting:_audio:_Redirect:_Voicemail": {
+                                          "case": "Redirect: Voicemail",
+                                          "actions": {
+                                            "Greeting:_audio:_Call_routing_options:_voicemail": {
+                                              "runAfter": {},
+                                              "type": "Http",
+                                              "inputs": {
+                                                "method": "POST",
+                                                "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Set-AutoAttendantHoliday",
+                                                "headers": {
+                                                  "x-functions-key": "@parameters('VAR - FunctionKey (new_VARFunctionKey)')"
+                                                },
+                                                "body": {
+                                                  "Identity": "@triggerOutputs()?['body/AutoAttendant/Value']",
+                                                  "HolidayName": "@triggerOutputs()?['body/Holiday/Value']",
+                                                  "HolidayStartDate": "@items('Apply_to_each')?['StartDate']",
+                                                  "HolidayEndDate": "@items('Apply_to_each')?['EndDate']",
+                                                  "HolidayGreetingType": "audio",
+                                                  "HolidayGreetingAudio": "@triggerOutputs()?['body/Greetingaudio']",
+                                                  "HolidayRedirectTarget": "@triggerOutputs()?['body/Holiday_x003a_Callroutingtarget']",
+                                                  "HolidayRedirectType": "@triggerOutputs()?['body/Holiday_x003a_Callroutingoptions/Value']",
+                                                  "HolidayVoicemailTarget": "@triggerOutputs()?['body/Holiday_x003a_CalloverflowShared']",
+                                                  "HolidayVoicemailSuppression": "@triggerOutputs()?['body/Callroutingvoicemailpromptsuppre']",
+                                                  "SPSite": "@parameters('VAR - TeamsvoicemanagementSPSite (new_TeamsvoicemanagementSPSite)')"
+                                                },
+                                                "authentication": {
+                                                  "type": "ActiveDirectoryOAuth",
+                                                  "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+                                                  "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                                  "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                                  "secret": "@outputs('Get_secret')?['body/value']"
+                                                }
+                                              }
+                                            },
+                                            "Holiday_not_provisioned:_Greeting:_audio:_voicemail": {
+                                              "runAfter": {
+                                                "Greeting:_audio:_Call_routing_options:_voicemail": [
+                                                  "Succeeded"
+                                                ]
+                                              },
+                                              "type": "SetVariable",
+                                              "inputs": {
+                                                "name": "Action",
+                                                "value": "Added holiday to auto attendant: audio greeting - voicemail"
+                                              }
+                                            },
+                                            "Holiday_not_provisioned:_Greeting:_audio:_voicemail:_check": {
+                                              "actions": {
+                                                "Holiday_provisioned:_Greeting:_audio:_voicemail:_result_success": {
+                                                  "runAfter": {},
+                                                  "type": "SetVariable",
+                                                  "inputs": {
+                                                    "name": "Result",
+                                                    "value": "Success"
+                                                  }
+                                                }
+                                              },
+                                              "runAfter": {
+                                                "Holiday_not_provisioned:_Greeting:_audio:_voicemail": [
+                                                  "Succeeded"
+                                                ]
+                                              },
+                                              "else": {
+                                                "actions": {
+                                                  "Holiday_provisioned:_Greeting:_audio:_voicemail:_result_failed": {
+                                                    "runAfter": {},
+                                                    "type": "SetVariable",
+                                                    "inputs": {
+                                                      "name": "Result",
+                                                      "value": "Failed"
+                                                    }
+                                                  }
+                                                }
+                                              },
+                                              "expression": {
+                                                "equals": [
+                                                  "@outputs('Greeting:_audio:_Call_routing_options:_voicemail')['statusCode']",
+                                                  200
+                                                ]
+                                              },
+                                              "type": "If"
+                                            }
+                                          }
+                                        },
+                                        "Greeting:_audio:_Disconnect": {
+                                          "case": "Disconnect",
+                                          "actions": {
+                                            "Greeting:_audio:_Call_routing_options:_disconnect": {
+                                              "runAfter": {},
+                                              "type": "Http",
+                                              "inputs": {
+                                                "method": "POST",
+                                                "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Set-AutoAttendantHoliday",
+                                                "headers": {
+                                                  "x-functions-key": "@parameters('VAR - FunctionKey (new_VARFunctionKey)')"
+                                                },
+                                                "body": {
+                                                  "Identity": "@triggerOutputs()?['body/AutoAttendant/Value']",
+                                                  "HolidayName": "@triggerOutputs()?['body/Holiday/Value']",
+                                                  "HolidayStartDate": "@items('Apply_to_each')?['StartDate']",
+                                                  "HolidayEndDate": "@items('Apply_to_each')?['EndDate']",
+                                                  "HolidayGreetingType": "audio",
+                                                  "HolidayGreetingAudio": "@triggerOutputs()?['body/Greetingaudio']",
+                                                  "HolidayRedirectType": "@triggerOutputs()?['body/Holiday_x003a_Callroutingoptions/Value']",
+                                                  "SPSite": "@parameters('VAR - TeamsvoicemanagementSPSite (new_TeamsvoicemanagementSPSite)')"
+                                                },
+                                                "authentication": {
+                                                  "type": "ActiveDirectoryOAuth",
+                                                  "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+                                                  "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                                  "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                                  "secret": "@outputs('Get_secret')?['body/value']"
+                                                }
+                                              }
+                                            },
+                                            "Holiday_not_provisioned:_audio_greeting_-_disconnect": {
+                                              "runAfter": {
+                                                "Greeting:_audio:_Call_routing_options:_disconnect": [
+                                                  "Succeeded"
+                                                ]
+                                              },
+                                              "type": "SetVariable",
+                                              "inputs": {
+                                                "name": "Action",
+                                                "value": "Added holiday to auto attendant: audio greeting - disconnect"
+                                              }
+                                            },
+                                            "Holiday_not_provisioned:_Greeting:_audio:_disconnect:_check": {
+                                              "actions": {
+                                                "Holiday_provisioned:_Greeting:_audio:_disconnect:_check:_success": {
+                                                  "runAfter": {},
+                                                  "type": "SetVariable",
+                                                  "inputs": {
+                                                    "name": "Result",
+                                                    "value": "Success"
+                                                  }
+                                                }
+                                              },
+                                              "runAfter": {
+                                                "Holiday_not_provisioned:_audio_greeting_-_disconnect": [
+                                                  "Succeeded"
+                                                ]
+                                              },
+                                              "else": {
+                                                "actions": {
+                                                  "Holiday_provisioned:_Greeting:_audio:_disconnect:_check:_failed": {
+                                                    "runAfter": {},
+                                                    "type": "SetVariable",
+                                                    "inputs": {
+                                                      "name": "Result",
+                                                      "value": "Failed"
+                                                    }
+                                                  }
+                                                }
+                                              },
+                                              "expression": {
+                                                "equals": [
+                                                  "@outputs('Greeting:_audio:_Call_routing_options:_disconnect')['statusCode']",
+                                                  200
+                                                ]
+                                              },
+                                              "type": "If"
+                                            }
+                                          }
+                                        }
+                                      },
+                                      "default": {
+                                        "actions": {
+                                          "Greeting:_audio:_Call_routing_options:_other": {
+                                            "runAfter": {},
+                                            "type": "Http",
+                                            "inputs": {
+                                              "method": "POST",
+                                              "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Set-AutoAttendantHoliday",
+                                              "headers": {
+                                                "@{parameters('VAR - FunctionKey (new_VARFunctionKey)')}x-functions-key": ""
+                                              },
+                                              "body": {
+                                                "Identity": "@triggerOutputs()?['body/AutoAttendant/Value']",
+                                                "HolidayName": "@triggerOutputs()?['body/Holiday/Value']",
+                                                "HolidayStartDate": "@items('Apply_to_each')?['StartDate']",
+                                                "HolidayEndDate": "@items('Apply_to_each')?['EndDate']",
+                                                "HolidayGreetingType": "audio",
+                                                "HolidayGreetingAudio": "@triggerOutputs()?['body/Greetingaudio']",
+                                                "HolidayRedirectTarget": "@triggerOutputs()?['body/Holiday_x003a_Callroutingtarget']",
+                                                "HolidayRedirectType": "@triggerOutputs()?['body/Holiday_x003a_Callroutingoptions/Value']",
+                                                "SPSite": "@parameters('VAR - TeamsvoicemanagementSPSite (new_TeamsvoicemanagementSPSite)')"
+                                              },
+                                              "authentication": {
+                                                "type": "ActiveDirectoryOAuth",
+                                                "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+                                                "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                                "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                                "secret": "@outputs('Get_secret')?['body/value']"
+                                              }
+                                            }
+                                          },
+                                          "Holiday_not_provisioned:_audio_greeting_-_other": {
+                                            "runAfter": {
+                                              "Greeting:_audio:_Call_routing_options:_other": [
+                                                "Succeeded"
+                                              ]
+                                            },
+                                            "type": "SetVariable",
+                                            "inputs": {
+                                              "name": "Action",
+                                              "value": "Added holiday to auto attendant: audio greeting - other"
+                                            }
+                                          },
+                                          "Holiday_not_provisioned:_Greeting:_audio:_other:_check": {
+                                            "actions": {
+                                              "Holiday_provisioned:_Greeting:_audio:_other:_check:_success": {
+                                                "runAfter": {},
+                                                "type": "SetVariable",
+                                                "inputs": {
+                                                  "name": "Result",
+                                                  "value": "Success"
+                                                }
+                                              }
+                                            },
+                                            "runAfter": {
+                                              "Holiday_not_provisioned:_audio_greeting_-_other": [
+                                                "Succeeded"
+                                              ]
+                                            },
+                                            "else": {
+                                              "actions": {
+                                                "Holiday_provisioned:_Greeting:_audio:_other:_check:_failed": {
+                                                  "runAfter": {},
+                                                  "type": "SetVariable",
+                                                  "inputs": {
+                                                    "name": "Result",
+                                                    "value": "Failed"
+                                                  }
+                                                }
+                                              }
+                                            },
+                                            "expression": {
+                                              "equals": [
+                                                "@outputs('Greeting:_audio:_Call_routing_options:_other')['statusCode']",
+                                                200
+                                              ]
+                                            },
+                                            "type": "If"
+                                          }
+                                        }
+                                      },
+                                      "expression": "@triggerOutputs()?['body/Holiday_x003a_Callroutingoptions/Value']",
+                                      "type": "Switch"
+                                    }
+                                  }
+                                },
+                                "Greeting:_text": {
+                                  "case": "Add a greeting message",
+                                  "actions": {
+                                    "Greeting:_text:_Call_routing_options": {
+                                      "runAfter": {},
+                                      "cases": {
+                                        "Greeting:_text:_Redirect:_Voicemail": {
+                                          "case": "Redirect: Voicemail",
+                                          "actions": {
+                                            "Greeting:_text:_Call_routing_options:_voicemail": {
+                                              "runAfter": {},
+                                              "type": "Http",
+                                              "inputs": {
+                                                "method": "POST",
+                                                "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Set-AutoAttendantHoliday",
+                                                "headers": {
+                                                  "x-functions-key": "@parameters('VAR - FunctionKey (new_VARFunctionKey)')"
+                                                },
+                                                "body": {
+                                                  "Identity": "@triggerOutputs()?['body/AutoAttendant/Value']",
+                                                  "HolidayName": "@triggerOutputs()?['body/Holiday/Value']",
+                                                  "HolidayStartDate": "@items('Apply_to_each')?['StartDate']",
+                                                  "HolidayEndDate": "@items('Apply_to_each')?['EndDate']",
+                                                  "HolidayGreetingType": "text",
+                                                  "HolidayGreetingText": "@triggerOutputs()?['body/Greetingtext']",
+                                                  "HolidayRedirectTarget": "@triggerOutputs()?['body/Holiday_x003a_Callroutingtarget']",
+                                                  "HolidayRedirectType": "@triggerOutputs()?['body/Holiday_x003a_Callroutingoptions/Value']",
+                                                  "HolidayVoicemailTarget": "@triggerOutputs()?['body/Holiday_x003a_CalloverflowShared']",
+                                                  "HolidayVoicemailSuppression": "@triggerOutputs()?['body/Callroutingvoicemailpromptsuppre']"
+                                                },
+                                                "authentication": {
+                                                  "type": "ActiveDirectoryOAuth",
+                                                  "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+                                                  "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                                  "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                                  "secret": "@outputs('Get_secret')?['body/value']"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        },
+                                        "Greeting:_text:_Disconnect": {
+                                          "case": "Disconnect",
+                                          "actions": {
+                                            "Greeting:_text:_Call_routing_options:_disconnect": {
+                                              "runAfter": {},
+                                              "type": "Http",
+                                              "inputs": {
+                                                "method": "POST",
+                                                "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Set-AutoAttendantHoliday",
+                                                "headers": {
+                                                  "x-functions-key": "@parameters('VAR - FunctionKey (new_VARFunctionKey)')"
+                                                },
+                                                "body": {
+                                                  "Identity": "@triggerOutputs()?['body/AutoAttendant/Value']",
+                                                  "HolidayName": "@triggerOutputs()?['body/Holiday/Value']",
+                                                  "HolidayStartDate": "@items('Apply_to_each')?['StartDate']",
+                                                  "HolidayEndDate": "@items('Apply_to_each')?['EndDate']",
+                                                  "HolidayGreetingType": "@triggerOutputs()?['body/Greetingoptions/Value']",
+                                                  "HolidayGreetingText": "text",
+                                                  "HolidayRedirectType": "@triggerOutputs()?['body/Holiday_x003a_Callroutingoptions/Value']"
+                                                },
+                                                "authentication": {
+                                                  "type": "ActiveDirectoryOAuth",
+                                                  "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+                                                  "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                                  "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                                  "secret": "@outputs('Get_secret')?['body/value']"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      },
+                                      "default": {
+                                        "actions": {
+                                          "Greeting:_text:_Call_routing_options:_other": {
+                                            "runAfter": {},
+                                            "type": "Http",
+                                            "inputs": {
+                                              "method": "POST",
+                                              "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Set-AutoAttendantHoliday",
+                                              "headers": {
+                                                "x-functions-key": "@parameters('VAR - FunctionKey (new_VARFunctionKey)')"
+                                              },
+                                              "body": {
+                                                "Identity": "@triggerOutputs()?['body/AutoAttendant/Value']",
+                                                "HolidayName": "@triggerOutputs()?['body/Holiday/Value']",
+                                                "HolidayStartDate": "@items('Apply_to_each')?['StartDate']",
+                                                "HolidayEndDate": "@items('Apply_to_each')?['EndDate']",
+                                                "HolidayGreetingType": "text",
+                                                "HolidayGreetingText": "@triggerOutputs()?['body/Greetingtext']",
+                                                "HolidayRedirectTarget": "@triggerOutputs()?['body/Holiday_x003a_Callroutingtarget']",
+                                                "HolidayRedirectType": "@triggerOutputs()?['body/Holiday_x003a_Callroutingoptions/Value']"
+                                              },
+                                              "authentication": {
+                                                "type": "ActiveDirectoryOAuth",
+                                                "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+                                                "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                                "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                                "secret": "@outputs('Get_secret')?['body/value']"
+                                              }
+                                            }
+                                          }
+                                        }
+                                      },
+                                      "expression": "@triggerOutputs()?['body/Holiday_x003a_Callroutingoptions/Value']",
+                                      "type": "Switch"
+                                    }
+                                  }
+                                }
+                              },
+                              "default": {
+                                "actions": {
+                                  "No_greeting:_Call_routing_options": {
+                                    "runAfter": {},
+                                    "cases": {
+                                      "No_greeting:_Redirect:_Voicemail": {
+                                        "case": "Redirect: Voicemail",
+                                        "actions": {
+                                          "No_greeting:_Call_routing_options:_voicemail": {
+                                            "runAfter": {},
+                                            "type": "Http",
+                                            "inputs": {
+                                              "method": "POST",
+                                              "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Set-AutoAttendantHoliday",
+                                              "headers": {
+                                                "x-functions-key": "@parameters('VAR - FunctionKey (new_VARFunctionKey)')"
+                                              },
+                                              "body": {
+                                                "Identity": "@triggerOutputs()?['body/AutoAttendant/Value']",
+                                                "HolidayName": "@triggerOutputs()?['body/Holiday/Value']",
+                                                "HolidayStartDate": "@items('Apply_to_each')?['StartDate']",
+                                                "HolidayEndDate": "@items('Apply_to_each')?['EndDate']",
+                                                "HolidayGreetingType": "@triggerOutputs()?['body/Greetingoptions/Value']",
+                                                "HolidayRedirectTarget": "@triggerOutputs()?['body/Holiday_x003a_Callroutingtarget']",
+                                                "HolidayRedirectType": "@triggerOutputs()?['body/Holiday_x003a_Callroutingoptions/Value']",
+                                                "HolidayVoicemailTarget": "@triggerOutputs()?['body/Holiday_x003a_CalloverflowShared']",
+                                                "HolidayVoicemailSuppression": "@triggerOutputs()?['body/Callroutingvoicemailpromptsuppre']"
+                                              },
+                                              "authentication": {
+                                                "type": "ActiveDirectoryOAuth",
+                                                "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+                                                "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                                "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                                "secret": "@outputs('Get_secret')?['body/value']"
+                                              }
+                                            }
+                                          }
+                                        }
+                                      },
+                                      "No_greeting:_disconnect": {
+                                        "case": "Disconnect",
+                                        "actions": {
+                                          "No_greeting:_Call_routing_options:_disconnect": {
+                                            "runAfter": {},
+                                            "type": "Http",
+                                            "inputs": {
+                                              "method": "POST",
+                                              "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Set-AutoAttendantHoliday",
+                                              "headers": {
+                                                "x-functions-key": "@parameters('VAR - FunctionKey (new_VARFunctionKey)')"
+                                              },
+                                              "body": {
+                                                "Identity": "@triggerOutputs()?['body/AutoAttendant/Value']",
+                                                "HolidayName": "@triggerOutputs()?['body/Holiday/Value']",
+                                                "HolidayStartDate": "@items('Apply_to_each')?['StartDate']",
+                                                "HolidayEndDate": "@items('Apply_to_each')?['EndDate']",
+                                                "HolidayGreetingType": "@triggerOutputs()?['body/Greetingoptions/Value']",
+                                                "HolidayRedirectType": "@triggerOutputs()?['body/Holiday_x003a_Callroutingoptions/Value']"
+                                              },
+                                              "authentication": {
+                                                "type": "ActiveDirectoryOAuth",
+                                                "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+                                                "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                                "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                                "secret": "@outputs('Get_secret')?['body/value']"
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "default": {
+                                      "actions": {
+                                        "No_greeting:_Call_routing_options:_other": {
+                                          "runAfter": {},
+                                          "type": "Http",
+                                          "inputs": {
+                                            "method": "POST",
+                                            "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Set-AutoAttendantHoliday",
+                                            "headers": {
+                                              "x-functions-key": "@parameters('VAR - FunctionKey (new_VARFunctionKey)')"
+                                            },
+                                            "body": {
+                                              "Identity": "@triggerOutputs()?['body/AutoAttendant/Value']",
+                                              "HolidayName": "@triggerOutputs()?['body/Holiday/Value']",
+                                              "HolidayStartDate": "@items('Apply_to_each')?['StartDate']",
+                                              "HolidayEndDate": "@items('Apply_to_each')?['EndDate']",
+                                              "HolidayGreetingType": "@triggerOutputs()?['body/Greetingoptions/Value']",
+                                              "HolidayRedirectTarget": "@triggerOutputs()?['body/Holiday_x003a_Callroutingtarget']",
+                                              "HolidayRedirectType": "@triggerOutputs()?['body/Holiday_x003a_Callroutingoptions/Value']"
+                                            },
+                                            "authentication": {
+                                              "type": "ActiveDirectoryOAuth",
+                                              "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+                                              "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                              "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+                                              "secret": "@outputs('Get_secret')?['body/value']"
+                                            }
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "expression": "@triggerOutputs()?['body/Holiday_x003a_Callroutingoptions/Value']",
+                                    "type": "Switch"
+                                  }
+                                }
+                              },
+                              "expression": "@triggerOutputs()?['body/Greetingoptions/Value']",
+                              "metadata": {
+                                "operationMetadataId": "66e3a455-588a-4061-b1d2-ee959793caca"
+                              },
+                              "type": "Switch"
+                            },
+                            "Update_auto_attendant_holiday_association:_result": {
+                              "actions": {
+                                "Create_item": {
+                                  "runAfter": {},
+                                  "metadata": {
+                                    "operationMetadataId": "3132074d-7375-49c9-822a-a092f656e27e"
+                                  },
+                                  "type": "OpenApiConnection",
+                                  "inputs": {
+                                    "host": {
+                                      "connectionName": "shared_sharepointonline_1",
+                                      "operationId": "PostItem",
+                                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                                    },
+                                    "parameters": {
+                                      "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                                      "table": "@parameters('VAR - SPO List - Voice management audit (new_VARSPOListVoicemanagementaudit)')",
+                                      "item/Title": "Updated auto attendant associated with holiday",
+                                      "item/Timestamp": "@utcNow()",
+                                      "item/Result": "@variables('Result')",
+                                      "item/AffectedObject": "@triggerOutputs()?['body/AutoAttendant/Value']",
+                                      "item/User": "@triggerOutputs()?['body/Editor/DisplayName']",
+                                      "item/Message": "Updated holiday association: @{triggerOutputs()?['body/Holiday/Value']}"
+                                    },
+                                    "authentication": "@parameters('$authentication')"
+                                  }
+                                }
+                              },
+                              "runAfter": {
+                                "Switch": [
+                                  "Succeeded"
+                                ]
+                              },
+                              "else": {
+                                "actions": {
+                                  "Create_item_2": {
+                                    "runAfter": {},
+                                    "metadata": {
+                                      "operationMetadataId": "560c7741-da42-40c2-b1e3-19d0cfc1563b"
+                                    },
+                                    "type": "OpenApiConnection",
+                                    "inputs": {
+                                      "host": {
+                                        "connectionName": "shared_sharepointonline_1",
+                                        "operationId": "PostItem",
+                                        "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                                      },
+                                      "parameters": {
+                                        "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                                        "table": "@parameters('VAR - SPO List - Voice management audit (new_VARSPOListVoicemanagementaudit)')",
+                                        "item/Title": "Updated auto attendant associated with holiday",
+                                        "item/Timestamp": "@utcNow()",
+                                        "item/Result": "@variables('Result')",
+                                        "item/AffectedObject": "@triggerOutputs()?['body/AutoAttendant/Value']",
+                                        "item/User": "@triggerOutputs()?['body/Editor/DisplayName']",
+                                        "item/Message": "Updated holiday association: @{triggerOutputs()?['body/Holiday/Value']}"
+                                      },
+                                      "authentication": "@parameters('$authentication')"
+                                    }
+                                  }
+                                }
+                              },
+                              "expression": {
+                                "equals": [
+                                  "@variables('Result')",
+                                  "Success"
+                                ]
+                              },
+                              "metadata": {
+                                "operationMetadataId": "40e9d272-5c2b-414b-a39f-e591967bc831"
+                              },
+                              "type": "If"
+                            }
+                          }
+                        },
+                        "expression": {
+                          "equals": [
+                            "@triggerOutputs()?['body/Provisioningstatus/Value']",
+                            "new"
+                          ]
+                        },
+                        "metadata": {
+                          "operationMetadataId": "f66d6418-d64d-4b09-8dc7-358c18f7740f"
+                        },
+                        "type": "If"
+                      }
+                    },
+                    "runAfter": {
+                      "Retrieve_holiday_settings": [
+                        "Succeeded"
+                      ]
+                    },
+                    "metadata": {
+                      "operationMetadataId": "fc898f70-ef5a-4d08-83bd-5364052c63a8"
+                    },
+                    "type": "Foreach"
+                  }
+                }
+              },
+              "expression": {
+                "and": [
+                  {
+                    "equals": [
+                      "@outputs('Get_changes_for_an_item_or_a_file_(properties_only)')?['body/ColumnHasChanged/Provisioningstatus']",
+                      "@true"
+                    ]
+                  },
+                  {
+                    "equals": [
+                      "@triggerOutputs()?['body/Provisioningstatus/Value']",
+                      "delete"
+                    ]
+                  }
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "64e24ff9-2c57-4d8a-ac1d-b922327666a8"
+              },
+              "type": "If"
+            }
+          },
+          "runAfter": {
+            "Initialize_Result_variable": [
+              "Succeeded"
+            ]
+          },
+          "expression": {
+            "equals": [
+              "@triggerOutputs()?['body/Provisioningstatus0']",
+              "not provisioned"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "6a500343-94b8-42f4-89bd-15145ced2eec"
+          },
+          "type": "If"
+        }
+      }
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}

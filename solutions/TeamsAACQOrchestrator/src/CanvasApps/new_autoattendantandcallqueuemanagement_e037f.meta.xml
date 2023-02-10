@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CanvasApp xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Name>new_autoattendantandcallqueuemanagement_e037f</Name>
+  <AppVersion>2022-11-24T07:40:15Z</AppVersion>
+  <Status>Ready</Status>
+  <CreatedByClientVersion>3.22111.19.0</CreatedByClientVersion>
+  <MinClientVersion>3.22111.19.0</MinClientVersion>
+  <Tags>{"primaryDeviceWidth":"1366","primaryDeviceHeight":"768","sienaVersion":"20221028T152819Z-3.22102.33.0","deviceCapabilities":"","supportsPortrait":"true","supportsLandscape":"true","primaryFormFactor":"Tablet","publisherVersion":"3.22111.19","minimumRequiredApiVersion":"2.2.0","hasComponent":"true","hasUnlockedComponent":"true","isUnifiedRootApp":"false"}</Tags>
+  <IsCdsUpgraded>0</IsCdsUpgraded>
+  <GalleryItemId xsi:nil="true"></GalleryItemId>
+  <BackgroundColor>rgba(0, 34, 64, 1)</BackgroundColor>
+  <DisplayName>Teams AA CQ Orchestrator (TACO)</DisplayName>
+  <Description xsi:nil="true"></Description>
+  <CommitMessage xsi:nil="true"></CommitMessage>
+  <Publisher></Publisher>
+  <AuthorizationReferences>[]</AuthorizationReferences>
+  <ConnectionReferences>{"4cb54bfc-3281-4727-8c1c-03b43e1daa84":{"id":"/providers/microsoft.powerapps/apis/shared_sharepointonline","displayName":"SharePoint","iconUri":"https://connectoricons-prod.azureedge.net/releases/v1.0.1610-greyhound-localization-RelayFix/1.0.1610.3091/sharepointonline/icon.png","dataSources":["Auto Attendant - holidays","Holidays","User administration","Voice management audit log","Auto Attendant management","Call Queue management"],"dependencies":[],"dependents":[],"parameterHints":{},"parameterHintsV2":{},"isOnPremiseConnection":false,"bypassConsent":false,"dataSets":{"https://m365x14050590.sharepoint.com/sites/AACQMgt":{"datasetOverride":{"name":"https://m365x14050590.sharepoint.com/sites/AACQMgt","environmentVariableName":"new_VARSPOSiteAutoAttendantandCallQueueManagement"},"dataSources":{"Auto Attendant - holidays":{"tableName":"c3320e53-9174-4e66-b431-914dcc1082b4"},"Holidays":{"tableName":"9ff23bcc-6155-43aa-8805-02ea35378ba3"},"User administration":{"tableName":"8c97c346-bd8b-4a51-b516-b966b08e103f"},"Voice management audit log":{"tableName":"28e7817f-0a5c-450a-ae02-6b8b2203c6ac"},"Auto Attendant management":{"tableName":"c58a536d-87cd-42dc-adaa-435ed44f60d2"},"Call Queue management":{"tableName":"2a46921d-22cc-414e-95e9-3a4d1d7a2955"}}}},"apiTier":"Standard","actions":["providers/PowerPlatform.Governance/Operations/Read"]},"87650519-80fe-4c56-be6f-348e3fc5d479":{"id":"/providers/microsoft.powerapps/apis/shared_office365users","displayName":"Office 365 Users","iconUri":"https://connectoricons-prod.azureedge.net/releases/v1.0.1593/1.0.1593.2980/office365users/icon.png","dataSources":["Office365Users"],"dependencies":[],"dependents":[],"parameterHints":{},"parameterHintsV2":{},"isOnPremiseConnection":false,"bypassConsent":false,"dataSets":{},"apiTier":"Standard","actions":["UserPhotoMetadata","UserPhotoV2","MyProfileV2","SearchUser"]},"6f0e972f-3d5c-4193-913b-0a19b8003709":{"id":"/providers/microsoft.powerapps/apis/shared_logicflows","displayName":"Logic flows","iconUri":"https://connectoricons-prod.azureedge.net/releases/v1.0.1534/1.0.1534.2605/logicflows/icon.png","dataSources":["UploadFile"],"dependencies":["19dbabbf-b289-4737-8a88-f38f6a16db7c"],"dependents":[],"parameterHints":{"workflowName":{"value":"cb4972ea-1460-4f5d-b722-ad68f43c87a3"},"workflowEntityId":{"value":"93f08815-88b6-ec11-983f-000d3a319c6c"},"19dbabbf-b289-4737-8a88-f38f6a16db7c":{"value":"shared_sharepointonline_2"}},"parameterHintsV2":{"workflowName":{"value":"cb4972ea-1460-4f5d-b722-ad68f43c87a3"},"workflowEntityId":{"value":"93f08815-88b6-ec11-983f-000d3a319c6c"},"shared_sharepointonline_2":{"value":"19dbabbf-b289-4737-8a88-f38f6a16db7c"}},"isOnPremiseConnection":false,"bypassConsent":false,"dataSets":{},"apiTier":"Standard","actions":["Run"]},"19dbabbf-b289-4737-8a88-f38f6a16db7c":{"id":"/providers/microsoft.powerapps/apis/shared_sharepointonline","displayName":"SharePoint","iconUri":"https://connectoricons-prod.azureedge.net/releases/v1.0.1610-greyhound-localization-RelayFix/1.0.1610.3091/sharepointonline/icon.png","dataSources":[],"dependencies":[],"dependents":["6f0e972f-3d5c-4193-913b-0a19b8003709"],"parameterHints":{},"parameterHintsV2":{},"isOnPremiseConnection":false,"bypassConsent":false,"dataSets":{},"apiTier":"Standard","actions":["providers/PowerPlatform.Governance/Operations/Read"]}}</ConnectionReferences>
+  <DatabaseReferences>{}</DatabaseReferences>
+  <AppComponents>[]</AppComponents>
+  <AppComponentDependencies>[]</AppComponentDependencies>
+  <CanConsumeAppPass>1</CanConsumeAppPass>
+  <CanvasAppType>0</CanvasAppType>
+  <BypassConsent>0</BypassConsent>
+  <AdminControlBypassConsent>0</AdminControlBypassConsent>
+  <EmbeddedApp xsi:nil="true"></EmbeddedApp>
+  <IntroducedVersion>1.0</IntroducedVersion>
+  <CdsDependencies>{"cdsdependencies":[{"logicalname":"new_VARSPOSiteAutoAttendantandCallQueueManagement","componenttype":380,"componenttypeplatformname":"EnvironmentVariableDefinition"}]}</CdsDependencies>
+  <IsCustomizable>1</IsCustomizable>
+  <BackgroundImageUri>/CanvasApps/new_autoattendantandcallqueuemanagement_e037f_BackgroundImageUri</BackgroundImageUri>
+  <DocumentUri>/CanvasApps/new_autoattendantandcallqueuemanagement_e037f_DocumentUri.msapp</DocumentUri>
+</CanvasApp>

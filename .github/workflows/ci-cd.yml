@@ -27,7 +27,7 @@ jobs:
           path: packed-solutions
 
   deploy-to-test:
-    if: ${{ startsWith(github.ref_name , 'Dev' ) || startsWith(github.ref_name , 'alm' ) || github.ref_name == 'main'}}  # if the branch is 'Dev', was main
+    if: ${{ startsWith(github.ref_name , 'dev' ) || startsWith(github.ref_name , 'alm' ) || github.ref_name == 'main'}}  # if the branch is 'Dev', was main
     strategy:
       matrix:
         environment: [test-jos1]

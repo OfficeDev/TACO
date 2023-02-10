@@ -1,0 +1,75 @@
+left_menu_bar_v2_wide As CanvasComponent:
+    Default: ="Text"
+    Fill: =RGBA(0, 34, 64, 1)
+    Height: =700
+    menuitems: |-
+        =Table(
+            {Value: "Home", Icon: Icon.Home, Screen: 'Home Screen'},
+            {Value: "Auto Attendants", Icon: Icon.Waypoint, Screen: 'Auto Attendants Screen', Screen2: 'Auto Attendant Edit Screen'},
+            {Value: "Call Queues", Icon: Icon.Waypoint, Screen: 'Call Queues Screen', Screen2: 'Call Queue Edit Screen'},
+            {Value: "User Management", Icon: Icon.Waypoint, Screen: 'User Management Screen', Screen2: 'User Management Edit Screen'}    
+         )
+    Width: =150
+    X: =0
+    Y: =0
+    ZIndex: =1
+
+    glr_menu_items_1 As gallery.galleryVertical:
+        Height: =463
+        Items: =left_menu_bar_v2_wide.menuitems
+        Layout: =Layout.Vertical
+        OnSelect: =Navigate(ThisItem.Screen)
+        ShowScrollbar: =false
+        TemplateFill: =If(ThisItem.Screen.Name=left_menu_bar_v2_wide.Default,RGBA(98, 100, 167, 1), RGBA(51, 52, 74, 1))
+        TemplatePadding: =0
+        TemplateSize: =50
+        Width: =150
+        Y: =1
+        ZIndex: =4
+
+        btn_menu_item_1 As button:
+            BorderThickness: =0
+            Fill: |-
+                =If(ThisItem.Screen.Name=left_menu_bar_v2_wide.Default,ColorValue("#002240"), ColorValue("#002240"))
+            FocusedBorderThickness: =0
+            Height: =50
+            HoverFill: =ColorFade(Self.Fill,.3)
+            OnSelect: =Navigate(ThisItem.Screen,ScreenTransition.None)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            RadiusBottomLeft: =0
+            RadiusBottomRight: =0
+            RadiusTopLeft: =0
+            RadiusTopRight: =0
+            Size: =11
+            Text: =ThisItem.Value
+            Width: =Parent.TemplateWidth
+            ZIndex: =1
+
+        rec_menu_item_1 As rectangle:
+            BorderColor: =RGBA(255, 255, 255, 1)
+            Fill: =RGBA(255, 255, 255, 1)
+            Height: =50
+            Visible: =If(ThisItem.Screen.Name=left_menu_bar_v2_wide.Default,true, false)
+            Width: =5
+            ZIndex: =2
+
+    Label1_1 As label:
+        Align: =Center
+        Color: =RGBA(255, 255, 255, 1)
+        FontWeight: =Semibold
+        Height: =37
+        Size: =10
+        Text: ="Version 1.1"
+        Y: =644
+        ZIndex: =5
+
+    Image1_1 As image:
+        Height: =37
+        Image: ='taco-white-logo-transparent'
+        Width: =150
+        Y: =607
+        ZIndex: =6
+

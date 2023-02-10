@@ -1,0 +1,1264 @@
+"'User Management Edit Screen' As screen":
+    Fill: =RGBA(243, 242, 241, 1)
+    Height: =Max(App.Height, App.DesignHeight)
+    OnVisible: =If(ObjectType.Value = "Auto Attendant", Set(locCurrentTab, "Auto Attendant"), Set(locCurrentTab, "Call Queue"))
+    Width: =Max(App.Width, App.DesignWidth)
+
+    header_bar_5 As header_bar:
+
+    frm_UserManagement As form:
+        AcceptsFocus: =false
+        DataSource: ='User administration'
+        Item: =UserPermission
+        NumberOfColumns: =2
+        Width: =1194
+        X: =98
+        Y: =162
+        ZIndex: =2
+
+        DataCard1 As typedDataCard.blankCard:
+            BorderStyle: =BorderStyle.Solid
+            DisplayMode: =DisplayMode.Edit
+            Fill: =ColorValue(UAColor)
+            Height: =40
+            Visible: =If(locCurrentTab = "Auto Attendant", true, false)
+            Width: =850
+            X: =1
+            Y: =1
+            ZIndex: =1
+
+            DataCardKey16_1 As label:
+                AutoHeight: =true
+                Color: =RGBA(255, 255, 255, 1)
+                FontWeight: =Bold
+                Height: =34
+                Size: =11
+                Text: ="Business hours"
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =5
+                ZIndex: =1
+
+        DataCard2 As typedDataCard.blankCard:
+            BorderStyle: =BorderStyle.Solid
+            DisplayMode: =DisplayMode.Edit
+            Fill: =ColorValue(UAColor)
+            Height: =40
+            Visible: =If(locCurrentTab = "Auto Attendant", true, false)
+            Width: =850
+            X: =0
+            Y: =3
+            ZIndex: =1
+
+            DataCardKey16_2 As label:
+                AutoHeight: =true
+                Color: =RGBA(255, 255, 255, 1)
+                FontWeight: =Bold
+                Height: =34
+                Size: =11
+                Text: ="After business hours"
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =5
+                ZIndex: =1
+
+        DataCard5 As typedDataCard.blankCard:
+            BorderStyle: =BorderStyle.Solid
+            DisplayMode: =DisplayMode.Edit
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Visible: =If(locCurrentTab = "Call Queue", true, false)
+            Width: =775
+            X: =0
+            Y: =5
+            ZIndex: =1
+
+            DataCardKey16_6 As label:
+                AutoHeight: =true
+                FontWeight: =FontWeight.Semibold
+                Height: =34
+                Size: =11
+                Text: ="Greeting and music on hold"
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =9
+                ZIndex: =1
+
+        DataCard4 As typedDataCard.blankCard:
+            BorderStyle: =BorderStyle.Solid
+            DisplayMode: =DisplayMode.Edit
+            Fill: =ColorValue(UAColor)
+            Height: =40
+            Visible: =If(locCurrentTab = "Auto Attendant", true, false)
+            Width: =850
+            X: =0
+            Y: =6
+            ZIndex: =1
+
+            DataCardKey16_5 As label:
+                AutoHeight: =true
+                Color: =RGBA(255, 255, 255, 1)
+                FontWeight: =Bold
+                Height: =34
+                Size: =11
+                Text: ="Holidays"
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =5
+                ZIndex: =1
+
+        DataCard6 As typedDataCard.blankCard:
+            BorderStyle: =BorderStyle.Solid
+            DisplayMode: =DisplayMode.Edit
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Visible: =If(locCurrentTab = "Call Queue", true, false)
+            Width: =650
+            X: =0
+            Y: =8
+            ZIndex: =1
+
+            DataCardKey16_7 As label:
+                AutoHeight: =true
+                FontWeight: =FontWeight.Semibold
+                Height: =34
+                Size: =11
+                Text: ="Agent Alert time"
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =16
+                ZIndex: =1
+
+        DataCard7 As typedDataCard.blankCard:
+            BorderStyle: =BorderStyle.Solid
+            DisplayMode: =DisplayMode.Edit
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Visible: =If(locCurrentTab = "Call Queue", true, false)
+            Width: =650
+            X: =0
+            Y: =9
+            ZIndex: =1
+
+            DataCardKey16_8 As label:
+                AutoHeight: =true
+                FontWeight: =FontWeight.Semibold
+                Height: =34
+                Size: =11
+                Text: ="Call overflow/timeout"
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =16
+                ZIndex: =1
+
+        ObjectName_DataCard1 As typedDataCard.textualEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Title"
+            Default: =ThisItem.Title
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: =DataSourceInfo([@'User administration'],DataSourceInfo.DisplayName,"Title")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            MaxLength: =DataSourceInfo([@'User administration'], DataSourceInfo.MaxLength, "Title")
+            Required: =true
+            Update: =DataCardValue41.Text
+            Visible: =false
+            Width: =597
+            X: =0
+            Y: =0
+            ZIndex: =4
+
+            DataCardKey15 As label:
+                AutoHeight: =true
+                Height: =34
+                Text: =Parent.DisplayName
+                Width: =(Parent.Width - 60) * 0.4
+                Wrap: =false
+                X: =30
+                Y: =10 + (DataCardValue41.Height / 2) - (Self.Height / 2)
+                ZIndex: =1
+
+            DataCardValue41 As text:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                Default: =Parent.Default
+                DelayOutput: =true
+                DisplayMode: =Parent.DisplayMode
+                MaxLength: =Parent.MaxLength
+                PaddingLeft: =5
+                RadiusBottomLeft: =0
+                RadiusBottomRight: =0
+                RadiusTopLeft: =0
+                RadiusTopRight: =0
+                Tooltip: =Parent.DisplayName
+                Width: =(Parent.Width - 60) * 0.6
+                X: =DataCardKey15.X + DataCardKey15.Width
+                Y: =10
+                ZIndex: =2
+
+            ErrorMessage41 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue41.Y + DataCardValue41.Height
+                ZIndex: =3
+
+            StarVisible43 As label:
+                Align: =Align.Center
+                Height: =DataCardKey15.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey15.Y
+                ZIndex: =4
+
+        User_DataCard1 As typedDataCard.comboBoxEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="UPN"
+            Default: =ThisItem.User
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: =DataSourceInfo([@'User administration'],DataSourceInfo.DisplayName,"UPN")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =DataCardValue55.Selected
+            Visible: =false
+            Width: =597
+            X: =1
+            Y: =0
+            ZIndex: =4
+
+            DataCardKey20 As label:
+                AutoHeight: =true
+                Color: =ColorValue(HeaderColor)
+                FontWeight: =Semibold
+                Height: =34
+                Size: =11
+                Text: =Parent.DisplayName
+                Width: =(Parent.Width - 60) * 0.4
+                Wrap: =false
+                X: =30
+                Y: =10 + (DataCardValue55.Height / 2) - (Self.Height / 2)
+                ZIndex: =1
+
+            DataCardValue55 As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =1
+                ChevronBackground: =ColorValue(HeaderColor)
+                DefaultSelectedItems: =Parent.Default
+                DisplayFields: =["DisplayName","Email","Picture"]
+                DisplayMode: =Parent.DisplayMode
+                Height: =35
+                IsSearchable: =false
+                Items: =Choices([@'User administration'].User)
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["DisplayName"]
+                SearchItems: =[]
+                SelectMultiple: =false
+                Size: =10
+                Template: =ListItemTemplate.Person
+                Tooltip: =Parent.DisplayName
+                Width: =(Parent.Width - 60) * 0.6
+                X: =DataCardKey20.X + DataCardKey20.Width
+                Y: =10
+                ZIndex: =2
+
+            ErrorMessage55 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue55.Y + DataCardValue55.Height
+                ZIndex: =3
+
+            StarVisible55 As label:
+                Align: =Align.Center
+                Height: =DataCardKey20.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey20.Y
+                ZIndex: =4
+
+        Role_DataCard1 As typedDataCard.comboBoxEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="Role"
+            Default: =ThisItem.Role
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: =DataSourceInfo([@'User administration'],DataSourceInfo.DisplayName,"Role")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =65
+            Required: =false
+            Update: =DataCardValue62.Selected
+            Width: =597
+            X: =0
+            Y: =1
+            ZIndex: =4
+
+            DataCardKey27 As label:
+                AutoHeight: =true
+                Color: =ColorValue(HeaderColor)
+                FontWeight: =Semibold
+                Height: =34
+                Size: =11
+                Text: =Parent.DisplayName
+                Width: =(Parent.Width - 60) * 0.2
+                Wrap: =false
+                X: =30
+                Y: =10 + (DataCardValue62.Height / 2) - (Self.Height / 2)
+                ZIndex: =1
+
+            DataCardValue62 As combobox:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                BorderThickness: =1
+                ChevronBackground: =ColorValue(HeaderColor)
+                DefaultSelectedItems: =Parent.Default
+                DisplayFields: =["Value"]
+                DisplayMode: =Parent.DisplayMode
+                Height: =35
+                IsSearchable: =false
+                Items: =Choices([@'User administration'].Role)
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SearchFields: =["Value"]
+                SearchItems: =[]
+                SelectMultiple: =false
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                Width: =(Parent.Width - 60) * 0.6
+                X: =DataCardKey27.X + DataCardKey27.Width
+                Y: =10
+                ZIndex: =2
+
+            ErrorMessage62 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue62.Y + DataCardValue62.Height
+                ZIndex: =3
+
+            StarVisible62 As label:
+                Align: =Align.Center
+                Height: =DataCardKey27.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey27.Y
+                ZIndex: =4
+
+        AA_AllowChangeGreeting_BH_DataCard1 As typedDataCard.toggleEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="AllowChangingGreetingAABH"
+            Default: =ThisItem.AA_AllowChangeGreeting_BH
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: =DataSourceInfo([@'User administration'],DataSourceInfo.DisplayName,"AllowChangingGreetingAABH")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =40
+            Required: =false
+            Update: =DataCardValue51.Value
+            Visible: =If(locCurrentTab = "Auto Attendant", true, false)
+            Width: =400
+            X: =0
+            Y: =2
+            ZIndex: =4
+
+            DataCardKey16 As label:
+                AutoHeight: =true
+                Color: =ColorValue(HeaderColor)
+                FontWeight: =Semibold
+                Height: =34
+                Size: =11
+                Text: ="Allow change greeting"
+                Width: =(Parent.Width - 60) * 0.7
+                Wrap: =false
+                X: =30
+                Y: =10 + (DataCardValue51.Height / 2) - (Self.Height / 2)
+                ZIndex: =1
+
+            DataCardValue51 As toggleSwitch:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                Default: =Parent.Default
+                DisplayMode: =Parent.DisplayMode
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                TrueFill: =ColorValue(HeaderColor)
+                X: =Parent.Width  - Self.Width - 30
+                Y: =12
+                ZIndex: =2
+
+            ErrorMessage51 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue51.Y + DataCardValue51.Height
+                ZIndex: =3
+
+            StarVisible51 As label:
+                Align: =Align.Center
+                Height: =DataCardKey16.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey16.Y
+                ZIndex: =4
+
+        AA_AllowChangeRouting_BH_DataCard1 As typedDataCard.toggleEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="AA_AllowChangingRouting_BH"
+            Default: =ThisItem.AA_AllowChangeRouting_BH
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: =DataSourceInfo([@'User administration'],DataSourceInfo.DisplayName,"AA_AllowChangingRouting_BH")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =40
+            Required: =false
+            Update: =DataCardValue56.Value
+            Visible: =If(locCurrentTab = "Auto Attendant", true, false)
+            Width: =450
+            X: =1
+            Y: =2
+            ZIndex: =4
+
+            DataCardKey21 As label:
+                AutoHeight: =true
+                Color: =ColorValue(HeaderColor)
+                FontWeight: =Semibold
+                Height: =34
+                Size: =11
+                Text: ="Allow change routing"
+                Width: =(Parent.Width - 60) * 0.7
+                Wrap: =false
+                X: =30
+                Y: =10 + (DataCardValue56.Height / 2) - (Self.Height / 2)
+                ZIndex: =1
+
+            DataCardValue56 As toggleSwitch:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                Default: =Parent.Default
+                DisplayMode: =Parent.DisplayMode
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                TrueFill: =ColorValue(HeaderColor)
+                X: =Parent.Width  - Self.Width - 30
+                Y: =12
+                ZIndex: =2
+
+            ErrorMessage56 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue56.Y + DataCardValue56.Height
+                ZIndex: =3
+
+            StarVisible56 As label:
+                Align: =Align.Center
+                Height: =DataCardKey21.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey21.Y
+                ZIndex: =4
+
+        AA_AllowChangeBusinessHours_DataCard1 As typedDataCard.toggleEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="AA_AllowChangeBusinessHours"
+            Default: =ThisItem.AA_AllowChangeBusinessHours
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: =DataSourceInfo([@'User administration'],DataSourceInfo.DisplayName,"AA_AllowChangeBusinessHours")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =DataCardValue52.Value
+            Visible: =If(locCurrentTab = "Auto Attendant", true, false)
+            Width: =400
+            X: =1
+            Y: =3
+            ZIndex: =4
+
+            DataCardKey17 As label:
+                AutoHeight: =true
+                Color: =ColorValue(HeaderColor)
+                FontWeight: =Semibold
+                Height: =34
+                Size: =11
+                Text: ="Allow change business hours"
+                Width: =(Parent.Width - 60) * 0.7
+                Wrap: =false
+                X: =30
+                Y: =10 + (DataCardValue52.Height / 2) - (Self.Height / 2)
+                ZIndex: =1
+
+            DataCardValue52 As toggleSwitch:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                Default: =Parent.Default
+                DisplayMode: =Parent.DisplayMode
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                TrueFill: =ColorValue(HeaderColor)
+                X: =Parent.Width  - Self.Width - 30
+                Y: =12
+                ZIndex: =2
+
+            ErrorMessage52 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue52.Y + DataCardValue52.Height
+                ZIndex: =3
+
+            StarVisible52 As label:
+                Align: =Align.Center
+                Height: =DataCardKey17.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey17.Y
+                ZIndex: =4
+
+        AA_AllowCallRouting_AH_DataCard1 As typedDataCard.toggleEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="AA_AllowCallRouting_AH"
+            Default: =ThisItem.AA_AllowCallRouting_AH
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: =DataSourceInfo([@'User administration'],DataSourceInfo.DisplayName,"AA_AllowCallRouting_AH")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =DataCardValue54.Value
+            Visible: =If(locCurrentTab = "Auto Attendant", true, false)
+            Width: =400
+            X: =0
+            Y: =4
+            ZIndex: =4
+
+            DataCardKey19 As label:
+                AutoHeight: =true
+                Color: =ColorValue(HeaderColor)
+                FontWeight: =Semibold
+                Height: =34
+                Size: =11
+                Text: ="Allow change routing"
+                Width: =(Parent.Width - 60) * 0.7
+                Wrap: =false
+                X: =30
+                Y: =10 + (DataCardValue54.Height / 2) - (Self.Height / 2)
+                ZIndex: =1
+
+            DataCardValue54 As toggleSwitch:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                Default: =Parent.Default
+                DisplayMode: =Parent.DisplayMode
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                TrueFill: =ColorValue(HeaderColor)
+                X: =Parent.Width  - Self.Width - 30
+                Y: =12
+                ZIndex: =2
+
+            ErrorMessage54 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue54.Y + DataCardValue54.Height
+                ZIndex: =3
+
+            StarVisible54 As label:
+                Align: =Align.Center
+                Height: =DataCardKey19.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey19.Y
+                ZIndex: =4
+
+        AA_AllowChangeGreeting_AH_DataCard1 As typedDataCard.toggleEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="AA_AllowChangeGreeting_AH"
+            Default: =ThisItem.AA_AllowChangeGreeting_AH
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: =DataSourceInfo([@'User administration'],DataSourceInfo.DisplayName,"AA_AllowChangeGreeting_AH")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =DataCardValue53.Value
+            Visible: =If(locCurrentTab = "Auto Attendant", true, false)
+            Width: =450
+            X: =1
+            Y: =4
+            ZIndex: =4
+
+            DataCardKey18 As label:
+                AutoHeight: =true
+                Color: =ColorValue(HeaderColor)
+                FontWeight: =Semibold
+                Height: =34
+                Size: =11
+                Text: ="Allow change greeting"
+                Width: =(Parent.Width - 60) * 0.7
+                Wrap: =false
+                X: =30
+                Y: =10 + (DataCardValue53.Height / 2) - (Self.Height / 2)
+                ZIndex: =1
+
+            DataCardValue53 As toggleSwitch:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                Default: =Parent.Default
+                DisplayMode: =Parent.DisplayMode
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                TrueFill: =ColorValue(HeaderColor)
+                X: =Parent.Width  - Self.Width - 30
+                Y: =12
+                ZIndex: =2
+
+            ErrorMessage53 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue53.Y + DataCardValue53.Height
+                ZIndex: =3
+
+            StarVisible53 As label:
+                Align: =Align.Center
+                Height: =DataCardKey18.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey18.Y
+                ZIndex: =4
+
+        CQ_AllowChangeGreeting_DataCard1 As typedDataCard.toggleEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="CQ_AllowChangeGreeting"
+            Default: =ThisItem.CQ_AllowChangeGreeting
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: =DataSourceInfo([@'User administration'],DataSourceInfo.DisplayName,"CQ_AllowChangeGreeting")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =DataCardValue57.Value
+            Visible: =If(locCurrentTab = "Call Queue", true, false)
+            Width: =600
+            X: =1
+            Y: =5
+            ZIndex: =4
+
+            DataCardKey22 As label:
+                AutoHeight: =true
+                Height: =34
+                Size: =11
+                Text: ="Allow change greeting"
+                Width: =(Parent.Width - 60) * 0.4
+                Wrap: =false
+                X: =30
+                Y: =10 + (DataCardValue57.Height / 2) - (Self.Height / 2)
+                ZIndex: =1
+
+            DataCardValue57 As toggleSwitch:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                Default: =Parent.Default
+                DisplayMode: =Parent.DisplayMode
+                Size: =11
+                Tooltip: =Parent.DisplayName
+                X: =Parent.Width  - Self.Width - 30
+                Y: =12
+                ZIndex: =2
+
+            ErrorMessage57 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue57.Y + DataCardValue57.Height
+                ZIndex: =3
+
+            StarVisible57 As label:
+                Align: =Align.Center
+                Height: =DataCardKey22.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey22.Y
+                ZIndex: =4
+
+        CQ_AllowChangeMoH_DataCard1 As typedDataCard.toggleEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="CQ_AllowChangeMoH"
+            Default: =ThisItem.CQ_AllowChangeMoH
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: =DataSourceInfo([@'User administration'],DataSourceInfo.DisplayName,"CQ_AllowChangeMoH")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =DataCardValue58.Value
+            Visible: =If(locCurrentTab = "Call Queue", true, false)
+            Width: =600
+            X: =1
+            Y: =6
+            ZIndex: =4
+
+            DataCardKey23 As label:
+                AutoHeight: =true
+                Height: =34
+                Size: =11
+                Text: ="Allow change music on hold"
+                Width: =(Parent.Width - 60) * 0.4
+                Wrap: =false
+                X: =30
+                Y: =10 + (DataCardValue58.Height / 2) - (Self.Height / 2)
+                ZIndex: =1
+
+            DataCardValue58 As toggleSwitch:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                Default: =Parent.Default
+                DisplayMode: =Parent.DisplayMode
+                Size: =11
+                Tooltip: =Parent.DisplayName
+                X: =Parent.Width  - Self.Width - 30
+                Y: =12
+                ZIndex: =2
+
+            ErrorMessage58 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue58.Y + DataCardValue58.Height
+                ZIndex: =3
+
+            StarVisible58 As label:
+                Align: =Align.Center
+                Height: =DataCardKey23.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey23.Y
+                ZIndex: =4
+
+        AA_AllowAddHolidayToAA_DataCard1 As typedDataCard.toggleEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="AA_AllowAddHolidayToAA"
+            Default: =ThisItem.AA_AllowAddHolidayToAA
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: =DataSourceInfo([@'User administration'],DataSourceInfo.DisplayName,"AA_AllowAddHolidayToAA")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =DataCardValue64.Value
+            Visible: =If(locCurrentTab = "Auto Attendant", true, false)
+            Width: =600
+            X: =0
+            Y: =7
+            ZIndex: =4
+
+            DataCardKey29 As label:
+                AutoHeight: =true
+                Color: =ColorValue(HeaderColor)
+                FontWeight: =Semibold
+                Height: =34
+                Size: =11
+                Text: ="Allow add holiday to Auto Attendant"
+                Width: =(Parent.Width - 60) * 0.7
+                Wrap: =false
+                X: =30
+                Y: =10 + (DataCardValue64.Height / 2) - (Self.Height / 2)
+                ZIndex: =1
+
+            DataCardValue64 As toggleSwitch:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                Default: =Parent.Default
+                DisplayMode: =Parent.DisplayMode
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                TrueFill: =ColorValue(HeaderColor)
+                X: =Parent.Width  - Self.Width - 30
+                Y: =12
+                ZIndex: =2
+
+            ErrorMessage64 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue64.Y + DataCardValue64.Height
+                ZIndex: =3
+
+            StarVisible64 As label:
+                Align: =Align.Center
+                Height: =DataCardKey29.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey29.Y
+                ZIndex: =4
+
+        AA_AllowCreateNewHoliday_DataCard1 As typedDataCard.toggleEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="AA_AllowCreateNewHoliday"
+            Default: =ThisItem.AA_AllowCreateNewHoliday
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: =DataSourceInfo([@'User administration'],DataSourceInfo.DisplayName,"AA_AllowCreateNewHoliday")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =DataCardValue63.Value
+            Visible: =If(locCurrentTab = "Auto Attendant", true, false)
+            Width: =600
+            X: =1
+            Y: =7
+            ZIndex: =4
+
+            DataCardKey28 As label:
+                AutoHeight: =true
+                Color: =ColorValue(HeaderColor)
+                FontWeight: =Semibold
+                Height: =34
+                Size: =11
+                Text: ="Create new holiday"
+                Width: =(Parent.Width - 60) * 0.4
+                Wrap: =false
+                X: =30
+                Y: =10 + (DataCardValue63.Height / 2) - (Self.Height / 2)
+                ZIndex: =1
+
+            DataCardValue63 As toggleSwitch:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                Default: =Parent.Default
+                DisplayMode: =Parent.DisplayMode
+                Size: =10
+                Tooltip: =Parent.DisplayName
+                TrueFill: =ColorValue(HeaderColor)
+                X: =Parent.Width  - Self.Width - 30
+                Y: =12
+                ZIndex: =2
+
+            ErrorMessage63 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue63.Y + DataCardValue63.Height
+                ZIndex: =3
+
+            StarVisible63 As label:
+                Align: =Align.Center
+                Height: =DataCardKey28.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey28.Y
+                ZIndex: =4
+
+        CQ_AllowChangeAgentAlertTime_DataCard1 As typedDataCard.toggleEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="CQ_AllowAgentAlertTime"
+            Default: =ThisItem.CQ_AllowChangeAgentAlertTime
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: =DataSourceInfo([@'User administration'],DataSourceInfo.DisplayName,"CQ_AllowAgentAlertTime")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =DataCardValue59.Value
+            Visible: =If(locCurrentTab = "Call Queue", true, false)
+            Width: =597
+            X: =1
+            Y: =8
+            ZIndex: =4
+
+            DataCardKey24 As label:
+                AutoHeight: =true
+                Height: =34
+                Size: =11
+                Text: ="Change agent alert time"
+                Width: =(Parent.Width - 60) * 0.4
+                Wrap: =false
+                X: =30
+                Y: =10 + (DataCardValue59.Height / 2) - (Self.Height / 2)
+                ZIndex: =1
+
+            DataCardValue59 As toggleSwitch:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                Default: =Parent.Default
+                DisplayMode: =Parent.DisplayMode
+                Size: =11
+                Tooltip: =Parent.DisplayName
+                X: =Parent.Width  - Self.Width - 30
+                Y: =12
+                ZIndex: =2
+
+            ErrorMessage59 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue59.Y + DataCardValue59.Height
+                ZIndex: =3
+
+            StarVisible59 As label:
+                Align: =Align.Center
+                Height: =DataCardKey24.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey24.Y
+                ZIndex: =4
+
+        CQ_AllowChangeCallOverflow_DataCard1 As typedDataCard.toggleEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="CQ_AllowChange_CallOverflow"
+            Default: =ThisItem.CQ_AllowChangeCallOverflow
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: =DataSourceInfo([@'User administration'],DataSourceInfo.DisplayName,"CQ_AllowChange_CallOverflow")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =DataCardValue60.Value
+            Visible: =If(locCurrentTab = "Call Queue", true, false)
+            Width: =597
+            X: =1
+            Y: =9
+            ZIndex: =4
+
+            DataCardKey25 As label:
+                AutoHeight: =true
+                Height: =34
+                Size: =11
+                Text: ="Change overflow settings"
+                Width: =(Parent.Width - 60) * 0.4
+                Wrap: =false
+                X: =30
+                Y: =10 + (DataCardValue60.Height / 2) - (Self.Height / 2)
+                ZIndex: =1
+
+            DataCardValue60 As toggleSwitch:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                Default: =Parent.Default
+                DisplayMode: =Parent.DisplayMode
+                Size: =11
+                Tooltip: =Parent.DisplayName
+                X: =Parent.Width  - Self.Width - 30
+                Y: =12
+                ZIndex: =2
+
+            ErrorMessage60 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue60.Y + DataCardValue60.Height
+                ZIndex: =3
+
+            StarVisible60 As label:
+                Align: =Align.Center
+                Height: =DataCardKey25.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey25.Y
+                ZIndex: =4
+
+        CQ_AllowChangeCallTimeout_DataCard1 As typedDataCard.toggleEditCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="CQ_AllowChange_CallTimeout"
+            Default: =ThisItem.CQ_AllowChangeCallTimeout
+            DisplayMode: =Parent.DisplayMode
+            DisplayName: =DataSourceInfo([@'User administration'],DataSourceInfo.DisplayName,"CQ_AllowChange_CallTimeout")
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =DataCardValue61.Value
+            Visible: =If(locCurrentTab = "Call Queue", true, false)
+            Width: =597
+            X: =0
+            Y: =10
+            ZIndex: =4
+
+            DataCardKey26 As label:
+                AutoHeight: =true
+                Height: =34
+                Size: =11
+                Text: ="Change timeout settings"
+                Width: =(Parent.Width - 60) * 0.4
+                Wrap: =false
+                X: =30
+                Y: =10 + (DataCardValue61.Height / 2) - (Self.Height / 2)
+                ZIndex: =1
+
+            DataCardValue61 As toggleSwitch:
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                Default: =Parent.Default
+                DisplayMode: =Parent.DisplayMode
+                Size: =11
+                Tooltip: =Parent.DisplayName
+                X: =Parent.Width  - Self.Width - 30
+                Y: =12
+                ZIndex: =2
+
+            ErrorMessage61 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue61.Y + DataCardValue61.Height
+                ZIndex: =3
+
+            StarVisible61 As label:
+                Align: =Align.Center
+                Height: =DataCardKey26.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey26.Y
+                ZIndex: =4
+
+    rec_AutAttendantForm_BottomButtons_bar_2 As rectangle:
+        Fill: =RGBA(255, 255, 255, 1)
+        Height: =92
+        Width: =1306
+        X: =60
+        Y: =App.DesignHeight - rec_AutAttendantForm_BottomButtons_bar_2.Height
+        ZIndex: =3
+
+    btn_AutoAttendantHolidayForm_Cancel_1 As button:
+        BorderColor: =RGBA(51, 52, 74, 1)
+        BorderThickness: =1
+        Fill: =ColorValue(CancelColor)
+        FocusedBorderThickness: =1
+        HoverBorderColor: =RGBA(51, 52, 74, 1)
+        HoverColor: =RGBA(51, 52, 74, 1)
+        HoverFill: =
+        OnSelect: |-
+            =ResetForm(frm_UserManagement);
+            Back()
+        PressedBorderColor: =RGBA(51, 52, 74, 1)
+        PressedColor: =RGBA(51, 52, 74, 1)
+        PressedFill: =
+        RadiusBottomLeft: =0
+        RadiusBottomRight: =0
+        RadiusTopLeft: =0
+        RadiusTopRight: =0
+        Size: =12
+        Text: ="Cancel"
+        X: =948
+        Y: =702
+        ZIndex: =4
+
+    btn_AutoAttendantHolidayForm_Submit_1 As button:
+        BorderColor: =RGBA(51, 52, 74, 1)
+        BorderThickness: =0
+        DisabledColor: =RGBA(255, 255, 255, 1)
+        DisabledFill: =RGBA(219, 219, 219, 1)
+        DisplayMode: =If(frm_UserManagement.Unsaved, DisplayMode.Edit, DisplayMode.Disabled)
+        Fill: =ColorValue(UpdateColor)
+        HoverBorderColor: =RGBA(51, 52, 74, 1)
+        HoverFill: =
+        OnSelect: |-
+            =SubmitForm(frm_UserManagement);
+            Navigate('User Management Screen',ScreenTransition.None)
+        PressedBorderColor: =RGBA(51, 52, 74, 1)
+        PressedColor: =RGBA(255, 255, 255, 1)
+        PressedFill: =RGBA(51, 52, 74, 1)
+        RadiusBottomLeft: =0
+        RadiusBottomRight: =0
+        RadiusTopLeft: =0
+        RadiusTopRight: =0
+        Size: =12
+        Text: ="Update"
+        X: =568
+        Y: =702
+        ZIndex: =5
+
+    btn_AutoAttendantHolidayForm_Back_1 As button:
+        BorderColor: =RGBA(51, 52, 74, 1)
+        BorderThickness: =If(DisplayMode.Edit,1,0)
+        DisabledColor: =RGBA(255, 255, 255, 1)
+        DisabledFill: =RGBA(219, 219, 219, 1)
+        DisplayMode: =If(locCurrentTab = "Greeting and music", Disabled, Edit)
+        Fill: =ColorValue(BackColor)
+        FocusedBorderThickness: =1
+        HoverBorderColor: =RGBA(51, 52, 74, 1)
+        HoverColor: =RGBA(51, 52, 74, 1)
+        HoverFill: =
+        OnSelect: |-
+            =If(locCurrentTab = "Call routing",Set(locCurrentTab,"Greeting"),If(locCurrentTab = "Business hours",Set(locCurrentTab,"Call routing"),If(locCurrentTab = "ABH_Greeting",Set(locCurrentTab,"Business hours"),If(locCurrentTab = "ABH_Call routing",Set(locCurrentTab,"ABH_Greeting"),If(locCurrentTab = "Holidays",Set(locCurrentTab,"ABH_Call routing"))))));
+            Navigate('Auto Attendant Edit Screen',ScreenTransition.None);
+        PressedBorderColor: =RGBA(51, 52, 74, 1)
+        PressedColor: =RGBA(51, 52, 74, 1)
+        PressedFill: =
+        RadiusBottomLeft: =0
+        RadiusBottomRight: =0
+        RadiusTopLeft: =0
+        RadiusTopRight: =0
+        Size: =12
+        Text: ="Back"
+        X: =200
+        Y: =702
+        ZIndex: =6
+
+    left_menu_bar_5 As left_menu_bar:
+        Default: ="User Management Screen"
+        Height: =703
+        Y: =header_bar_5.Y + header_bar_5.Height
+        ZIndex: =7
+
+    rec_AutoAttendantName_bar_6 As rectangle:
+        Fill: =RGBA(202, 202, 202, 1)
+        Height: =80
+        Width: =Parent.Width - cmp_left_menu_1.Width
+        X: =cmp_left_menu_1.X + cmp_left_menu_1.Width
+        Y: =cmp_header_1.Y + cmp_header.Height
+        ZIndex: =8
+
+    lbl_AutoAttendantName_2 As label:
+        FontWeight: =Semibold
+        Text: =Concatenate(UserPermission.User.DisplayName, " (", UserPermission.Title,")")
+        Width: =650
+        X: =98
+        Y: =71
+        ZIndex: =9
+
+    lbl_AutoAttendant_name_header_5 As label:
+        Color: =RGBA(255, 255, 255, 1)
+        Fill: =ColorValue(UAColor)
+        FontWeight: =FontWeight.Bold
+        Height: =6
+        PaddingBottom: =15
+        PaddingLeft: =15
+        PaddingRight: =15
+        PaddingTop: =15
+        Text: =""
+        Width: =1306
+        X: =60
+        Y: =762
+        ZIndex: =10
+

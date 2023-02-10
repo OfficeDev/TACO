@@ -1,0 +1,199 @@
+"'User Management Screen' As screen":
+    Fill: =RGBA(237, 237, 237, 1)
+    Height: =Max(App.Height, App.DesignHeight)
+    OnVisible: =Set(locCurrentTab, Blank())
+    Width: =Max(App.Width, App.DesignWidth)
+
+    header_bar_4 As header_bar:
+
+    "gal_Users As gallery.'BrowseLayout_Vertical_OneTextVariant_ver4.0'":
+        Fill: =RGBA(255, 255, 255, 1)
+        Height: =588
+        Items: =Filter('User administration', User.DisplayName = locUserFullName And Role.Value = "Owner")
+        Layout: =Layout.Vertical
+        TemplatePadding: =0
+        TemplateSize: =42
+        Width: =600
+        X: =96
+        Y: =160
+        ZIndex: =1
+
+        Title3 As label:
+            FontWeight: =Normal
+            Height: =33
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =12
+            Text: =ThisItem.Title
+            VerticalAlign: =VerticalAlign.Top
+            Width: =433
+            X: =12
+            Y: =8
+            ZIndex: =1
+
+        NextArrow3 As icon.ChevronRight:
+            AccessibleLabel: =Self.Tooltip
+            Color: =ColorValue(UAColor)
+            Height: =60
+            Icon: =Icon.ChevronRight
+            OnSelect: =
+            PaddingBottom: =10
+            PaddingLeft: =10
+            PaddingRight: =10
+            PaddingTop: =10
+            TabIndex: =0
+            Tooltip: ="View item details"
+            Width: =40
+            X: =Parent.TemplateWidth - Self.Width - 5
+            Y: =(Parent.TemplateHeight / 2) - (Self.Height / 2)
+            ZIndex: =2
+
+        Separator3 As rectangle:
+            Fill: =ColorFade(ColorValue(UAColor),.2)
+            Height: =1
+            OnSelect: =Select(Parent)
+            Width: =Parent.TemplateWidth
+            Y: =Parent.TemplateHeight - 1
+            ZIndex: =3
+
+        Rectangle6 As rectangle:
+            Fill: =ColorValue(UAColor)
+            Height: =41
+            OnSelect: =Select(Parent)
+            Visible: =If(ThisItem.IsSelected,true,false)
+            Width: =4
+            ZIndex: =4
+
+    left_menu_bar_4 As left_menu_bar:
+        Default: ="User Management Screen"
+        Height: =703
+        Y: =header_bar_4.Y + header_bar_4.Height
+        ZIndex: =7
+
+    rec_AutoAttendantName_bar_5 As rectangle:
+        Fill: =RGBA(202, 202, 202, 1)
+        Height: =80
+        Width: =Parent.Width - cmp_left_menu_1.Width
+        X: =cmp_left_menu_1.X + cmp_left_menu_1.Width
+        Y: =65
+        ZIndex: =8
+
+    lbl_AutoAttendant_name_header_4 As label:
+        Color: =RGBA(255, 255, 255, 1)
+        Fill: =ColorValue(UAColor)
+        FontWeight: =FontWeight.Bold
+        Height: =6
+        PaddingBottom: =15
+        PaddingLeft: =15
+        PaddingRight: =15
+        PaddingTop: =15
+        Text: =""
+        Width: =1306
+        X: =60
+        Y: =762
+        ZIndex: =9
+
+    "gal_Users_2 As gallery.'BrowseLayout_Vertical_ThreeTextVariant_ver4.0'":
+        Height: =469
+        Items: =Filter('User administration', Title = gal_Users.Selected.Title )
+        Layout: =Layout.Vertical
+        TemplatePadding: =0
+        TemplateSize: =35
+        Width: =435
+        X: =853
+        Y: =275
+        ZIndex: =10
+
+        lbl_users_object_2 As label:
+            Height: =27
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =11
+            Text: =ThisItem.User.DisplayName
+            VerticalAlign: =VerticalAlign.Top
+            Width: =250
+            X: =7
+            Y: =5
+            ZIndex: =2
+
+        lbl_users_role_2 As label:
+            Height: =27
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =11
+            Text: =ThisItem.Role.Value
+            VerticalAlign: =VerticalAlign.Top
+            Width: =167
+            X: =316
+            Y: =5
+            ZIndex: =3
+
+        ico_users_nextarrow_2 As icon.ChevronRight:
+            AccessibleLabel: =Self.Tooltip
+            Color: =ColorValue(UAColor)
+            Height: =35
+            Icon: =Icon.ChevronRight
+            OnSelect: |-
+                =Navigate('User Management Edit Screen',ScreenTransition.None,{UserPermission:ThisItem, ObjectType: ThisItem.'Object Type'})
+            PaddingBottom: =10
+            PaddingLeft: =10
+            PaddingRight: =10
+            PaddingTop: =10
+            TabIndex: =0
+            Tooltip: ="View item details"
+            Width: =45
+            X: =Parent.TemplateWidth - Self.Width - 5
+            ZIndex: =4
+
+        sep_users_2 As rectangle:
+            Fill: =ColorValue(UAColor)
+            Height: =1
+            OnSelect: =Select(Parent)
+            Width: =Parent.TemplateWidth
+            Y: =Parent.TemplateHeight - 1
+            ZIndex: =5
+
+    Label2_2 As label:
+        FontWeight: =Semibold
+        Height: =36
+        Text: ="User Management"
+        Width: =394
+        X: =98
+        Y: =71
+        ZIndex: =11
+
+    Label5 As label:
+        Align: =Center
+        BorderColor: =RGBA(128, 128, 128, 1)
+        BorderStyle: =Solid
+        BorderThickness: =1
+        Color: =RGBA(0, 94, 146, 1)
+        FontWeight: =Semibold
+        Height: =63
+        Size: =11
+        Text: ="Choose a user below to edit access."
+        Width: =459
+        X: =841
+        Y: =160
+        ZIndex: =12
+
+    Label6 As label:
+        Align: =Center
+        FontWeight: =Semibold
+        Height: =30
+        Size: =11
+        Text: =gal_Users.Selected.Name
+        Width: =459
+        X: =841
+        Y: =235
+        ZIndex: =13
+

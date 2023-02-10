@@ -1,0 +1,129 @@
+"'User Management Screen Detail' As screen":
+    Height: =Max(App.Height, App.DesignHeight)
+    OnVisible: =Set(locCurrentTab, Blank())
+    Width: =Max(App.Width, App.DesignWidth)
+
+    header_bar_6 As header_bar:
+
+    lbl_header_user_1 As label:
+        FontWeight: =FontWeight.Semibold
+        Size: =15
+        Text: ="Object"
+        X: =gal_Users_1.X + lbl_users_user_1.X
+        Y: =106
+        ZIndex: =3
+
+    lbl_header_object_1 As label:
+        FontWeight: =FontWeight.Semibold
+        Size: =15
+        Text: ="User"
+        X: =gal_Users_1.X + lbl_users_object_1.X
+        Y: =106
+        ZIndex: =4
+
+    lbl_header_role_1 As label:
+        FontWeight: =FontWeight.Semibold
+        Size: =15
+        Text: ="Role"
+        X: =gal_Users_1.X + lbl_users_role_1.X
+        Y: =106
+        ZIndex: =5
+
+    "gal_Users_1 As gallery.'BrowseLayout_Vertical_ThreeTextVariant_ver4.0'":
+        Items: =Filter('User administration', Title = gal_Users.Selected.Title )
+        Layout: =Layout.Vertical
+        TemplatePadding: =0
+        TemplateSize: =49
+        Width: =1165
+        X: =173
+        Y: =146
+        ZIndex: =6
+
+        lbl_users_user_1 As label:
+            Height: =Self.Size * 1.8
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =15
+            Text: =ThisItem.Title
+            VerticalAlign: =VerticalAlign.Top
+            Width: =Parent.TemplateWidth / 4
+            X: =32
+            Y: =16
+            ZIndex: =1
+
+        lbl_users_object_1 As label:
+            Height: =27
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =15
+            Text: =ThisItem.User.DisplayName
+            VerticalAlign: =VerticalAlign.Top
+            Width: =Parent.TemplateWidth / 4
+            X: =lbl_users_user_1.X + lbl_users_user_1.Width + 10
+            Y: =lbl_users_user_1.Y
+            ZIndex: =2
+
+        lbl_users_role_1 As label:
+            Height: =27
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Text: =ThisItem.Role.Value
+            VerticalAlign: =VerticalAlign.Top
+            Width: =Parent.TemplateWidth / 4
+            X: =lbl_users_object_1.X + lbl_users_object_1.Width + 10
+            Y: =lbl_users_object_1.Y
+            ZIndex: =3
+
+        ico_users_nextarrow_1 As icon.ChevronRight:
+            AccessibleLabel: =Self.Tooltip
+            Height: =49
+            Icon: =Icon.ChevronRight
+            OnSelect: |-
+                =Navigate('User Management Edit Screen',ScreenTransition.None,{UserPermission:ThisItem, ObjectType: ThisItem.'Object Type'})
+            PaddingBottom: =10
+            PaddingLeft: =10
+            PaddingRight: =10
+            PaddingTop: =10
+            TabIndex: =0
+            Tooltip: ="View item details"
+            Width: =40
+            X: =Parent.TemplateWidth - Self.Width - 5
+            ZIndex: =4
+
+        sep_users_1 As rectangle:
+            Height: =1
+            OnSelect: =Select(Parent)
+            Width: =Parent.TemplateWidth
+            Y: =Parent.TemplateHeight - 1
+            ZIndex: =5
+
+    left_menu_bar_6 As left_menu_bar:
+        Default: ="User Management Screen"
+        menuitems: |-
+            =Table(
+                {Value: "Home", Icon: Icon.Home, Screen: 'Home Screen'},
+                {Value: "Auto Attendants", Icon: Icon.Waypoint, Screen: 'Auto Attendants Screen', Screen2: 'Auto Attendant Edit Screen'},
+                {Value: "Call Queues", Icon: Icon.Waypoint, Screen: 'Call Queues Screen', Screen2: 'Call Queue Edit Screen'},
+                {Value: "User Management", Icon: Icon.Waypoint, Screen: 'User Management Screen Detail', Screen2: 'User Management Edit Screen'}    
+             )
+        Y: =header_bar_6.Y + header_bar_6.Height
+        ZIndex: =7
+
+    Icon1_3 As icon.Add:
+        Height: =39
+        Icon: =Icon.Reload
+        OnSelect: =Refresh('User administration')
+        Width: =36
+        X: =1302
+        Y: =107
+        ZIndex: =8
+

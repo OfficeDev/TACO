@@ -1,0 +1,1961 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_keyvault": {
+        "runtimeSource": "invoker",
+        "connection": {
+          "connectionReferenceLogicalName": "new_CONVault"
+        },
+        "api": {
+          "name": "shared_keyvault"
+        }
+      },
+      "shared_sharepointonline": {
+        "runtimeSource": "invoker",
+        "connection": {
+          "connectionReferenceLogicalName": "new_sharedsharepointonline_89176"
+        },
+        "api": {
+          "name": "shared_sharepointonline"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        },
+        "VAR - Tenant (new_VARTenant)": {
+          "defaultValue": "M365x14050590.OnMicrosoft.com",
+          "type": "String",
+          "metadata": {
+            "schemaName": "new_VARTenant",
+            "description": "Tenant name, for example. contoso.onmicrosoft.com"
+          }
+        },
+        "VAR - application id (new_VARapplicationid)": {
+          "defaultValue": "c4b9ee70-6da2-42b4-9fee-cf7b1531d268",
+          "type": "String",
+          "metadata": {
+            "schemaName": "new_VARapplicationid"
+          }
+        },
+        "VAR - FunctionApp (new_VARFunctionApp)": {
+          "defaultValue": "taco-ukwtg",
+          "type": "String",
+          "metadata": {
+            "schemaName": "new_VARFunctionApp",
+            "description": "Name of the function app"
+          }
+        },
+        "VAR - FunctionKey (new_VARFunctionKey)": {
+          "defaultValue": "462tk2llK8lgL0sFAGiIY3qMb5aAehPGpIujhc3Kjx51AzFuh4-uwQ==",
+          "type": "String",
+          "metadata": {
+            "schemaName": "new_VARFunctionKey",
+            "description": "Host key of the function app"
+          }
+        },
+        "VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)": {
+          "defaultValue": "https://m365x14050590.sharepoint.com/sites/AACQMgt",
+          "type": "String",
+          "metadata": {
+            "schemaName": "new_VARSPOSiteAutoAttendantandCallQueueManagement",
+            "description": "SharePoint Site address where the applications Lists are stored"
+          }
+        },
+        "VAR - SPO List - Auto Attendant Management (new_VARSPOListAutoAttendantManagement)": {
+          "defaultValue": "c58a536d-87cd-42dc-adaa-435ed44f60d2",
+          "type": "String",
+          "metadata": {
+            "schemaName": "new_VARSPOListAutoAttendantManagement",
+            "description": "Auto Attendant Management"
+          }
+        },
+        "VAR - SPO List - Auto Attendant Holidays (new_VARSPOListAutoAttendantHolidays)": {
+          "defaultValue": "c3320e53-9174-4e66-b431-914dcc1082b4",
+          "type": "String",
+          "metadata": {
+            "schemaName": "new_VARSPOListAutoAttendantHolidays",
+            "description": "Auto Attendant Holidays"
+          }
+        },
+        "VAR - SPO List - Holidays (new_VARSPOListHolidays)": {
+          "defaultValue": "9ff23bcc-6155-43aa-8805-02ea35378ba3",
+          "type": "String",
+          "metadata": {
+            "schemaName": "new_VARSPOListHolidays",
+            "description": "holidays"
+          }
+        },
+        "VAR - SPO List - Voice management audit (new_VARSPOListVoicemanagementaudit)": {
+          "defaultValue": "28e7817f-0a5c-450a-ae02-6b8b2203c6ac",
+          "type": "String",
+          "metadata": {
+            "schemaName": "new_VARSPOListVoicemanagementaudit",
+            "description": "Voice management audit"
+          }
+        }
+      },
+      "triggers": {
+        "manual": {
+          "metadata": {
+            "operationMetadataId": "4120b048-e7dc-46ec-8107-28d6cee25b5d"
+          },
+          "type": "Request",
+          "kind": "Button",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {},
+              "required": []
+            }
+          }
+        }
+      },
+      "actions": {
+        "Get_secret": {
+          "runAfter": {},
+          "metadata": {
+            "operationMetadataId": "d2037fef-1db0-4f97-8c3a-6a0c2aac26f5"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_keyvault",
+              "operationId": "GetSecret",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_keyvault"
+            },
+            "parameters": {
+              "secretName": "TACO-appSecret"
+            },
+            "authentication": {
+              "type": "Raw",
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+            }
+          }
+        },
+        "Initialize_result_variable": {
+          "runAfter": {
+            "Retrieve_configured_auto_attendants_in_Teams": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "5a055ac8-31f2-447c-89eb-9ca61452fe73"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "Result",
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "Retrieve_configured_auto_attendants_in_Teams": {
+          "runAfter": {
+            "Get_secret": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "3406326c-3c55-4b04-ac3d-75d1a76fa2e2"
+          },
+          "type": "Http",
+          "inputs": {
+            "method": "POST",
+            "uri": "https://@{parameters('VAR - FunctionApp (new_VARFunctionApp)')}.azurewebsites.net/api/Export-AutoAttendant",
+            "headers": {
+              "x-functions-key": "@parameters('VAR - FunctionKey (new_VARFunctionKey)')"
+            },
+            "authentication": {
+              "type": "ActiveDirectoryOAuth",
+              "tenant": "@parameters('VAR - Tenant (new_VARTenant)')",
+              "audience": "@parameters('VAR - application id (new_VARapplicationid)')",
+              "clientId": "@parameters('VAR - application id (new_VARapplicationid)')",
+              "secret": "@outputs('Get_secret')?['body/value']"
+            }
+          }
+        },
+        "Validate_HTTP_response": {
+          "actions": {
+            "Parse_JSON": {
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "6f381dc3-4361-40a6-bd21-4783b80b4ad3"
+              },
+              "type": "ParseJson",
+              "inputs": {
+                "content": "@body('Retrieve_configured_auto_attendants_in_Teams')",
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "Name": {
+                        "type": "string"
+                      },
+                      "BHGreetingType": {},
+                      "BHGreetingAudio": {},
+                      "BHGreetingText": {},
+                      "BHAction": {},
+                      "BHTarget": {},
+                      "BHEnableSharedVoicemailSystemPromptSuppression": {},
+                      "AHGreetingType": {},
+                      "AHGreetingAudio": {},
+                      "AHGreetingText": {},
+                      "AHAction": {},
+                      "AHTarget": {},
+                      "AHEnableSharedVoicemailSystemPromptSuppression": {},
+                      "MondayExtraRange": {},
+                      "MondayStartTime1": {},
+                      "MondayEndTime1": {},
+                      "MondayStartTime2": {},
+                      "MondayEndTime2": {},
+                      "TuesdayExtraRange": {},
+                      "TuesdayStartTime1": {},
+                      "TuesdayEndTime1": {},
+                      "TuesdayStartTime2": {},
+                      "TuesdayEndTime2": {},
+                      "WednesdayExtraRange": {},
+                      "WednesdayStartTime1": {},
+                      "WednesdayEndTime1": {},
+                      "WednesdayStartTime2": {},
+                      "WednesdayEndTime2": {},
+                      "ThursdayExtraRange": {},
+                      "ThursdayStartTime1": {},
+                      "ThursdayEndTime1": {},
+                      "ThursdayStartTime2": {},
+                      "ThursdayEndTime2": {},
+                      "FridayExtraRange": {},
+                      "FridayStartTime1": {},
+                      "FridayEndTime1": {},
+                      "FridayStartTime2": {},
+                      "FridayEndTime2": {},
+                      "SaturdayExtraRange": {},
+                      "SaturdayStartTime1": {},
+                      "SaturdayEndTime1": {},
+                      "SaturdayStartTime2": {},
+                      "SaturdayEndTime2": {},
+                      "SundayExtraRange": {},
+                      "SundayStartTime1": {},
+                      "SundayEndTime1": {},
+                      "SundayStartTime2": {},
+                      "SundayEndTime2": {},
+                      "Holidays": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "HolidayName": {},
+                            "HolidayStart": {},
+                            "HolidayEnd": {},
+                            "HolidayGreetingtype": {},
+                            "HolidayGreetingtext": {},
+                            "HolidayGreetingaudio": {},
+                            "HolidayAction": {},
+                            "HolidayCallTarget": {}
+                          },
+                          "required": []
+                        }
+                      }
+                    },
+                    "required": [
+                      "Name"
+                    ]
+                  }
+                }
+              }
+            },
+            "Apply_to_each": {
+              "foreach": "@body('Parse_JSON')",
+              "actions": {
+                "Retrieve_AA_config": {
+                  "runAfter": {},
+                  "metadata": {
+                    "operationMetadataId": "880def21-0461-4060-a272-4f99cae79af7"
+                  },
+                  "type": "OpenApiConnection",
+                  "inputs": {
+                    "host": {
+                      "connectionName": "shared_sharepointonline",
+                      "operationId": "GetItems",
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                    },
+                    "parameters": {
+                      "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                      "table": "@parameters('VAR - SPO List - Auto Attendant Management (new_VARSPOListAutoAttendantManagement)')",
+                      "$filter": "Title eq '@{items('Apply_to_each')['Name']}'",
+                      "$top": 1
+                    },
+                    "authentication": {
+                      "type": "Raw",
+                      "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+                    }
+                  }
+                },
+                "Compose": {
+                  "runAfter": {
+                    "Retrieve_AA_config": [
+                      "Succeeded"
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "508c8430-7b0e-40af-ad34-143ab698ea82"
+                  },
+                  "type": "Compose",
+                  "inputs": "@length(body('Retrieve_AA_Config')?['value'])"
+                },
+                "Check_if_this_is_a_new_AA_or_an_existing_AA": {
+                  "actions": {
+                    "Apply_to_each_2": {
+                      "foreach": "@outputs('Retrieve_AA_config')?['body/value']",
+                      "actions": {
+                        "Update_existing_AA": {
+                          "runAfter": {},
+                          "metadata": {
+                            "operationMetadataId": "6f5220bd-556b-4127-a9e7-8bd6aee79275"
+                          },
+                          "type": "OpenApiConnection",
+                          "inputs": {
+                            "host": {
+                              "connectionName": "shared_sharepointonline",
+                              "operationId": "PatchItem",
+                              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                            },
+                            "parameters": {
+                              "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                              "table": "@parameters('VAR - SPO List - Auto Attendant Management (new_VARSPOListAutoAttendantManagement)')",
+                              "id": "@items('Apply_to_each_2')?['ID']",
+                              "item/Title": "@items('Apply_to_each')['Name']",
+                              "item/Greetingoptions/Value": "@items('Apply_to_each')?['BHGreetingType']",
+                              "item/Greetingaudio_x003a_businesshour": "@items('Apply_to_each')?['BHGreetingAudio']",
+                              "item/Greetingtext_x003a_businesshours": "@items('Apply_to_each')?['BHGreetingText']",
+                              "item/Greetingoptions_x003a_afterbusin/Value": "@items('Apply_to_each')?['AHGreetingType']",
+                              "item/Greetingaudio_x003a_outofbusines": "@items('Apply_to_each')?['AHGreetingAudio']",
+                              "item/Greetingtext_x003a_outofbusiness": "@items('Apply_to_each')?['AHGreetingText']",
+                              "item/Callroutingoptions/Value": "@items('Apply_to_each')?['BHAction']",
+                              "item/Callroutingtarget": "@items('Apply_to_each')?['BHTarget']",
+                              "item/Callroutingvoicemailpromptsuppre": "@items('Apply_to_each')?['BHEnableSharedVoicemailSystemPromptSuppression']",
+                              "item/MondayStartTime1/Value": "@items('Apply_to_each')?['MondayStartTime1']",
+                              "item/MondayEndTime1/Value": "@items('Apply_to_each')?['MondayEndTime1']",
+                              "item/MondayStartTime2/Value": "@items('Apply_to_each')?['MondayStartTime2']",
+                              "item/MondayEndTime2/Value": "@items('Apply_to_each')?['MondayEndTime2']",
+                              "item/MondayExtraTimeRange": "@items('Apply_to_each')?['MondayExtraRange']",
+                              "item/TuesdayStartTime1/Value": "@items('Apply_to_each')?['TuesdayStartTime1']",
+                              "item/TuesdayEndTime1/Value": "@items('Apply_to_each')?['TuesdayEndTime1']",
+                              "item/TuesdayStartTime2/Value": "@items('Apply_to_each')?['TuesdayStartTime2']",
+                              "item/TuesdayEndTime2/Value": "@items('Apply_to_each')?['TuesdayEndTime2']",
+                              "item/TuesdayExtraTimeRange": "@items('Apply_to_each')?['TuesdayExtraRange']",
+                              "item/WednesdayStartTime1/Value": "@items('Apply_to_each')?['WednesdayStartTime1']",
+                              "item/WednesdayEndTime1/Value": "@items('Apply_to_each')?['WednesdayEndTime1']",
+                              "item/WednesdayStartTime2/Value": "@items('Apply_to_each')?['WednesdayStartTime2']",
+                              "item/WednesdayEndTime2/Value": "@items('Apply_to_each')?['WednesdayEndTime2']",
+                              "item/WednesdayExtraTimeRange": "@items('Apply_to_each')?['WednesdayExtraRange']",
+                              "item/ThursdayStartTime1/Value": "@items('Apply_to_each')?['ThursdayStartTime1']",
+                              "item/ThursdayEndTime1/Value": "@items('Apply_to_each')?['ThursdayEndTime1']",
+                              "item/ThursdayStartTime2/Value": "@items('Apply_to_each')?['ThursdayEndTime1']",
+                              "item/ThursdayEndTime2/Value": "@items('Apply_to_each')?['ThursdayEndTime2']",
+                              "item/ThursdayExtraTimeRange": "@items('Apply_to_each')?['ThursdayExtraRange']",
+                              "item/FridayStartTime1/Value": "@items('Apply_to_each')?['FridayStartTime1']",
+                              "item/FridayEndTime1/Value": "@items('Apply_to_each')?['FridayStartTime2']",
+                              "item/FridayStartTime2/Value": "@items('Apply_to_each')?['FridayStartTime2']",
+                              "item/FridayEndTime2/Value": "@items('Apply_to_each')?['FridayEndTime2']",
+                              "item/FridayExtraTimeRange": "@items('Apply_to_each')?['FridayExtraRange']",
+                              "item/SaturdayStartTime1/Value": "@items('Apply_to_each')?['SaturdayStartTime1']",
+                              "item/SaturdayEndTime1/Value": "@items('Apply_to_each')?['SaturdayEndTime1']",
+                              "item/SaturdayStartTime2/Value": "@items('Apply_to_each')?['SaturdayStartTime2']",
+                              "item/SaturdayEndTime2/Value": "@items('Apply_to_each')?['SaturdayEndTime2']",
+                              "item/SaturdayExtraTimeRange": "@items('Apply_to_each')?['SaturdayExtraRange']",
+                              "item/SundayStartTime1/Value": "@items('Apply_to_each')?['SundayStartTime1']",
+                              "item/SundayEndTime1/Value": "@items('Apply_to_each')?['SundayEndTime1']",
+                              "item/SundayStartTime2/Value": "@items('Apply_to_each')?['SundayStartTime2']",
+                              "item/SundayEndTime2/Value": "@items('Apply_to_each')?['SundayEndTime2']",
+                              "item/SundayExtraTimeRange": "@items('Apply_to_each')?['SundayExtraRange']",
+                              "item/Callroutingoptions_x003a_afterbu/Value": "@items('Apply_to_each')?['AHAction']",
+                              "item/Callroutingtarget_x003a_afterbus": "@items('Apply_to_each')?['AHTarget']",
+                              "item/Callroutingvoicemailpromptsuppre0": "@items('Apply_to_each')?['AHEnableSharedVoicemailSystemPromptSuppression']",
+                              "item/ProvisioningStatus/Value": "provisioned"
+                            },
+                            "authentication": {
+                              "type": "Raw",
+                              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+                            }
+                          }
+                        },
+                        "Existing_AA-_iterate_holidays": {
+                          "foreach": "@items('Apply_to_each')?['Holidays']",
+                          "actions": {
+                            "Compose_2": {
+                              "runAfter": {
+                                "Select_AA_IDs": [
+                                  "Succeeded"
+                                ]
+                              },
+                              "metadata": {
+                                "operationMetadataId": "c893abf1-b69b-4be2-b56e-3e5834a6f779"
+                              },
+                              "type": "Compose",
+                              "inputs": "@join(body('Select_AA_IDs'),';')"
+                            },
+                            "Existing_AA_-_Check_if_this_is_a_new_holiday_or_an_existing_holiday": {
+                              "runAfter": {},
+                              "metadata": {
+                                "operationMetadataId": "7eb82488-fa04-41f7-8683-c59373993698"
+                              },
+                              "type": "OpenApiConnection",
+                              "inputs": {
+                                "host": {
+                                  "connectionName": "shared_sharepointonline",
+                                  "operationId": "GetItems",
+                                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                                },
+                                "parameters": {
+                                  "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                                  "table": "@parameters('VAR - SPO List - Holidays (new_VARSPOListHolidays)')",
+                                  "$filter": "Title eq '@{items('Existing_AA-_iterate_holidays')?['HolidayName']}'",
+                                  "$top": 1
+                                },
+                                "authentication": {
+                                  "type": "Raw",
+                                  "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+                                }
+                              }
+                            },
+                            "Check_if_this_is_a_new_holiday_or_an_existing_holiday": {
+                              "actions": {
+                                "Existing_AA_-_Existing_Holiday": {
+                                  "runAfter": {},
+                                  "metadata": {
+                                    "operationMetadataId": "1542279e-0309-47de-9334-1faa89794d1f"
+                                  },
+                                  "type": "OpenApiConnection",
+                                  "inputs": {
+                                    "host": {
+                                      "connectionName": "shared_sharepointonline",
+                                      "operationId": "PatchItem",
+                                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                                    },
+                                    "parameters": {
+                                      "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                                      "table": "@parameters('VAR - SPO List - Holidays (new_VARSPOListHolidays)')",
+                                      "id": "@outputs('Compose_2')",
+                                      "item/Title": "@items('Existing_AA-_iterate_holidays')?['HolidayName']",
+                                      "item/StartDate": "@items('Existing_AA-_iterate_holidays')?['HolidayStart']",
+                                      "item/EndDate": "@items('Existing_AA-_iterate_holidays')?['HolidayEnd']",
+                                      "item/Provisioningstatus/Value": "provisioned"
+                                    },
+                                    "authentication": {
+                                      "type": "Raw",
+                                      "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+                                    }
+                                  }
+                                },
+                                "Existing_AA_-_Existing_Holiday_-_check_if_already_associated": {
+                                  "runAfter": {
+                                    "Existing_AA_-_Existing_Holiday_-_audit": [
+                                      "Succeeded"
+                                    ]
+                                  },
+                                  "metadata": {
+                                    "operationMetadataId": "963383e2-2530-4259-ad33-665827c0e43f"
+                                  },
+                                  "type": "OpenApiConnection",
+                                  "inputs": {
+                                    "host": {
+                                      "connectionName": "shared_sharepointonline",
+                                      "operationId": "GetItems",
+                                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                                    },
+                                    "parameters": {
+                                      "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                                      "table": "@parameters('VAR - SPO List - Auto Attendant Holidays (new_VARSPOListAutoAttendantHolidays)')",
+                                      "$filter": "Title eq '@{concat(items('Apply_to_each')['Name'],'-', items('Existing_AA-_iterate_holidays')['HolidayName'])}'",
+                                      "$top": 1
+                                    },
+                                    "authentication": {
+                                      "type": "Raw",
+                                      "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+                                    }
+                                  }
+                                },
+                                "Existing_AA_-_Existing_Holiday_-_check_if_already_associated_-_get_AA_id": {
+                                  "runAfter": {
+                                    "Existing_AA_-_Existing_Holiday_-_check_if_already_associated": [
+                                      "Succeeded"
+                                    ]
+                                  },
+                                  "metadata": {
+                                    "operationMetadataId": "0af3aac3-d96a-4e80-9382-a41f447f933c"
+                                  },
+                                  "type": "Select",
+                                  "inputs": {
+                                    "from": "@outputs('Existing_AA_-_Existing_Holiday_-_check_if_already_associated')?['body/value']",
+                                    "select": "@Item()['Id']"
+                                  }
+                                },
+                                "Existing_AA_-_Existing_Holiday_-_id": {
+                                  "runAfter": {
+                                    "Existing_AA_-_Existing_Holiday_-_check_if_already_associated_-_get_AA_id": [
+                                      "Succeeded"
+                                    ]
+                                  },
+                                  "metadata": {
+                                    "operationMetadataId": "e5cf0f79-3ae2-4239-a04f-c7b0524d512c"
+                                  },
+                                  "type": "Compose",
+                                  "inputs": "@join(body('Existing_AA_-_Existing_Holiday_-_check_if_already_associated_-_get_AA_id'),';')"
+                                },
+                                "Existing_AA_-_Existing_Holiday_-_check_if_AA_is_already_associated": {
+                                  "actions": {
+                                    "Existing_AA_-_Existing_Holiday_-_Existing_association_-_redirect": {
+                                      "actions": {
+                                        "Existing_AA_-_Existing_Holiday_-_Existing_association_-_redirect_voicemail": {
+                                          "runAfter": {},
+                                          "metadata": {
+                                            "operationMetadataId": "9733968d-98f4-4d6f-b17a-e46961eb130f"
+                                          },
+                                          "type": "OpenApiConnection",
+                                          "inputs": {
+                                            "host": {
+                                              "connectionName": "shared_sharepointonline",
+                                              "operationId": "PatchItem",
+                                              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                                            },
+                                            "parameters": {
+                                              "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                                              "table": "@parameters('VAR - SPO List - Auto Attendant Holidays (new_VARSPOListAutoAttendantHolidays)')",
+                                              "id": "@outputs('Existing_AA_-_Existing_Holiday_-_id')",
+                                              "item/Title": "@concat(items('Apply_to_each')['Name'],'-', items('Existing_AA-_iterate_holidays')['HolidayName'])",
+                                              "item/Holiday/Id": "@outputs('Compose_2')",
+                                              "item/AutoAttendant/Id": "@outputs('Update_existing_AA')?['body/ID']",
+                                              "item/Greetingoptions/Value": "@items('Existing_AA-_iterate_holidays')?['HolidayGreetingtype']",
+                                              "item/Greetingaudio": "@items('Existing_AA-_iterate_holidays')?['HolidayGreetingaudio']",
+                                              "item/Greetingtext": "@items('Existing_AA-_iterate_holidays')?['HolidayGreetingtext']",
+                                              "item/Holiday_x003a_Callroutingoptions/Value": "@items('Existing_AA-_iterate_holidays')?['HolidayAction']",
+                                              "item/Holiday_x003a_CalloverflowShared": "@items('Existing_AA-_iterate_holidays')?['HolidayCallTarget']",
+                                              "item/Callroutingvoicemailpromptsuppre": true,
+                                              "item/Provisioningstatus/Value": "update",
+                                              "item/Provisioningstatus0/Value": "provisioned"
+                                            },
+                                            "authentication": {
+                                              "type": "Raw",
+                                              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+                                            }
+                                          }
+                                        },
+                                        "Existing_AA_-_Existing_Holiday_-_Existing_association_-_redirect_vm_-_audit": {
+                                          "runAfter": {
+                                            "Existing_AA_-_Existing_Holiday_-_Existing_association_-_redirect_voicemail": [
+                                              "Succeeded"
+                                            ]
+                                          },
+                                          "metadata": {
+                                            "operationMetadataId": "8f9d8979-2393-4725-94bf-303a59c5eaab"
+                                          },
+                                          "type": "OpenApiConnection",
+                                          "inputs": {
+                                            "host": {
+                                              "connectionName": "shared_sharepointonline",
+                                              "operationId": "PostItem",
+                                              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                                            },
+                                            "parameters": {
+                                              "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                                              "table": "@parameters('VAR - SPO List - Voice management audit (new_VARSPOListVoicemanagementaudit)')",
+                                              "item/Title": "Updated holiday association",
+                                              "item/Timestamp": "@utcNow()",
+                                              "item/Result": "Success",
+                                              "item/AffectedObject": "@outputs('Existing_AA_-_Existing_Holiday_-_Existing_association_-_redirect_voicemail')?['body/{Name}']",
+                                              "item/User": "@outputs('Existing_AA_-_Existing_Holiday_-_Existing_association_-_redirect_voicemail')?['body/Editor/DisplayName']",
+                                              "item/Message": "Holiday association settings updated by import flow"
+                                            },
+                                            "authentication": {
+                                              "type": "Raw",
+                                              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+                                            }
+                                          }
+                                        }
+                                      },
+                                      "runAfter": {},
+                                      "else": {
+                                        "actions": {
+                                          "Existing_AA_-_Existing_Holiday_-_Existing_association_-_redirect_other": {
+                                            "runAfter": {},
+                                            "metadata": {
+                                              "operationMetadataId": "f2b6145a-8069-422f-9542-6a44febbcecd"
+                                            },
+                                            "type": "OpenApiConnection",
+                                            "inputs": {
+                                              "host": {
+                                                "connectionName": "shared_sharepointonline",
+                                                "operationId": "PatchItem",
+                                                "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                                              },
+                                              "parameters": {
+                                                "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                                                "table": "@parameters('VAR - SPO List - Auto Attendant Holidays (new_VARSPOListAutoAttendantHolidays)')",
+                                                "id": "@outputs('Existing_AA_-_Existing_Holiday_-_id')",
+                                                "item/Title": "@concat(items('Apply_to_each')['Name'],'-', items('Existing_AA-_iterate_holidays')['HolidayName'])",
+                                                "item/Holiday/Id": "@outputs('Compose_2')",
+                                                "item/AutoAttendant/Id": "@outputs('Update_existing_AA')?['body/ID']",
+                                                "item/Greetingoptions/Value": "@items('Existing_AA-_iterate_holidays')?['HolidayGreetingtype']",
+                                                "item/Greetingaudio": "@items('Existing_AA-_iterate_holidays')?['HolidayGreetingaudio']",
+                                                "item/Greetingtext": "@items('Existing_AA-_iterate_holidays')?['HolidayGreetingtext']",
+                                                "item/Holiday_x003a_Callroutingoptions/Value": "@items('Existing_AA-_iterate_holidays')?['HolidayAction']",
+                                                "item/Holiday_x003a_Callroutingtarget": "@items('Existing_AA-_iterate_holidays')?['HolidayCallTarget']",
+                                                "item/Callroutingvoicemailpromptsuppre": true,
+                                                "item/Provisioningstatus/Value": "update",
+                                                "item/Provisioningstatus0/Value": "provisioned"
+                                              },
+                                              "authentication": {
+                                                "type": "Raw",
+                                                "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+                                              }
+                                            }
+                                          },
+                                          "Existing_AA_-_Existing_Holiday_-_Existing_association_-_redirect_other-_audit": {
+                                            "runAfter": {
+                                              "Existing_AA_-_Existing_Holiday_-_Existing_association_-_redirect_other": [
+                                                "Succeeded"
+                                              ]
+                                            },
+                                            "metadata": {
+                                              "operationMetadataId": "f25ce68d-f7de-49c1-baa2-f496366088d3"
+                                            },
+                                            "type": "OpenApiConnection",
+                                            "inputs": {
+                                              "host": {
+                                                "connectionName": "shared_sharepointonline",
+                                                "operationId": "PostItem",
+                                                "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                                              },
+                                              "parameters": {
+                                                "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                                                "table": "@parameters('VAR - SPO List - Voice management audit (new_VARSPOListVoicemanagementaudit)')",
+                                                "item/Title": "Updated holiday association",
+                                                "item/Timestamp": "@utcNow()",
+                                                "item/Result": "Success",
+                                                "item/AffectedObject": "@outputs('Existing_AA_-_Existing_Holiday_-_Existing_association_-_redirect_other')?['body/{Name}']",
+                                                "item/User": "@outputs('Existing_AA_-_Existing_Holiday_-_Existing_association_-_redirect_other')?['body/Editor/DisplayName']",
+                                                "item/Message": "Holiday association settings updated by import flow"
+                                              },
+                                              "authentication": {
+                                                "type": "Raw",
+                                                "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+                                              }
+                                            }
+                                          }
+                                        }
+                                      },
+                                      "expression": {
+                                        "equals": [
+                                          "@variables('HolidayArray')",
+                                          "Redirect: Voicemail"
+                                        ]
+                                      },
+                                      "metadata": {
+                                        "operationMetadataId": "4bf5f7cd-cbda-4375-8ffa-6f1af3addda9"
+                                      },
+                                      "type": "If"
+                                    }
+                                  },
+                                  "runAfter": {
+                                    "Existing_AA_-_Existing_Holiday_-_id": [
+                                      "Succeeded"
+                                    ]
+                                  },
+                                  "else": {
+                                    "actions": {
+                                      "Existing_AA_-_Existing_Holiday_-_New_association_-_redirect": {
+                                        "actions": {
+                                          "Existing_AA_-_Existing_Holiday_-_New_association_-_redirect_vm": {
+                                            "runAfter": {},
+                                            "metadata": {
+                                              "operationMetadataId": "34b137a8-10c4-470d-8077-806192f4cd6d"
+                                            },
+                                            "type": "OpenApiConnection",
+                                            "inputs": {
+                                              "host": {
+                                                "connectionName": "shared_sharepointonline",
+                                                "operationId": "PostItem",
+                                                "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                                              },
+                                              "parameters": {
+                                                "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                                                "table": "@parameters('VAR - SPO List - Auto Attendant Holidays (new_VARSPOListAutoAttendantHolidays)')",
+                                                "item/Title": "@concat(items('Apply_to_each')['Name'],'-', items('Existing_AA-_iterate_holidays')['HolidayName'])",
+                                                "item/Holiday/Id": "@outputs('Compose_2')",
+                                                "item/AutoAttendant/Id": "@outputs('Update_existing_AA')?['body/ID']",
+                                                "item/Greetingoptions/Value": "@items('Existing_AA-_iterate_holidays')?['HolidayGreetingtype']",
+                                                "item/Greetingaudio": "@items('Existing_AA-_iterate_holidays')?['HolidayGreetingaudio']",
+                                                "item/Greetingtext": "@items('Existing_AA-_iterate_holidays')?['HolidayGreetingtext']",
+                                                "item/Holiday_x003a_Callroutingoptions/Value": "@items('Existing_AA-_iterate_holidays')?['HolidayAction']",
+                                                "item/Holiday_x003a_CalloverflowShared": "@items('Existing_AA-_iterate_holidays')?['HolidayCallTarget']",
+                                                "item/Callroutingvoicemailpromptsuppre": true,
+                                                "item/Provisioningstatus/Value": "new",
+                                                "item/Provisioningstatus0/Value": "provisioned"
+                                              },
+                                              "authentication": {
+                                                "type": "Raw",
+                                                "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+                                              }
+                                            }
+                                          },
+                                          "Existing_AA_-_Existing_Holiday_-_New_association_-_redirect_vm_-_audit": {
+                                            "runAfter": {
+                                              "Existing_AA_-_Existing_Holiday_-_New_association_-_redirect_vm": [
+                                                "Succeeded"
+                                              ]
+                                            },
+                                            "metadata": {
+                                              "operationMetadataId": "9eeacf9c-8c3f-4e56-a7b9-a02402738c4e"
+                                            },
+                                            "type": "OpenApiConnection",
+                                            "inputs": {
+                                              "host": {
+                                                "connectionName": "shared_sharepointonline",
+                                                "operationId": "PostItem",
+                                                "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                                              },
+                                              "parameters": {
+                                                "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                                                "table": "@parameters('VAR - SPO List - Voice management audit (new_VARSPOListVoicemanagementaudit)')",
+                                                "item/Title": "Updated holiday association",
+                                                "item/Timestamp": "@utcNow()",
+                                                "item/Result": "Success",
+                                                "item/AffectedObject": "@outputs('Existing_AA_-_Existing_Holiday_-_New_association_-_redirect_vm')?['body/{Name}']",
+                                                "item/User": "@outputs('Existing_AA_-_Existing_Holiday_-_New_association_-_redirect_vm')?['body/Editor/DisplayName']",
+                                                "item/Message": "New holiday association settings added by import flow"
+                                              },
+                                              "authentication": {
+                                                "type": "Raw",
+                                                "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+                                              }
+                                            }
+                                          }
+                                        },
+                                        "runAfter": {},
+                                        "else": {
+                                          "actions": {
+                                            "Existing_AA_-_Existing_Holiday_-_New_association_-_redirect_other": {
+                                              "runAfter": {},
+                                              "metadata": {
+                                                "operationMetadataId": "c424b4a9-6a30-4def-b03b-88036c75a497"
+                                              },
+                                              "type": "OpenApiConnection",
+                                              "inputs": {
+                                                "host": {
+                                                  "connectionName": "shared_sharepointonline",
+                                                  "operationId": "PostItem",
+                                                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                                                },
+                                                "parameters": {
+                                                  "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                                                  "table": "@parameters('VAR - SPO List - Auto Attendant Holidays (new_VARSPOListAutoAttendantHolidays)')",
+                                                  "item/Title": "@concat(items('Apply_to_each')['Name'],'-', items('Existing_AA-_iterate_holidays')['HolidayName'])",
+                                                  "item/Holiday/Id": "@outputs('Compose_2')",
+                                                  "item/AutoAttendant/Id": "@outputs('Update_existing_AA')?['body/ID']",
+                                                  "item/Greetingoptions/Value": "@items('Existing_AA-_iterate_holidays')?['HolidayGreetingtype']",
+                                                  "item/Greetingaudio": "@items('Existing_AA-_iterate_holidays')?['HolidayGreetingaudio']",
+                                                  "item/Greetingtext": "@items('Existing_AA-_iterate_holidays')?['HolidayGreetingtext']",
+                                                  "item/Holiday_x003a_Callroutingoptions/Value": "@items('Existing_AA-_iterate_holidays')?['HolidayAction']",
+                                                  "item/Holiday_x003a_Callroutingtarget": "@items('Existing_AA-_iterate_holidays')?['HolidayCallTarget']",
+                                                  "item/Callroutingvoicemailpromptsuppre": true,
+                                                  "item/Provisioningstatus/Value": "new",
+                                                  "item/Provisioningstatus0/Value": "provisioned"
+                                                },
+                                                "authentication": {
+                                                  "type": "Raw",
+                                                  "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+                                                }
+                                              }
+                                            },
+                                            "Existing_AA_-_Existing_Holiday_-_New_association_-_redirect_other-_audit": {
+                                              "runAfter": {
+                                                "Existing_AA_-_Existing_Holiday_-_New_association_-_redirect_other": [
+                                                  "Succeeded"
+                                                ]
+                                              },
+                                              "metadata": {
+                                                "operationMetadataId": "ce3f76d2-b62e-4d67-a2c7-291d2f735928"
+                                              },
+                                              "type": "OpenApiConnection",
+                                              "inputs": {
+                                                "host": {
+                                                  "connectionName": "shared_sharepointonline",
+                                                  "operationId": "PostItem",
+                                                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                                                },
+                                                "parameters": {
+                                                  "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                                                  "table": "@parameters('VAR - SPO List - Voice management audit (new_VARSPOListVoicemanagementaudit)')",
+                                                  "item/Title": "Updated holiday association",
+                                                  "item/Timestamp": "@utcNow()",
+                                                  "item/Result": "Success",
+                                                  "item/AffectedObject": "@outputs('Existing_AA_-_Existing_Holiday_-_New_association_-_redirect_other')?['body/{Name}']",
+                                                  "item/User": "@outputs('Existing_AA_-_Existing_Holiday_-_New_association_-_redirect_other')?['body/Editor/DisplayName']",
+                                                  "item/Message": "New holiday association settings added by import flow"
+                                                },
+                                                "authentication": {
+                                                  "type": "Raw",
+                                                  "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        },
+                                        "expression": {
+                                          "equals": [
+                                            "@items('Existing_AA-_iterate_holidays')?['HolidayAction']",
+                                            "Redirect: Voicemail"
+                                          ]
+                                        },
+                                        "metadata": {
+                                          "operationMetadataId": "a767a1ac-8be1-4533-b076-f8ed20d5e60a"
+                                        },
+                                        "type": "If"
+                                      }
+                                    }
+                                  },
+                                  "expression": {
+                                    "greater": [
+                                      "@length(outputs('Existing_AA_-_Existing_Holiday_-_id'))",
+                                      0
+                                    ]
+                                  },
+                                  "metadata": {
+                                    "operationMetadataId": "bf28d7ee-dc4b-4c57-aa7f-d1f6c1eea657"
+                                  },
+                                  "type": "If"
+                                },
+                                "Existing_AA_-_Existing_Holiday_-_audit": {
+                                  "runAfter": {
+                                    "Existing_AA_-_Existing_Holiday": [
+                                      "Succeeded"
+                                    ]
+                                  },
+                                  "metadata": {
+                                    "operationMetadataId": "6d30e7b4-99cc-4ce5-8cb9-d079d14f9e36"
+                                  },
+                                  "type": "OpenApiConnection",
+                                  "inputs": {
+                                    "host": {
+                                      "connectionName": "shared_sharepointonline",
+                                      "operationId": "PostItem",
+                                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                                    },
+                                    "parameters": {
+                                      "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                                      "table": "@parameters('VAR - SPO List - Voice management audit (new_VARSPOListVoicemanagementaudit)')",
+                                      "item/Title": "Updated holiday settings",
+                                      "item/Timestamp": "@utcNow()",
+                                      "item/Result": "Success",
+                                      "item/AffectedObject": "@items('Existing_AA-_iterate_holidays')?['HolidayName']",
+                                      "item/User": "@outputs('Existing_AA_-_Existing_Holiday')?['body/Editor/DisplayName']",
+                                      "item/Message": "Holiday settings updated by import flow"
+                                    },
+                                    "authentication": {
+                                      "type": "Raw",
+                                      "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+                                    }
+                                  }
+                                }
+                              },
+                              "runAfter": {
+                                "Compose_2": [
+                                  "Succeeded"
+                                ]
+                              },
+                              "else": {
+                                "actions": {
+                                  "Existing_AA_-_New_Holiday_-_redirect": {
+                                    "actions": {
+                                      "Existing_AA_-_New_Holiday_-_New_association_-_redirect_voicemail": {
+                                        "runAfter": {},
+                                        "metadata": {
+                                          "operationMetadataId": "93d30d3d-ce25-4ecc-8fa8-474a8ccc8911"
+                                        },
+                                        "type": "OpenApiConnection",
+                                        "inputs": {
+                                          "host": {
+                                            "connectionName": "shared_sharepointonline",
+                                            "operationId": "PostItem",
+                                            "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                                          },
+                                          "parameters": {
+                                            "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                                            "table": "@parameters('VAR - SPO List - Auto Attendant Holidays (new_VARSPOListAutoAttendantHolidays)')",
+                                            "item/Title": "@concat(items('Apply_to_each')['Name'],'-', items('Existing_AA-_iterate_holidays')['HolidayName'])",
+                                            "item/Holiday/Id": "@outputs('Existing_AA_-_New_holiday')?['body/ID']",
+                                            "item/AutoAttendant/Id": "@outputs('Update_existing_AA')?['body/ID']",
+                                            "item/Greetingoptions/Value": "@items('Existing_AA-_iterate_holidays')?['HolidayGreetingtype']",
+                                            "item/Greetingaudio": "@items('Existing_AA-_iterate_holidays')?['HolidayGreetingaudio']",
+                                            "item/Greetingtext": "@items('Existing_AA-_iterate_holidays')?['HolidayGreetingtext']",
+                                            "item/Holiday_x003a_Callroutingoptions/Value": "@items('Existing_AA-_iterate_holidays')?['HolidayAction']",
+                                            "item/Holiday_x003a_CalloverflowShared": "@items('Existing_AA-_iterate_holidays')?['HolidayCallTarget']",
+                                            "item/Callroutingvoicemailpromptsuppre": true,
+                                            "item/Provisioningstatus/Value": "new",
+                                            "item/Provisioningstatus0/Value": "provisioned"
+                                          },
+                                          "authentication": {
+                                            "type": "Raw",
+                                            "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+                                          }
+                                        }
+                                      },
+                                      "Existing_AA_-_New_Holiday_-_New_association_-_redirect_voicemail_-_audit": {
+                                        "runAfter": {
+                                          "Existing_AA_-_New_Holiday_-_New_association_-_redirect_voicemail": [
+                                            "Succeeded"
+                                          ]
+                                        },
+                                        "metadata": {
+                                          "operationMetadataId": "ad04b994-5d5e-4239-90e0-d6796b3a6655"
+                                        },
+                                        "type": "OpenApiConnection",
+                                        "inputs": {
+                                          "host": {
+                                            "connectionName": "shared_sharepointonline",
+                                            "operationId": "PostItem",
+                                            "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                                          },
+                                          "parameters": {
+                                            "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                                            "table": "@parameters('VAR - SPO List - Voice management audit (new_VARSPOListVoicemanagementaudit)')",
+                                            "item/Title": "New holiday association added",
+                                            "item/Timestamp": "@utcNow()",
+                                            "item/Result": "Success",
+                                            "item/AffectedObject": "@outputs('Existing_AA_-_New_Holiday_-_New_association_-_redirect_voicemail')?['body/{Name}']",
+                                            "item/User": "@outputs('Existing_AA_-_New_Holiday_-_New_association_-_redirect_voicemail')?['body/Author/DisplayName']",
+                                            "item/Message": "New holiday association settings added by import flow"
+                                          },
+                                          "authentication": {
+                                            "type": "Raw",
+                                            "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "runAfter": {
+                                      "Existing_AA_-_New_Holiday_-_audit": [
+                                        "Succeeded"
+                                      ]
+                                    },
+                                    "else": {
+                                      "actions": {
+                                        "Existing_AA_-_New_Holiday_-_New_association_-_redirect_other": {
+                                          "runAfter": {},
+                                          "metadata": {
+                                            "operationMetadataId": "7b30de7d-ffb0-4084-b24b-a6e1a387daad"
+                                          },
+                                          "type": "OpenApiConnection",
+                                          "inputs": {
+                                            "host": {
+                                              "connectionName": "shared_sharepointonline",
+                                              "operationId": "PostItem",
+                                              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                                            },
+                                            "parameters": {
+                                              "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                                              "table": "@parameters('VAR - SPO List - Auto Attendant Holidays (new_VARSPOListAutoAttendantHolidays)')",
+                                              "item/Title": "@concat(items('Apply_to_each')['Name'],'-', items('Existing_AA-_iterate_holidays')['HolidayName'])",
+                                              "item/Holiday/Id": "@outputs('Existing_AA_-_New_holiday')?['body/ID']",
+                                              "item/AutoAttendant/Id": "@outputs('Update_existing_AA')?['body/ID']",
+                                              "item/Greetingoptions/Value": "@items('Existing_AA-_iterate_holidays')?['HolidayGreetingtype']",
+                                              "item/Greetingaudio": "@items('Existing_AA-_iterate_holidays')?['HolidayGreetingaudio']",
+                                              "item/Greetingtext": "@items('Existing_AA-_iterate_holidays')?['HolidayGreetingaudio']",
+                                              "item/Holiday_x003a_Callroutingoptions/Value": "@items('Existing_AA-_iterate_holidays')?['HolidayAction']",
+                                              "item/Holiday_x003a_Callroutingtarget": "@items('Existing_AA-_iterate_holidays')?['HolidayCallTarget']",
+                                              "item/Callroutingvoicemailpromptsuppre": true,
+                                              "item/Provisioningstatus/Value": "new",
+                                              "item/Provisioningstatus0/Value": "provisioned"
+                                            },
+                                            "authentication": {
+                                              "type": "Raw",
+                                              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+                                            }
+                                          }
+                                        },
+                                        "Existing_AA_-_New_Holiday_-_New_association_-_redirect_other-_audit": {
+                                          "runAfter": {
+                                            "Existing_AA_-_New_Holiday_-_New_association_-_redirect_other": [
+                                              "Succeeded"
+                                            ]
+                                          },
+                                          "metadata": {
+                                            "operationMetadataId": "8828bb78-3017-4e4e-bc0e-bae82047c03b"
+                                          },
+                                          "type": "OpenApiConnection",
+                                          "inputs": {
+                                            "host": {
+                                              "connectionName": "shared_sharepointonline",
+                                              "operationId": "PostItem",
+                                              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                                            },
+                                            "parameters": {
+                                              "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                                              "table": "@parameters('VAR - SPO List - Voice management audit (new_VARSPOListVoicemanagementaudit)')",
+                                              "item/Title": "New holiday association added",
+                                              "item/Timestamp": "@utcNow()",
+                                              "item/Result": "Success",
+                                              "item/AffectedObject": "@outputs('Existing_AA_-_New_Holiday_-_New_association_-_redirect_other')?['body/{Name}']",
+                                              "item/User": "@outputs('Existing_AA_-_New_Holiday_-_New_association_-_redirect_other')?['body/Author/DisplayName']",
+                                              "item/Message": "New holiday association settings added by import flow"
+                                            },
+                                            "authentication": {
+                                              "type": "Raw",
+                                              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+                                            }
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "expression": {
+                                      "equals": [
+                                        "@variables('HolidayArray')",
+                                        "Redirect: Voicemail"
+                                      ]
+                                    },
+                                    "metadata": {
+                                      "operationMetadataId": "16d8f286-f629-4665-9559-0a4dec203a7a"
+                                    },
+                                    "type": "If"
+                                  },
+                                  "Existing_AA_-_New_holiday": {
+                                    "runAfter": {},
+                                    "metadata": {
+                                      "operationMetadataId": "aa9ac76f-4374-48f1-a81b-f2bb8b9b9166"
+                                    },
+                                    "type": "OpenApiConnection",
+                                    "inputs": {
+                                      "host": {
+                                        "connectionName": "shared_sharepointonline",
+                                        "operationId": "PostItem",
+                                        "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                                      },
+                                      "parameters": {
+                                        "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                                        "table": "@parameters('VAR - SPO List - Holidays (new_VARSPOListHolidays)')",
+                                        "item/Title": "@items('Existing_AA-_iterate_holidays')?['HolidayName']",
+                                        "item/StartDate": "@items('Existing_AA-_iterate_holidays')?['HolidayStart']",
+                                        "item/EndDate": "@items('Existing_AA-_iterate_holidays')?['HolidayEnd']",
+                                        "item/Provisioningstatus/Value": "provisioned"
+                                      },
+                                      "authentication": {
+                                        "type": "Raw",
+                                        "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+                                      }
+                                    }
+                                  },
+                                  "Existing_AA_-_New_Holiday_-_audit": {
+                                    "runAfter": {
+                                      "Existing_AA_-_New_holiday": [
+                                        "Succeeded"
+                                      ]
+                                    },
+                                    "metadata": {
+                                      "operationMetadataId": "630ab2c0-ad43-4d19-9d15-a5c559aaca41"
+                                    },
+                                    "type": "OpenApiConnection",
+                                    "inputs": {
+                                      "host": {
+                                        "connectionName": "shared_sharepointonline",
+                                        "operationId": "PostItem",
+                                        "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                                      },
+                                      "parameters": {
+                                        "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                                        "table": "@parameters('VAR - SPO List - Voice management audit (new_VARSPOListVoicemanagementaudit)')",
+                                        "item/Title": "New holiday settings",
+                                        "item/Timestamp": "@utcNow()",
+                                        "item/Result": "Success",
+                                        "item/AffectedObject": "@items('Existing_AA-_iterate_holidays')?['HolidayName']",
+                                        "item/User": "@outputs('Existing_AA_-_New_holiday')?['body/Editor/DisplayName']",
+                                        "item/Message": "New holiday settings added by import flow"
+                                      },
+                                      "authentication": {
+                                        "type": "Raw",
+                                        "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "expression": {
+                                "greater": [
+                                  "@length(outputs('Compose_2'))",
+                                  0
+                                ]
+                              },
+                              "metadata": {
+                                "operationMetadataId": "8eb4a04d-0eec-429e-8529-84cb16b26e3e"
+                              },
+                              "type": "If"
+                            },
+                            "Select_AA_IDs": {
+                              "runAfter": {
+                                "Append_holiday_name_to_HolidayArray_variable": [
+                                  "Succeeded"
+                                ]
+                              },
+                              "metadata": {
+                                "operationMetadataId": "670ae34b-c1b2-4a97-b1b4-81ec500e4eaf"
+                              },
+                              "type": "Select",
+                              "inputs": {
+                                "from": "@outputs('Existing_AA_-_Check_if_this_is_a_new_holiday_or_an_existing_holiday')?['body/value']",
+                                "select": "@item()?['ID']"
+                              }
+                            },
+                            "Append_holiday_name_to_HolidayArray_variable": {
+                              "runAfter": {
+                                "Existing_AA_-_Check_if_this_is_a_new_holiday_or_an_existing_holiday": [
+                                  "Succeeded"
+                                ]
+                              },
+                              "metadata": {
+                                "operationMetadataId": "6253586a-012d-49c3-94bc-0f897f6588d6"
+                              },
+                              "type": "AppendToArrayVariable",
+                              "inputs": {
+                                "name": "HolidayArray",
+                                "value": "@items('Existing_AA-_iterate_holidays')?['HolidayName']"
+                              }
+                            }
+                          },
+                          "runAfter": {
+                            "Update_existing_AA_-_audit": [
+                              "Succeeded"
+                            ]
+                          },
+                          "metadata": {
+                            "operationMetadataId": "1401f33f-ff5b-4eb8-8b7d-05af98a7cbf6"
+                          },
+                          "type": "Foreach"
+                        },
+                        "Update_existing_AA_-_audit": {
+                          "runAfter": {
+                            "Update_existing_AA": [
+                              "Succeeded"
+                            ]
+                          },
+                          "metadata": {
+                            "operationMetadataId": "5bc74478-a5fe-4bdd-a0c9-9356b9844442"
+                          },
+                          "type": "OpenApiConnection",
+                          "inputs": {
+                            "host": {
+                              "connectionName": "shared_sharepointonline",
+                              "operationId": "PostItem",
+                              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                            },
+                            "parameters": {
+                              "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                              "table": "@parameters('VAR - SPO List - Voice management audit (new_VARSPOListVoicemanagementaudit)')",
+                              "item/Title": "Updated Auto Attendant settings",
+                              "item/Timestamp": "@utcNow()",
+                              "item/Result": "Success",
+                              "item/AffectedObject": "@outputs('Update_existing_AA')?['body/{Name}']",
+                              "item/User": "@outputs('Update_existing_AA')?['body/Editor/DisplayName']",
+                              "item/Message": "Auto Attendant settings updated by import flow"
+                            },
+                            "authentication": {
+                              "type": "Raw",
+                              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+                            }
+                          }
+                        }
+                      },
+                      "runAfter": {},
+                      "metadata": {
+                        "operationMetadataId": "290d462b-9fa5-4486-9b4a-4707547fc986"
+                      },
+                      "type": "Foreach"
+                    },
+                    "Set_status_variable:_updated_AA": {
+                      "runAfter": {
+                        "Apply_to_each_7": [
+                          "Succeeded"
+                        ]
+                      },
+                      "metadata": {
+                        "operationMetadataId": "b6d7b5a8-8106-4d6e-a3df-f2696043aa86"
+                      },
+                      "type": "SetVariable",
+                      "inputs": {
+                        "name": "Action",
+                        "value": "Updated auto attendant settings"
+                      }
+                    },
+                    "Get_items_4": {
+                      "runAfter": {
+                        "Apply_to_each_2": [
+                          "Succeeded"
+                        ]
+                      },
+                      "metadata": {
+                        "operationMetadataId": "9fd2c0bf-4c49-4205-99e4-45b70ba04608"
+                      },
+                      "type": "OpenApiConnection",
+                      "inputs": {
+                        "host": {
+                          "connectionName": "shared_sharepointonline",
+                          "operationId": "GetItems",
+                          "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                        },
+                        "parameters": {
+                          "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                          "table": "@parameters('VAR - SPO List - Auto Attendant Holidays (new_VARSPOListAutoAttendantHolidays)')",
+                          "$filter": "substringof('@{items('Apply_to_each')['Name']}',Title)"
+                        },
+                        "authentication": {
+                          "type": "Raw",
+                          "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+                        }
+                      }
+                    },
+                    "Apply_to_each_7": {
+                      "foreach": "@outputs('Get_items_4')?['body/value']",
+                      "actions": {
+                        "Condition_8": {
+                          "actions": {
+                            "Compose_8": {
+                              "runAfter": {},
+                              "metadata": {
+                                "operationMetadataId": "8afbe315-de80-45df-9a31-9356a08a5721"
+                              },
+                              "type": "Compose",
+                              "inputs": "Do not remove: @{items('Apply_to_each_7')}"
+                            }
+                          },
+                          "runAfter": {},
+                          "else": {
+                            "actions": {
+                              "Compose_9": {
+                                "runAfter": {},
+                                "metadata": {
+                                  "operationMetadataId": "ef02949a-94a1-428c-a149-d3c819fbd9e2"
+                                },
+                                "type": "Compose",
+                                "inputs": "Remove: @{items('Apply_to_each_7')}"
+                              },
+                              "Delete_item": {
+                                "runAfter": {
+                                  "Compose_9": [
+                                    "Succeeded"
+                                  ]
+                                },
+                                "metadata": {
+                                  "operationMetadataId": "01f10e09-de6f-4271-b8e1-21574487ac01"
+                                },
+                                "type": "OpenApiConnection",
+                                "inputs": {
+                                  "host": {
+                                    "connectionName": "shared_sharepointonline",
+                                    "operationId": "DeleteItem",
+                                    "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                                  },
+                                  "parameters": {
+                                    "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                                    "table": "@parameters('VAR - SPO List - Auto Attendant Holidays (new_VARSPOListAutoAttendantHolidays)')",
+                                    "id": "@items('Apply_to_each_7')?['ID']"
+                                  },
+                                  "authentication": {
+                                    "type": "Raw",
+                                    "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "expression": {
+                            "contains": [
+                              "@variables('HolidayArray')",
+                              "@items('Apply_to_each_7')?['Holiday/Value']"
+                            ]
+                          },
+                          "metadata": {
+                            "operationMetadataId": "9d410f24-2510-4be7-b710-65bc47e15f33"
+                          },
+                          "type": "If"
+                        }
+                      },
+                      "runAfter": {
+                        "Get_items_4": [
+                          "Succeeded"
+                        ]
+                      },
+                      "metadata": {
+                        "operationMetadataId": "e45ef5c8-c397-44b3-8221-7d017c2a6935"
+                      },
+                      "type": "Foreach"
+                    }
+                  },
+                  "runAfter": {
+                    "Compose": [
+                      "Succeeded"
+                    ]
+                  },
+                  "else": {
+                    "actions": {
+                      "Create_new_AA": {
+                        "runAfter": {},
+                        "metadata": {
+                          "operationMetadataId": "b15afc06-ed0c-4433-9546-f0a02dc0e079"
+                        },
+                        "type": "OpenApiConnection",
+                        "inputs": {
+                          "host": {
+                            "connectionName": "shared_sharepointonline",
+                            "operationId": "PostItem",
+                            "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                          },
+                          "parameters": {
+                            "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                            "table": "@parameters('VAR - SPO List - Auto Attendant Management (new_VARSPOListAutoAttendantManagement)')",
+                            "item/Title": "@items('Apply_to_each')['Name']",
+                            "item/Greetingoptions/Value": "@items('Apply_to_each')?['BHGreetingType']",
+                            "item/Greetingaudio_x003a_businesshour": "@items('Apply_to_each')?['BHGreetingAudio']",
+                            "item/Greetingtext_x003a_businesshours": "@items('Apply_to_each')?['BHGreetingText']",
+                            "item/Greetingoptions_x003a_afterbusin/Value": "@items('Apply_to_each')?['AHGreetingType']",
+                            "item/Greetingaudio_x003a_outofbusines": "@items('Apply_to_each')?['AHGreetingAudio']",
+                            "item/Greetingtext_x003a_outofbusiness": "@items('Apply_to_each')?['AHGreetingText']",
+                            "item/Callroutingoptions/Value": "@items('Apply_to_each')?['BHAction']",
+                            "item/Callroutingtarget": "@items('Apply_to_each')?['BHTarget']",
+                            "item/Callroutingvoicemailpromptsuppre": "@items('Apply_to_each')?['BHEnableSharedVoicemailSystemPromptSuppression']",
+                            "item/MondayStartTime1/Value": "@items('Apply_to_each')?['MondayStartTime1']",
+                            "item/MondayEndTime1/Value": "@items('Apply_to_each')?['MondayEndTime1']",
+                            "item/MondayStartTime2/Value": "@items('Apply_to_each')?['MondayStartTime2']",
+                            "item/MondayEndTime2/Value": "@items('Apply_to_each')?['MondayEndTime2']",
+                            "item/MondayExtraTimeRange": "@items('Apply_to_each')?['MondayExtraRange']",
+                            "item/TuesdayStartTime1/Value": "@items('Apply_to_each')?['TuesdayStartTime1']",
+                            "item/TuesdayEndTime1/Value": "@items('Apply_to_each')?['TuesdayEndTime1']",
+                            "item/TuesdayStartTime2/Value": "@items('Apply_to_each')?['TuesdayStartTime2']",
+                            "item/TuesdayEndTime2/Value": "@items('Apply_to_each')?['TuesdayEndTime2']",
+                            "item/TuesdayExtraTimeRange": "@items('Apply_to_each')?['TuesdayExtraRange']",
+                            "item/WednesdayStartTime1/Value": "@items('Apply_to_each')?['WednesdayStartTime1']",
+                            "item/WednesdayEndTime1/Value": "@items('Apply_to_each')?['WednesdayEndTime1']",
+                            "item/WednesdayStartTime2/Value": "@items('Apply_to_each')?['WednesdayStartTime2']",
+                            "item/WednesdayEndTime2/Value": "@items('Apply_to_each')?['WednesdayEndTime2']",
+                            "item/WednesdayExtraTimeRange": "@items('Apply_to_each')?['WednesdayExtraRange']",
+                            "item/ThursdayStartTime1/Value": "@items('Apply_to_each')?['ThursdayStartTime1']",
+                            "item/ThursdayEndTime1/Value": "@items('Apply_to_each')?['ThursdayEndTime1']",
+                            "item/ThursdayStartTime2/Value": "@items('Apply_to_each')?['ThursdayStartTime2']",
+                            "item/ThursdayEndTime2/Value": "@items('Apply_to_each')?['ThursdayEndTime2']",
+                            "item/ThursdayExtraTimeRange": "@items('Apply_to_each')?['ThursdayExtraRange']",
+                            "item/FridayStartTime1/Value": "@items('Apply_to_each')?['FridayStartTime1']",
+                            "item/FridayEndTime1/Value": "@items('Apply_to_each')?['FridayEndTime1']",
+                            "item/FridayStartTime2/Value": "@items('Apply_to_each')?['FridayStartTime2']",
+                            "item/FridayEndTime2/Value": "@items('Apply_to_each')?['FridayEndTime2']",
+                            "item/FridayExtraTimeRange": "@items('Apply_to_each')?['FridayExtraRange']",
+                            "item/SaturdayStartTime1/Value": "@items('Apply_to_each')?['SaturdayStartTime1']",
+                            "item/SaturdayEndTime1/Value": "@items('Apply_to_each')?['SaturdayEndTime1']",
+                            "item/SaturdayStartTime2/Value": "@items('Apply_to_each')?['SaturdayStartTime2']",
+                            "item/SaturdayEndTime2/Value": "@items('Apply_to_each')?['SaturdayEndTime2']",
+                            "item/SaturdayExtraTimeRange": "@items('Apply_to_each')?['SaturdayExtraRange']",
+                            "item/SundayStartTime1/Value": "@items('Apply_to_each')?['SundayStartTime1']",
+                            "item/SundayEndTime1/Value": "@items('Apply_to_each')?['SundayEndTime1']",
+                            "item/SundayStartTime2/Value": "@items('Apply_to_each')?['SundayStartTime2']",
+                            "item/SundayEndTime2/Value": "@items('Apply_to_each')?['SundayEndTime2']",
+                            "item/SundayExtraTimeRange": "@items('Apply_to_each')?['SundayExtraRange']",
+                            "item/Callroutingoptions_x003a_afterbu/Value": "@items('Apply_to_each')?['AHAction']",
+                            "item/Callroutingtarget_x003a_afterbus": "@items('Apply_to_each')?['AHTarget']",
+                            "item/Callroutingvoicemailpromptsuppre0": "@items('Apply_to_each')?['AHEnableSharedVoicemailSystemPromptSuppression']",
+                            "item/ProvisioningStatus/Value": "provisioned"
+                          },
+                          "authentication": {
+                            "type": "Raw",
+                            "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+                          }
+                        }
+                      },
+                      "New_AA_-_itterate_through_holidays": {
+                        "foreach": "@items('Apply_to_each')?['Holidays']",
+                        "actions": {
+                          "New_AA_-_Check_if_this_is_a_new_holiday_or_an_existing_holiday": {
+                            "runAfter": {},
+                            "metadata": {
+                              "operationMetadataId": "c4300d21-3ede-4a99-80d0-c041dd54e8d2"
+                            },
+                            "type": "OpenApiConnection",
+                            "inputs": {
+                              "host": {
+                                "connectionName": "shared_sharepointonline",
+                                "operationId": "GetItems",
+                                "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                              },
+                              "parameters": {
+                                "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                                "table": "@parameters('VAR - SPO List - Holidays (new_VARSPOListHolidays)')",
+                                "$filter": "Title eq '@{items('New_AA_-_itterate_through_holidays')?['HolidayName']}'",
+                                "$top": 1
+                              },
+                              "authentication": {
+                                "type": "Raw",
+                                "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+                              }
+                            }
+                          },
+                          "Compose_3": {
+                            "runAfter": {
+                              "Select": [
+                                "Succeeded"
+                              ]
+                            },
+                            "metadata": {
+                              "operationMetadataId": "1b959a22-7764-4e42-a587-093c6bbc62aa"
+                            },
+                            "type": "Compose",
+                            "inputs": "@join(body('Select'),';')"
+                          },
+                          "New_AA_-_new_holiday_or_an_existing_holiday": {
+                            "actions": {
+                              "Condition": {
+                                "actions": {
+                                  "New_AA_-_Existing_Holiday_-_New_holiday_association_-_redirect_voicemail": {
+                                    "runAfter": {},
+                                    "metadata": {
+                                      "operationMetadataId": "f7359062-8849-4787-95ad-73187468ccf3"
+                                    },
+                                    "type": "OpenApiConnection",
+                                    "inputs": {
+                                      "host": {
+                                        "connectionName": "shared_sharepointonline",
+                                        "operationId": "PostItem",
+                                        "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                                      },
+                                      "parameters": {
+                                        "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                                        "table": "@parameters('VAR - SPO List - Auto Attendant Holidays (new_VARSPOListAutoAttendantHolidays)')",
+                                        "item/Title": "@concat(items('Apply_to_each')['Name'], '-', items('New_AA_-_itterate_through_holidays')['HolidayName'])",
+                                        "item/Holiday/Id": "@outputs('Compose_3')",
+                                        "item/AutoAttendant/Id": "@outputs('Create_new_AA')?['body/ID']",
+                                        "item/Greetingoptions/Value": "@items('New_AA_-_itterate_through_holidays')?['HolidayGreetingtype']",
+                                        "item/Greetingaudio": "@items('New_AA_-_itterate_through_holidays')?['HolidayGreetingaudio']",
+                                        "item/Greetingtext": "@items('New_AA_-_itterate_through_holidays')?['HolidayGreetingtext']",
+                                        "item/Holiday_x003a_Callroutingoptions/Value": "@items('New_AA_-_itterate_through_holidays')?['HolidayAction']",
+                                        "item/Holiday_x003a_CalloverflowShared": "@items('New_AA_-_itterate_through_holidays')?['HolidayCallTarget']",
+                                        "item/Callroutingvoicemailpromptsuppre": true,
+                                        "item/Provisioningstatus/Value": "new",
+                                        "item/Provisioningstatus0/Value": "provisioned"
+                                      },
+                                      "authentication": {
+                                        "type": "Raw",
+                                        "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+                                      }
+                                    }
+                                  },
+                                  "New_AA_-_Existing_Holiday_-_New_holiday_association_-_redirect_voicemail_-_audit": {
+                                    "runAfter": {
+                                      "New_AA_-_Existing_Holiday_-_New_holiday_association_-_redirect_voicemail": [
+                                        "Succeeded"
+                                      ]
+                                    },
+                                    "metadata": {
+                                      "operationMetadataId": "fedc6bc3-fb10-45a5-873f-8902cf463208"
+                                    },
+                                    "type": "OpenApiConnection",
+                                    "inputs": {
+                                      "host": {
+                                        "connectionName": "shared_sharepointonline",
+                                        "operationId": "PostItem",
+                                        "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                                      },
+                                      "parameters": {
+                                        "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                                        "table": "@parameters('VAR - SPO List - Voice management audit (new_VARSPOListVoicemanagementaudit)')",
+                                        "item/Title": "Existing holiday association",
+                                        "item/Timestamp": "@utcNow()",
+                                        "item/Result": "Success",
+                                        "item/AffectedObject": "@outputs('New_AA_-_Existing_Holiday_-_New_holiday_association_-_redirect_voicemail')?['body/{Name}']",
+                                        "item/User": "@outputs('New_AA_-_Existing_Holiday_-_New_holiday_association_-_redirect_voicemail')?['body/Author/DisplayName']",
+                                        "item/Message": "New holiday association added by import flow"
+                                      },
+                                      "authentication": {
+                                        "type": "Raw",
+                                        "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+                                      }
+                                    }
+                                  }
+                                },
+                                "runAfter": {},
+                                "else": {
+                                  "actions": {
+                                    "New_AA_-_Existing_Holiday_-_New_holiday_association_-_redirect_other": {
+                                      "runAfter": {},
+                                      "metadata": {
+                                        "operationMetadataId": "b995e983-72ea-4fb2-b914-809739543dc2"
+                                      },
+                                      "type": "OpenApiConnection",
+                                      "inputs": {
+                                        "host": {
+                                          "connectionName": "shared_sharepointonline",
+                                          "operationId": "PostItem",
+                                          "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                                        },
+                                        "parameters": {
+                                          "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                                          "table": "@parameters('VAR - SPO List - Auto Attendant Holidays (new_VARSPOListAutoAttendantHolidays)')",
+                                          "item/Title": "@concat(items('Apply_to_each')['Name'], '-', items('New_AA_-_itterate_through_holidays')['HolidayName'])",
+                                          "item/Holiday/Id": "@outputs('Compose_3')",
+                                          "item/AutoAttendant/Id": "@outputs('Create_new_AA')?['body/ID']",
+                                          "item/Greetingoptions/Value": "@items('New_AA_-_itterate_through_holidays')?['HolidayGreetingtype']",
+                                          "item/Greetingaudio": "@items('New_AA_-_itterate_through_holidays')?['HolidayGreetingaudio']",
+                                          "item/Greetingtext": "@items('New_AA_-_itterate_through_holidays')?['HolidayGreetingtext']",
+                                          "item/Holiday_x003a_Callroutingoptions/Value": "@items('New_AA_-_itterate_through_holidays')?['HolidayAction']",
+                                          "item/Holiday_x003a_Callroutingtarget": "@items('New_AA_-_itterate_through_holidays')?['HolidayCallTarget']",
+                                          "item/Callroutingvoicemailpromptsuppre": true,
+                                          "item/Provisioningstatus/Value": "new",
+                                          "item/Provisioningstatus0/Value": "provisioned"
+                                        },
+                                        "authentication": {
+                                          "type": "Raw",
+                                          "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+                                        }
+                                      }
+                                    },
+                                    "New_AA_-_Existing_Holiday_-_New_holiday_association_-_redirect_other_-_audit": {
+                                      "runAfter": {
+                                        "New_AA_-_Existing_Holiday_-_New_holiday_association_-_redirect_other": [
+                                          "Succeeded"
+                                        ]
+                                      },
+                                      "metadata": {
+                                        "operationMetadataId": "6dde23b8-3953-4189-a123-6a320d9cc8fa"
+                                      },
+                                      "type": "OpenApiConnection",
+                                      "inputs": {
+                                        "host": {
+                                          "connectionName": "shared_sharepointonline",
+                                          "operationId": "PostItem",
+                                          "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                                        },
+                                        "parameters": {
+                                          "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                                          "table": "@parameters('VAR - SPO List - Voice management audit (new_VARSPOListVoicemanagementaudit)')",
+                                          "item/Title": "Existing holiday association",
+                                          "item/Timestamp": "@utcNow()",
+                                          "item/Result": "Success",
+                                          "item/AffectedObject": "@outputs('New_AA_-_Existing_Holiday_-_New_holiday_association_-_redirect_other')?['body/{Name}']",
+                                          "item/User": "@outputs('New_AA_-_Existing_Holiday_-_New_holiday_association_-_redirect_other')?['body/Author/DisplayName']",
+                                          "item/Message": "New holiday association added by import flow"
+                                        },
+                                        "authentication": {
+                                          "type": "Raw",
+                                          "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+                                        }
+                                      }
+                                    }
+                                  }
+                                },
+                                "expression": {
+                                  "equals": [
+                                    "@items('New_AA_-_itterate_through_holidays')?['HolidayAction']",
+                                    "Redirect: Voicemail"
+                                  ]
+                                },
+                                "metadata": {
+                                  "operationMetadataId": "04877ab5-3e7b-47e4-83c0-384bb2ebb0d7"
+                                },
+                                "type": "If"
+                              }
+                            },
+                            "runAfter": {
+                              "Compose_3": [
+                                "Succeeded"
+                              ]
+                            },
+                            "else": {
+                              "actions": {
+                                "New_aa_-_new_holiday": {
+                                  "runAfter": {},
+                                  "metadata": {
+                                    "operationMetadataId": "1562cab0-987e-4e90-bcb1-4e26b7c9e373"
+                                  },
+                                  "type": "OpenApiConnection",
+                                  "inputs": {
+                                    "host": {
+                                      "connectionName": "shared_sharepointonline",
+                                      "operationId": "PostItem",
+                                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                                    },
+                                    "parameters": {
+                                      "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                                      "table": "@parameters('VAR - SPO List - Holidays (new_VARSPOListHolidays)')",
+                                      "item/Title": "@items('New_AA_-_itterate_through_holidays')?['HolidayName']",
+                                      "item/StartDate": "@items('New_AA_-_itterate_through_holidays')?['HolidayStart']",
+                                      "item/EndDate": "@items('New_AA_-_itterate_through_holidays')?['HolidayEnd']",
+                                      "item/Provisioningstatus/Value": "provisioned"
+                                    },
+                                    "authentication": {
+                                      "type": "Raw",
+                                      "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+                                    }
+                                  }
+                                },
+                                "New_AA_-_new_holiday_-_audit": {
+                                  "runAfter": {
+                                    "New_aa_-_new_holiday": [
+                                      "Succeeded"
+                                    ]
+                                  },
+                                  "metadata": {
+                                    "operationMetadataId": "696c73ab-f6b1-468f-a0aa-ce60fd374246"
+                                  },
+                                  "type": "OpenApiConnection",
+                                  "inputs": {
+                                    "host": {
+                                      "connectionName": "shared_sharepointonline",
+                                      "operationId": "PostItem",
+                                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                                    },
+                                    "parameters": {
+                                      "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                                      "table": "@parameters('VAR - SPO List - Voice management audit (new_VARSPOListVoicemanagementaudit)')",
+                                      "item/Title": "New holiday added",
+                                      "item/Timestamp": "@utcNow()",
+                                      "item/Result": "Success",
+                                      "item/AffectedObject": "@outputs('New_aa_-_new_holiday')?['body/Title']",
+                                      "item/User": "@outputs('New_aa_-_new_holiday')?['body/Author/DisplayName']",
+                                      "item/Message": "New holiday added by import flow"
+                                    },
+                                    "authentication": {
+                                      "type": "Raw",
+                                      "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+                                    }
+                                  }
+                                },
+                                "New_AA_-_new_holiday_-_new_holiday_association_-_redirect": {
+                                  "actions": {
+                                    "New_AA_-_New_Holiday_-_New_holiday_association_-_redirect_voicemail": {
+                                      "runAfter": {},
+                                      "metadata": {
+                                        "operationMetadataId": "c5d6c5ad-d239-4cf6-b628-46e946fd03cf"
+                                      },
+                                      "type": "OpenApiConnection",
+                                      "inputs": {
+                                        "host": {
+                                          "connectionName": "shared_sharepointonline",
+                                          "operationId": "PostItem",
+                                          "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                                        },
+                                        "parameters": {
+                                          "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                                          "table": "@parameters('VAR - SPO List - Auto Attendant Holidays (new_VARSPOListAutoAttendantHolidays)')",
+                                          "item/Title": "@concat(items('Apply_to_each')['Name'], '-', items('New_AA_-_itterate_through_holidays')['HolidayName'])",
+                                          "item/Holiday/Id": "@outputs('New_aa_-_new_holiday')?['body/ID']",
+                                          "item/AutoAttendant/Id": "@outputs('Create_new_AA')?['body/ID']",
+                                          "item/Greetingoptions/Value": "@items('New_AA_-_itterate_through_holidays')?['HolidayGreetingtype']",
+                                          "item/Greetingaudio": "@items('New_AA_-_itterate_through_holidays')?['HolidayGreetingaudio']",
+                                          "item/Greetingtext": "@items('New_AA_-_itterate_through_holidays')?['HolidayGreetingtext']",
+                                          "item/Holiday_x003a_Callroutingoptions/Value": "@items('New_AA_-_itterate_through_holidays')?['HolidayAction']",
+                                          "item/Holiday_x003a_CalloverflowShared": "@items('New_AA_-_itterate_through_holidays')?['HolidayCallTarget']",
+                                          "item/Callroutingvoicemailpromptsuppre": true,
+                                          "item/Provisioningstatus/Value": "new",
+                                          "item/Provisioningstatus0/Value": "provisioned"
+                                        },
+                                        "authentication": {
+                                          "type": "Raw",
+                                          "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+                                        }
+                                      }
+                                    },
+                                    "New_AA_-_New_Holiday_-_New_holiday_association_-_redirect_voicemail_-_audit": {
+                                      "runAfter": {
+                                        "New_AA_-_New_Holiday_-_New_holiday_association_-_redirect_voicemail": [
+                                          "Succeeded"
+                                        ]
+                                      },
+                                      "metadata": {
+                                        "operationMetadataId": "5eaf9dda-bff0-4985-b28f-3af495366f71"
+                                      },
+                                      "type": "OpenApiConnection",
+                                      "inputs": {
+                                        "host": {
+                                          "connectionName": "shared_sharepointonline",
+                                          "operationId": "PostItem",
+                                          "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                                        },
+                                        "parameters": {
+                                          "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                                          "table": "@parameters('VAR - SPO List - Voice management audit (new_VARSPOListVoicemanagementaudit)')",
+                                          "item/Title": "New holiday association",
+                                          "item/Timestamp": "@utcNow()",
+                                          "item/Result": "Success",
+                                          "item/AffectedObject": "@outputs('New_AA_-_New_Holiday_-_New_holiday_association_-_redirect_voicemail')?['body/{Name}']",
+                                          "item/User": "@outputs('New_AA_-_New_Holiday_-_New_holiday_association_-_redirect_voicemail')?['body/Author/DisplayName']",
+                                          "item/Message": "New holiday association added by import flow"
+                                        },
+                                        "authentication": {
+                                          "type": "Raw",
+                                          "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "runAfter": {
+                                    "New_AA_-_new_holiday_-_audit": [
+                                      "Succeeded"
+                                    ]
+                                  },
+                                  "else": {
+                                    "actions": {
+                                      "New_AA_-_New_Holiday_-_New_holiday_association_-_redirect_other": {
+                                        "runAfter": {},
+                                        "metadata": {
+                                          "operationMetadataId": "875b8aad-8ca2-433d-a610-2f27b77aee05"
+                                        },
+                                        "type": "OpenApiConnection",
+                                        "inputs": {
+                                          "host": {
+                                            "connectionName": "shared_sharepointonline",
+                                            "operationId": "PostItem",
+                                            "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                                          },
+                                          "parameters": {
+                                            "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                                            "table": "@parameters('VAR - SPO List - Auto Attendant Holidays (new_VARSPOListAutoAttendantHolidays)')",
+                                            "item/Title": "@concat(items('Apply_to_each')['Name'], '-', items('New_AA_-_itterate_through_holidays')['HolidayName'])",
+                                            "item/Holiday/Id": "@outputs('New_aa_-_new_holiday')?['body/ID']",
+                                            "item/AutoAttendant/Id": "@outputs('Create_new_AA')?['body/ID']",
+                                            "item/Greetingoptions/Value": "@items('New_AA_-_itterate_through_holidays')?['HolidayGreetingtype']",
+                                            "item/Greetingaudio": "@items('New_AA_-_itterate_through_holidays')?['HolidayGreetingaudio']",
+                                            "item/Greetingtext": "@items('New_AA_-_itterate_through_holidays')?['HolidayGreetingtext']",
+                                            "item/Holiday_x003a_Callroutingoptions/Value": "@items('New_AA_-_itterate_through_holidays')?['HolidayCallTarget']",
+                                            "item/Holiday_x003a_Callroutingtarget": "@items('New_AA_-_itterate_through_holidays')?['HolidayCallTarget']",
+                                            "item/Callroutingvoicemailpromptsuppre": true,
+                                            "item/Provisioningstatus/Value": "new",
+                                            "item/Provisioningstatus0/Value": "provisioned"
+                                          },
+                                          "authentication": {
+                                            "type": "Raw",
+                                            "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+                                          }
+                                        }
+                                      },
+                                      "New_AA_-_New_Holiday_-_New_holiday_association_-_redirect_other_-_audit": {
+                                        "runAfter": {
+                                          "New_AA_-_New_Holiday_-_New_holiday_association_-_redirect_other": [
+                                            "Succeeded"
+                                          ]
+                                        },
+                                        "metadata": {
+                                          "operationMetadataId": "34b137a8-10c4-470d-8077-806192f4cd6d"
+                                        },
+                                        "type": "OpenApiConnection",
+                                        "inputs": {
+                                          "host": {
+                                            "connectionName": "shared_sharepointonline",
+                                            "operationId": "PostItem",
+                                            "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                                          },
+                                          "parameters": {
+                                            "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                                            "table": "@parameters('VAR - SPO List - Voice management audit (new_VARSPOListVoicemanagementaudit)')",
+                                            "item/Title": "New holiday association",
+                                            "item/Timestamp": "@utcNow()",
+                                            "item/Result": "Success",
+                                            "item/AffectedObject": "@outputs('New_AA_-_New_Holiday_-_New_holiday_association_-_redirect_other')?['body/{Name}']",
+                                            "item/User": "@outputs('New_AA_-_New_Holiday_-_New_holiday_association_-_redirect_other')?['body/Author/DisplayName']",
+                                            "item/Message": "New holiday association added by import flow"
+                                          },
+                                          "authentication": {
+                                            "type": "Raw",
+                                            "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+                                          }
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "expression": {
+                                    "equals": [
+                                      "@items('New_AA_-_itterate_through_holidays')?['HolidayAction']",
+                                      "Redirect: Voicemail"
+                                    ]
+                                  },
+                                  "metadata": {
+                                    "operationMetadataId": "8eb4a04d-0eec-429e-8529-84cb16b26e3e"
+                                  },
+                                  "type": "If"
+                                }
+                              }
+                            },
+                            "expression": {
+                              "greater": [
+                                "@length(outputs('Compose_3'))",
+                                0
+                              ]
+                            },
+                            "metadata": {
+                              "operationMetadataId": "05ab5c65-ee53-42d3-8ba7-64e50df9edcc"
+                            },
+                            "type": "If"
+                          },
+                          "Select": {
+                            "runAfter": {
+                              "New_AA_-_Check_if_this_is_a_new_holiday_or_an_existing_holiday": [
+                                "Succeeded"
+                              ]
+                            },
+                            "metadata": {
+                              "operationMetadataId": "e6e2921b-7dac-49e6-bff3-9ac03812488a"
+                            },
+                            "type": "Select",
+                            "inputs": {
+                              "from": "@outputs('New_AA_-_Check_if_this_is_a_new_holiday_or_an_existing_holiday')?['body/value']",
+                              "select": "@item()?['ID']"
+                            }
+                          }
+                        },
+                        "runAfter": {
+                          "Create_new_AA_-_audit": [
+                            "Succeeded"
+                          ]
+                        },
+                        "metadata": {
+                          "operationMetadataId": "52ed93df-02c4-4943-9782-0fd29a2a45c4"
+                        },
+                        "type": "Foreach"
+                      },
+                      "Create_new_AA_-_audit": {
+                        "runAfter": {
+                          "Create_new_AA": [
+                            "Succeeded"
+                          ]
+                        },
+                        "metadata": {
+                          "operationMetadataId": "f9631d47-561c-4269-96ca-56c81a0b2c77"
+                        },
+                        "type": "OpenApiConnection",
+                        "inputs": {
+                          "host": {
+                            "connectionName": "shared_sharepointonline",
+                            "operationId": "PostItem",
+                            "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                          },
+                          "parameters": {
+                            "dataset": "@parameters('VAR - SPO Site AutoAttendant and CallQueue Management (new_VARSPOSiteAutoAttendantandCallQueueManagement)')",
+                            "table": "@parameters('VAR - SPO List - Voice management audit (new_VARSPOListVoicemanagementaudit)')",
+                            "item/Title": "Created new Auto Attendant",
+                            "item/Timestamp": "@utcNow()",
+                            "item/Result": "Success",
+                            "item/AffectedObject": "@outputs('Create_new_AA')?['body/{Name}']",
+                            "item/User": "@outputs('Create_new_AA')?['body/Author/DisplayName']",
+                            "item/Message": "New Auto Attendant added by import flow"
+                          },
+                          "authentication": {
+                            "type": "Raw",
+                            "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "expression": {
+                    "equals": [
+                      "@outputs('Compose')",
+                      1
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "43029d68-5be1-4cf0-b2ee-fe0d387f718d"
+                  },
+                  "type": "If"
+                }
+              },
+              "runAfter": {
+                "Parse_JSON": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "be78d02f-d30b-49a5-a79b-79c14ec49f55"
+              },
+              "type": "Foreach"
+            }
+          },
+          "runAfter": {
+            "Initialize_HolidayArray_variable": [
+              "Succeeded"
+            ]
+          },
+          "else": {
+            "actions": {
+              "Set_Result_variable:_failed": {
+                "runAfter": {},
+                "metadata": {
+                  "operationMetadataId": "1c13462d-d15f-43ba-82ee-37dcf129d65a"
+                },
+                "type": "SetVariable",
+                "inputs": {
+                  "name": "Result",
+                  "value": "Failed"
+                }
+              }
+            }
+          },
+          "expression": {
+            "equals": [
+              "@outputs('Retrieve_configured_auto_attendants_in_Teams')['statusCode']",
+              200
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "b142702e-3525-4fab-991b-6c7f496e65a0"
+          },
+          "type": "If"
+        },
+        "Initialize_action_variable": {
+          "runAfter": {
+            "Initialize_result_variable": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "7d910445-f565-4e9e-8222-5a766623520e"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "Action",
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "Initialize_HolidayArray_variable": {
+          "runAfter": {
+            "Initialize_action_variable": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "c971b60c-da55-408f-894f-4d48ed253010"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "HolidayArray",
+                "type": "array"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}

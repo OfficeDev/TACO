@@ -10,7 +10,7 @@ on:
 
       branch:
         description: 'Branch to commit to'
-        default: 'Dev'
+        default: 'dev'
         type: string
         required: true 
 

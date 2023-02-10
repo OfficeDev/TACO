@@ -1,0 +1,106 @@
+"'Auto Attendants Screen' As screen":
+    Fill: =RGBA(237, 237, 237, 1)
+    Height: =Max(App.Height, App.DesignHeight)
+    OnVisible: =Set(locCurrentTab, Blank())
+    Width: =Max(App.Width, App.DesignWidth)
+
+    rec_AutoAttendantName_bar_3 As rectangle:
+        Fill: =RGBA(202, 202, 202, 1)
+        Height: =80
+        Width: =Parent.Width - cmp_left_menu_1.Width
+        X: =cmp_left_menu_1.X + cmp_left_menu_1.Width
+        Y: =cmp_header_1.Y + cmp_header.Height
+        ZIndex: =1
+
+    "gal_AutoAttendant As gallery.'BrowseLayout_Vertical_OneTextVariant_ver4.0'":
+        Fill: =RGBA(255, 255, 255, 1)
+        Height: =531
+        Items: =Filter('Auto Attendant management', Title in Filter('User administration', User.DisplayName = locUserFullName).Title)
+        Layout: =Layout.Vertical
+        TemplatePadding: =0
+        TemplateSize: =48
+        Width: =1187
+        X: =165
+        Y: =202
+        ZIndex: =2
+
+        Title1 As label:
+            Height: =46
+            HoverFill: =ColorFade(ColorValue(AAColor),.90)
+            OnSelect: =Select(Parent)
+            PaddingBottom: =15
+            PaddingLeft: =15
+            PaddingRight: =15
+            PaddingTop: =15
+            Size: =13
+            Text: =ThisItem.Title
+            Width: =1172
+            X: =10
+            Y: =2
+            ZIndex: =1
+
+        NextArrow1 As icon.ChevronRight:
+            AccessibleLabel: =Self.Tooltip
+            Color: =ColorValue(AAColor)
+            Height: =40
+            Icon: =Icon.ChevronRight
+            OnSelect: |-
+                =Navigate('Auto Attendant Edit Screen',ScreenTransition.None,{AAName:ThisItem, CurrentTab:"Greeting"})
+            PaddingLeft: =10
+            PaddingRight: =10
+            TabIndex: =0
+            Tooltip: ="View item details"
+            Width: =40
+            X: =Parent.TemplateWidth - Self.Width - 5
+            Y: =(Parent.TemplateHeight / 2) - (Self.Height / 2)
+            ZIndex: =2
+
+        Separator1 As rectangle:
+            Fill: =RGBA(179, 179, 179, 1)
+            Height: =1
+            OnSelect: =Select(Parent)
+            Width: =Parent.TemplateWidth
+            Y: =Parent.TemplateHeight - 1
+            ZIndex: =3
+
+    header_bar_3 As header_bar:
+        ZIndex: =3
+
+    left_menu_bar_3 As left_menu_bar:
+        Default: ="Auto Attendants Screen"
+        Height: =703
+        Y: =65
+        ZIndex: =4
+
+    lbl_AutoAttendant_name_header As label:
+        Color: =RGBA(255, 255, 255, 1)
+        Fill: =ColorValue(AAColor)
+        FontWeight: =FontWeight.Bold
+        Height: =6
+        PaddingBottom: =15
+        PaddingLeft: =15
+        PaddingRight: =15
+        PaddingTop: =15
+        Text: =""
+        Width: =1306
+        X: =60
+        Y: =762
+        ZIndex: =5
+
+    Label2 As label:
+        FontWeight: =Semibold
+        Height: =36
+        Text: ="Auto Attendant Administration"
+        Width: =394
+        X: =164
+        Y: =94
+        ZIndex: =6
+
+    lbl_Title_CallQueueName_1 As label:
+        FontWeight: =FontWeight.Bold
+        Text: ="Auto Attendant Name"
+        Width: =317
+        X: =165
+        Y: =154
+        ZIndex: =7
+
